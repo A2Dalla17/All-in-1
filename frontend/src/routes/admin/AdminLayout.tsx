@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import {
   BarChart3, Bell, Car, CreditCard, FileText, LayoutDashboard, LifeBuoy, LogOut,
-  Menu, Moon, Rocket, Route as RouteIcon, Settings, ShieldCheck, Sun, Tag, Users, Wallet, X,
+  Megaphone, Menu, Moon, Rocket, Route as RouteIcon, Settings, ShieldCheck, Sun, Tag, Users, Wallet, X,
 } from 'lucide-react';
 
 import { Avatar } from '@/components/ui/Avatar';
@@ -23,6 +23,9 @@ const TripsPage = lazy(() => import('./TripsPage').then((m) => ({ default: m.Tri
 const PaymentsPage = lazy(() => import('./PaymentsPage').then((m) => ({ default: m.PaymentsPage })));
 const SettingsPage = lazy(() => import('./SettingsPage').then((m) => ({ default: m.SettingsPage })));
 const ReleasesPage = lazy(() => import('./ReleasesPage').then((m) => ({ default: m.ReleasesPage })));
+const AdvertsManagerPage = lazy(() =>
+  import('./AdvertsManagerPage').then((m) => ({ default: m.AdvertsManagerPage })),
+);
 const DriverDossierPage = lazy(() =>
   import('./DriverDossierPage').then((m) => ({ default: m.DriverDossierPage })),
 );
@@ -61,6 +64,7 @@ const NAV_GROUPS: Array<{ heading: string; items: NavItem[] }> = [
   {
     heading: 'Platform',
     items: [
+      { to: '/admin/adverts', label: 'Advertising', icon: Megaphone },
       { to: '/admin/releases', label: 'Releases', icon: Rocket },
       { to: '/admin/reports', label: 'Reports', icon: FileText },
       { to: '/admin/support', label: 'Support', icon: LifeBuoy },
@@ -109,6 +113,7 @@ export function AdminLayout() {
                 <Route path="drivers/legacy" element={<DriversPage />} />
                 <Route path="trips" element={<TripsPage />} />
                 <Route path="payments" element={<PaymentsPage />} />
+                <Route path="adverts" element={<AdvertsManagerPage />} />
                 <Route path="releases" element={<ReleasesPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="*" element={<Navigate to="/admin" replace />} />

@@ -110,6 +110,9 @@ export const bannersApi = {
     const { data, error } = await supabase
       .from('featured_banners')
       .select('*')
+      /* Only what is aimed at this surface. RLS already hides inactive and
+         out-of-window rows, so placement is the one filter left. */
+      .in('placement', ['landing_banner', 'all'])
       .order('priority', { ascending: false })
       .order('sort_order', { ascending: true })
       .order('starts_at', { ascending: false })
