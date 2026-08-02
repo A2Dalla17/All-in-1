@@ -31,6 +31,9 @@ const DriverRankPage = lazy(() => import('./RankPage').then((m) => ({ default: m
 const DriverShiftsPage = lazy(() =>
   import('./ShiftsPage').then((m) => ({ default: m.DriverShiftsPage })),
 );
+const ApplicationPage = lazy(() =>
+  import('./ApplicationPage').then((m) => ({ default: m.ApplicationPage })),
+);
 const MessagesPage = lazy(() =>
   import('../shared/MessagesPage').then((m) => ({ default: m.MessagesPage })),
 );
@@ -73,6 +76,7 @@ export function DriverLayout() {
               <Route path="trips" element={<DriverTripsPage />} />
               <Route path="wallet" element={<DriverWalletPage />} />
               <Route path="profile" element={<DriverProfilePage />} />
+              <Route path="application" element={<ApplicationPage />} />
               <Route path="trip/:rideId" element={<DriverActiveTripPage />} />
               <Route path="rank" element={<DriverRankPage />} />
               <Route path="shifts" element={<DriverShiftsPage />} />

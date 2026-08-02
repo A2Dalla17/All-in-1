@@ -23,6 +23,9 @@ const TripsPage = lazy(() => import('./TripsPage').then((m) => ({ default: m.Tri
 const PaymentsPage = lazy(() => import('./PaymentsPage').then((m) => ({ default: m.PaymentsPage })));
 const SettingsPage = lazy(() => import('./SettingsPage').then((m) => ({ default: m.SettingsPage })));
 const ReleasesPage = lazy(() => import('./ReleasesPage').then((m) => ({ default: m.ReleasesPage })));
+const DriverDossierPage = lazy(() =>
+  import('./DriverDossierPage').then((m) => ({ default: m.DriverDossierPage })),
+);
 
 interface NavItem {
   to: string;
@@ -102,7 +105,8 @@ export function AdminLayout() {
                 <Route index element={<DashboardPage />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
                 <Route path="users" element={<UsersPage />} />
-                <Route path="drivers" element={<DriversPage />} />
+                <Route path="drivers" element={<DriverDossierPage />} />
+                <Route path="drivers/legacy" element={<DriversPage />} />
                 <Route path="trips" element={<TripsPage />} />
                 <Route path="payments" element={<PaymentsPage />} />
                 <Route path="releases" element={<ReleasesPage />} />

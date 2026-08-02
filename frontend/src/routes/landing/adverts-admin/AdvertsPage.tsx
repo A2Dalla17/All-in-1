@@ -8,12 +8,13 @@ import {
   LogOut,
   Trash2,
   Upload,
+  Video,
   X,
 } from 'lucide-react';
 
 import {
   KIND_LABEL,
-  bannersAdminApi,
+  bannersAdminApi, MAX_VIDEO_BYTES,
   type BannerKind,
   type FeaturedBanner,
 } from '@/api/banners';
@@ -132,6 +133,7 @@ export function AdvertsPage() {
 
 function NewAdvertForm({ onSaved }: { onSaved: () => void }) {
   const fileInput = useRef<HTMLInputElement>(null);
+  const videoInput = useRef<HTMLInputElement>(null);
 
   const [image, setImage] = useState<PreparedImage | null>(null);
   const [kind, setKind] = useState<BannerKind>('featured_business');
@@ -141,6 +143,11 @@ function NewAdvertForm({ onSaved }: { onSaved: () => void }) {
   const [ctaHref, setCtaHref] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  /* A video is held as the raw File. Unlike photos it is not re-encoded in the
+     browser: transcoding video client-side is minutes of work on a phone and
+     usually produces a worse file than the camera already made. The size limit
+     does the job instead. */
+  const [video, setVideo] = useState<{ file: File; previewUrl: string } | null>(null);
 
   /* Object URLs are not garbage collected. Without this, previewing twenty
      images in one session leaks twenty decoded bitmaps. */
@@ -149,6 +156,12 @@ function NewAdvertForm({ onSaved }: { onSaved: () => void }) {
       if (image) URL.revokeObjectURL(image.previewUrl);
     };
   }, [image]);
+
+  useEffect(() => {
+    return () => {
+      if (video) URL.revokeObjectURL(video.previewUrl);
+    };
+  }, [video]);
 
   async function onPick(file: File | undefined) {
     if (!file) return;
@@ -167,11 +180,44 @@ function NewAdvertForm({ onSaved }: { onSaved: () => void }) {
     }
   }
 
+  function onPickVideo(file: File | undefined) {
+    if (!file) return;
+    setError(null);
+
+    if (file.size > MAX_VIDEO_BYTES) {
+      setError(
+        `That video is ${(file.size / 1024 / 1024).toFixed(0)} MB and the limit is 20 MB. ` +
+          'Try a shorter clip, or export it at 720p instead of 4K.',
+      );
+      return;
+    }
+
+    /* A photo and a video are alternatives, not a pair — the slide renders one
+       or the other, so holding both would leave the choice ambiguous. */
+    if (image) {
+      URL.revokeObjectURL(image.previewUrl);
+      setImage(null);
+    }
+    setVideo((previous) => {
+      if (previous) URL.revokeObjectURL(previous.previewUrl);
+      return { file, previewUrl: URL.createObjectURL(file) };
+    });
+  }
+
   const save = useMutation({
     mutationFn: async () => {
-      const imageUrl = image
-        ? await bannersAdminApi.uploadImage(image.blob, image.extension)
-        : null;
+      let mediaUrl: string | null = null;
+      let posterUrl: string | null = null;
+      let mediaType: 'image' | 'video' = 'image';
+
+      if (video) {
+        const uploaded = await bannersAdminApi.uploadVideo(video.file);
+        mediaUrl = uploaded.url;
+        posterUrl = uploaded.posterUrl;
+        mediaType = 'video';
+      } else if (image) {
+        mediaUrl = await bannersAdminApi.uploadImage(image.blob, image.extension);
+      }
 
       return bannersAdminApi.create({
         kind,
@@ -179,7 +225,9 @@ function NewAdvertForm({ onSaved }: { onSaved: () => void }) {
         subtitle: subtitle.trim() || null,
         cta_label: ctaLabel.trim() || null,
         cta_href: ctaHref.trim() || null,
-        image_url: imageUrl,
+        image_url: mediaUrl,
+        media_type: mediaType,
+        poster_url: posterUrl,
         is_active: true,
         /* The quarterly driver leads the rotation; everything else queues
            behind it in the paid band. */
@@ -190,7 +238,9 @@ function NewAdvertForm({ onSaved }: { onSaved: () => void }) {
     },
     onSuccess: () => {
       if (image) URL.revokeObjectURL(image.previewUrl);
+      if (video) URL.revokeObjectURL(video.previewUrl);
       setImage(null);
+      setVideo(null);
       setTitle('');
       setSubtitle('');
       setCtaLabel('');
@@ -217,13 +267,16 @@ function NewAdvertForm({ onSaved }: { onSaved: () => void }) {
     <Card className="h-fit lg:sticky lg:top-8">
       <h2 className="text-h3 text-ink">Add an advert</h2>
       <p className="mt-1.5 text-body-sm text-ink-muted">
-        Choose a photo and give it a name. It goes live as soon as you publish.
+        Choose a photo or a short video and give it a name. It goes live as soon as
+        you publish.
       </p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         {/* Image picker */}
         <div>
-          <span className="mb-1.5 block text-body-sm font-medium text-ink">Photo</span>
+          <span className="mb-1.5 block text-body-sm font-medium text-ink">
+            Photo or video
+          </span>
 
           <input
             ref={fileInput}
@@ -266,6 +319,58 @@ function NewAdvertForm({ onSaved }: { onSaved: () => void }) {
               <span className="text-body-sm font-medium">Choose a photo</span>
               <span className="text-micro text-ink-subtle">JPG, PNG or WebP</span>
             </label>
+          )}
+
+          {/* Video. Offered as an alternative to the photo rather than an
+              extra: a slide shows one or the other, so allowing both would
+              leave it ambiguous which the visitor is meant to see. */}
+          <input
+            ref={videoInput}
+            id="advert-video"
+            type="file"
+            accept="video/mp4,video/webm,video/quicktime"
+            className="sr-only"
+            onChange={(e) => onPickVideo(e.target.files?.[0])}
+          />
+
+          {video ? (
+            <div className="relative mt-3 overflow-hidden rounded-tile border border-line">
+              <video
+                src={video.previewUrl}
+                className="aspect-[21/9] w-full object-cover"
+                muted
+                loop
+                playsInline
+                autoPlay
+              />
+              <button
+                type="button"
+                aria-label="Remove this video"
+                onClick={() => {
+                  URL.revokeObjectURL(video.previewUrl);
+                  setVideo(null);
+                  if (videoInput.current) videoInput.current.value = '';
+                }}
+                className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black/60 text-white backdrop-blur-sm hover:bg-black/75"
+              >
+                <X size={16} />
+              </button>
+              <p className="bg-surface px-3 py-2 text-micro text-ink-subtle">
+                {formatBytes(video.file.size)} · plays muted and on a loop, like every
+                advert video on the web
+              </p>
+            </div>
+          ) : (
+            !image && (
+              <label
+                htmlFor="advert-video"
+                className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-tile border border-dashed border-line-strong bg-surface px-4 py-3 text-body-sm text-ink-muted transition-colors hover:border-brand hover:text-brand-ink"
+              >
+                <Video size={18} aria-hidden />
+                <span className="font-medium">or choose a video</span>
+                <span className="text-micro text-ink-subtle">MP4 or WebM, up to 20 MB</span>
+              </label>
+            )
           )}
         </div>
 

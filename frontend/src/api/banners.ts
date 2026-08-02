@@ -33,7 +33,12 @@ export interface FeaturedBanner {
   title: string;
   subtitle: string | null;
   body: string | null;
+  /** The media URL — a photo or a video, depending on media_type. */
   image_url: string | null;
+  /** Decides <img> vs <video>. Stored, never inferred from the file extension. */
+  media_type: 'image' | 'video';
+  /** Still frame shown while a video loads. Null for photos. */
+  poster_url: string | null;
   cta_label: string | null;
   cta_href: string | null;
   priority: number;
@@ -137,6 +142,62 @@ export const bannersApi = {
  * for the check to live.
  */
 
+/**
+ * Grab a still from a video file, in the browser, for use as its poster.
+ *
+ * Seeks a little way in rather than to zero: the first frame of a phone
+ * recording is very often black or a blur while exposure settles, and a black
+ * poster is worse than none because it looks like a broken embed.
+ *
+ * Everything here is best-effort — a codec the browser cannot decode simply
+ * yields null and the advert plays without a poster.
+ */
+async function capturePoster(file: File): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const video = document.createElement('video');
+
+    const done = (blob: Blob | null) => {
+      URL.revokeObjectURL(url);
+      video.remove();
+      resolve(blob);
+    };
+
+    /* If the browser cannot decode this file, nothing below ever fires.
+       Without a timeout the promise would hang and the upload would appear
+       frozen. */
+    const timer = setTimeout(() => done(null), 8000);
+
+    video.preload = 'metadata';
+    video.muted = true;
+    video.playsInline = true;
+    video.src = url;
+
+    video.onloadeddata = () => {
+      video.currentTime = Math.min(1, (video.duration || 2) / 4);
+    };
+
+    video.onseeked = () => {
+      clearTimeout(timer);
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx || !canvas.width) return done(null);
+
+      ctx.drawImage(video, 0, 0);
+      canvas.toBlob((b) => done(b), 'image/jpeg', 0.8);
+    };
+
+    video.onerror = () => {
+      clearTimeout(timer);
+      done(null);
+    };
+  });
+}
+
+export type MediaType = 'image' | 'video';
+
 export interface BannerInput {
   kind: BannerKind;
   title: string;
@@ -144,6 +205,8 @@ export interface BannerInput {
   cta_label: string | null;
   cta_href: string | null;
   image_url: string | null;
+  media_type: MediaType;
+  poster_url: string | null;
   is_active: boolean;
   priority: number;
   sort_order: number;
@@ -151,6 +214,18 @@ export interface BannerInput {
 }
 
 const BUCKET = 'banners';
+
+/**
+ * Ceiling for an advert video.
+ *
+ * This bucket is public and the landing page is the first thing a visitor
+ * loads, so the file size is multiplied by the audience: it is a bandwidth
+ * bill for AC7 and a data allowance for whoever is standing at a bus stop.
+ * Twenty megabytes comfortably holds the ten to twenty seconds an advert
+ * should be, and the limit is enforced by the bucket as well as here — this
+ * check exists to give a useful message rather than a raw storage error.
+ */
+export const MAX_VIDEO_BYTES = 20 * 1024 * 1024;
 
 export const bannersAdminApi = {
   /** Every banner, live or not, newest first. */
@@ -188,6 +263,46 @@ export const bannersAdminApi = {
 
     const { data } = supabase.storage.from(BUCKET).getPublicUrl(name);
     return data.publicUrl;
+  },
+
+  /**
+   * Upload an advert video, and a still frame to show while it loads.
+   *
+   * Returns both URLs. The poster is captured in the browser from the video
+   * the advertiser just chose, so it costs them nothing and always matches
+   * the clip — a hand-picked poster drifts out of sync the moment the video
+   * is replaced.
+   */
+  async uploadVideo(file: File): Promise<{ url: string; posterUrl: string | null }> {
+    if (file.size > MAX_VIDEO_BYTES) {
+      throw new Error(
+        `That video is ${(file.size / 1024 / 1024).toFixed(0)} MB. The limit is 20 MB — ` +
+          'try a shorter clip, or export it at 720p rather than 4K.',
+      );
+    }
+
+    const ext = file.type === 'video/webm' ? 'webm' : 'mp4';
+    const name = `${crypto.randomUUID()}.${ext}`;
+
+    const { error } = await supabase.storage.from(BUCKET).upload(name, file, {
+      contentType: file.type || 'video/mp4',
+      cacheControl: '31536000',
+      upsert: false,
+    });
+    if (error) throw new Error(friendlyError(error));
+
+    const { data } = supabase.storage.from(BUCKET).getPublicUrl(name);
+
+    let posterUrl: string | null = null;
+    try {
+      const poster = await capturePoster(file);
+      if (poster) posterUrl = await this.uploadImage(poster, 'jpg');
+    } catch {
+      /* A missing poster is cosmetic — the advert still plays. Never fail the
+         upload over it. */
+    }
+
+    return { url: data.publicUrl, posterUrl };
   },
 
   async create(input: BannerInput): Promise<FeaturedBanner> {

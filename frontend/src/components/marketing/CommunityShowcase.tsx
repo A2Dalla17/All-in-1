@@ -80,6 +80,8 @@ interface Slide {
   title: string;
   subtitle: string | null;
   image: string | null;
+  mediaType: 'image' | 'video';
+  poster: string | null;
   ctaLabel: string | null;
   ctaHref: string | null;
 }
@@ -92,6 +94,8 @@ function toSlide(banner: FeaturedBanner): Slide {
     title: banner.title,
     subtitle: banner.subtitle,
     image: banner.image_url,
+    mediaType: banner.media_type ?? 'image',
+    poster: banner.poster_url,
     ctaLabel: banner.cta_label,
     ctaHref: banner.cta_href,
   };
@@ -111,6 +115,8 @@ const PLACEHOLDER: Slide = {
   title: 'Your business could be here',
   subtitle: 'Featured placement on the AC7 homepage',
   image: null,
+  mediaType: 'image',
+  poster: null,
   ctaLabel: 'Advertise with AC7',
   ctaHref: `tel:${env.controlCentre.tel}`,
 };
@@ -192,6 +198,7 @@ function Carousel({ slides }: { slides: Slide[] }) {
           position={index + 1}
           total={slides.length}
           animate={!reduceMotion && interacted}
+          playing={autoplay}
         />
       </div>
 
@@ -282,15 +289,22 @@ function SlideCard({
   position,
   total,
   animate,
+  playing,
 }: {
   slide: Slide;
   position: number;
   total: number;
   animate: boolean;
+  /** False when the carousel is paused or the visitor asked for reduced
+      motion. A video must obey the same control as the rotation — a Pause
+      button that stops the slides but leaves a video looping underneath is
+      not a pause button. */
+  playing: boolean;
 }) {
   const isDriver = slide.kind === 'driver_of_quarter';
   const isPlaceholder = slide.kind === 'placeholder';
   const hasImage = Boolean(slide.image);
+  const isVideo = slide.mediaType === 'video';
 
   return (
     <article
@@ -308,7 +322,9 @@ function SlideCard({
         animate && 'animate-fade-in',
       )}
     >
-      {hasImage ? (
+      {hasImage && isVideo ? (
+        <SlideVideo src={slide.image as string} poster={slide.poster} playing={playing} />
+      ) : hasImage ? (
         <img
           src={slide.image as string}
           /* Decorative: the advertiser's name is the heading directly over it,
@@ -386,5 +402,74 @@ function SlideCard({
         )}
       </div>
     </article>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+
+/**
+ * An advert video inside the showcase.
+ *
+ * ── Why it is muted, and why that is not a compromise ──────────────────────
+ * Every browser blocks autoplay with sound, so an unmuted autoplaying advert
+ * simply does not start — the advertiser gets a still frame and never knows
+ * why. Muted is the only setting under which the video actually plays. It is
+ * also the right one: sound firing unbidden on a landing page is hostile to
+ * someone browsing on a bus.
+ *
+ * ── Why it follows the carousel's play state ───────────────────────────────
+ * WCAG 2.2.2 requires anything that moves for more than five seconds to be
+ * pausable. The carousel already has a Pause button and honours
+ * prefers-reduced-motion; a video that ignored both would reintroduce exactly
+ * the problem that control exists to solve. So `playing` drives play/pause
+ * directly, and under reduced motion the video never starts — the poster
+ * stands in for it.
+ *
+ * ── preload="none" ─────────────────────────────────────────────────────────
+ * Adverts sit below the fold on a phone. Without this the browser begins
+ * fetching every advert video the moment the page loads, on someone's mobile
+ * data, before they have scrolled far enough to see one. The poster is a
+ * single small JPEG and carries the visual until playback is wanted.
+ */
+function SlideVideo({
+  src,
+  poster,
+  playing,
+}: {
+  src: string;
+  poster: string | null;
+  playing: boolean;
+}) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    if (playing) {
+      /* play() rejects if the browser declines — an old autoplay policy, low
+         power mode, a codec it cannot handle. That rejection is not an error
+         worth surfacing: the poster remains, which is a perfectly good advert. */
+      void el.play().catch(() => undefined);
+    } else {
+      el.pause();
+    }
+  }, [playing]);
+
+  return (
+    <video
+      ref={ref}
+      src={src}
+      poster={poster ?? undefined}
+      muted
+      loop
+      playsInline
+      preload="none"
+      /* Decorative in the same way the photo is: the advertiser's name is the
+         heading rendered directly over this. */
+      aria-hidden
+      tabIndex={-1}
+      className="absolute inset-0 h-full w-full object-cover"
+    />
   );
 }
