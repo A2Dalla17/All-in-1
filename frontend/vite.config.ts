@@ -45,7 +45,7 @@ function resolveReleaseId(env: Record<string, string>): string {
  * locally. In production the app is served as static files and talks to the
  * gateway origin configured via `VITE_API_BASE_URL`.
  */
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   // Kong proxy listens on :8000 and fronts every microservice.
@@ -68,6 +68,52 @@ export default defineConfig(({ mode }) => {
   const previewMode = env.VITE_PREVIEW_MODE === 'true';
 
   const releaseId = resolveReleaseId(env);
+
+  /**
+   * Refuse to build a production bundle that cannot reach Supabase.
+   *
+   * -- Why this is fatal rather than a warning -----------------------------
+   * src/lib/supabase.ts falls back to `https://placeholder.supabase.co` when
+   * the variables are absent, so that developers can run the UI without
+   * credentials. That fallback is correct for `npm run dev` and catastrophic
+   * for a deploy: the site builds green, loads, renders every screen, and then
+   * fails on the first request with "Failed to fetch". Nothing in the build
+   * log hints at the cause. That exact deploy has already been shipped once.
+   *
+   * A missing environment variable is a configuration mistake, and the cheapest
+   * possible moment to catch it is here — before the artefact exists — rather
+   * than from a user reporting that sign-in is broken.
+   *
+   * Dev is deliberately exempt: degrading is the right behaviour when there is
+   * no deploy to get wrong.
+   */
+  if (command === 'build' && !previewMode) {
+    const missing = ['VITE_SUPABASE_URL', 'VITE_SUPABASE_ANON_KEY'].filter(
+      (key) => !env[key]?.trim(),
+    );
+
+    if (missing.length) {
+      throw new Error(
+        [
+          '',
+          'BUILD STOPPED - Supabase is not configured.',
+          '',
+          `  Missing: ${missing.join(', ')}`,
+          '',
+          '  Without these the bundle points at placeholder.supabase.co. The site',
+          '  would deploy successfully and then fail on every sign-in with',
+          '  "Failed to fetch", with nothing in the build log to explain it.',
+          '',
+          '  On Vercel:  Project -> Settings -> Environment Variables',
+          '              add both, tick Production + Preview + Development,',
+          '              then redeploy.',
+          '',
+          '  Locally:    put them in frontend/.env.local',
+          '',
+        ].join('\n'),
+      );
+    }
+  }
 
   return {
     plugins: [react()],
