@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#FFFFFF" />
+
+    <!-- Added to the home screen, this opens without Safari's chrome and
+         keeps the AC7 name rather than the URL. `viewport-fit=cover` above
+         is what lets our --safe-top / --safe-bottom vars see the notch. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AC7 Ride" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icon-180.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <meta
+      name="description"
+      content="AC7 Ride — premium rides, every time. Book in seconds, track your driver live, travel in comfort."
+    />
+
+    <title>AC7 Ride</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      // Apply the saved theme before first paint. Without this a dark-mode
+      // user sees a white flash on every load.
+      (function () {
+        try {
+          var pref = localStorage.getItem('ac7.theme') || 'light';
+          var dark =
+            pref === 'dark' ||
+            (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) {
+            document.documentElement.classList.add('dark');
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0B0B0B');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, system-ui,
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #f8f8f8;
+        color: #121212;
+      }
+      html.dark,
+      html.dark body {
+        background-color: #121212;
+        color: #ffffff;
+      }
+
+      #boot {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+      }
+      #boot .mark {
+        font-size: 1.375rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: #8b0000;
+      }
+    </style>
+  </head>
+
+  <body class="h-full">
+    <div id="root" class="h-full"></div>
+
+    <div id="boot"><span class="mark">AC7 RIDE</span></div>
+
+    <noscript>
+      <p style="padding: 2rem; text-align: center">
+        AC7 Ride requires JavaScript. Please enable it and reload.
+      </p>
+    </noscript>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

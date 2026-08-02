@@ -1,0 +1,17 @@
+{
+  "name": "AC7 Ride — London",
+  "short_name": "AC7 Ride",
+  "description": "Premium rides across London. Book in seconds, track your driver live.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F8F8F8",
+  "theme_color": "#8B0000",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-180.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

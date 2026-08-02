@@ -1,0 +1,414 @@
+package websocket
+
+import (
+	"sync"
+
+	"github.com/richxcame/ride-hailing/pkg/logger"
+	"go.uber.org/zap"
+)
+
+// MessageHandler is a function that handles incoming messages
+type MessageHandler func(*Client, *Message)
+
+// Hub maintains the set of active clients and broadcasts messages
+type Hub struct {
+	// Registered clients by user ID
+	clients map[string]*Client
+
+	// Clients grouped by ride ID
+	rides map[string]map[string]*Client
+
+	// Clients grouped by negotiation session ID
+	negotiations map[string]map[string]*Client
+
+	// Register requests from clients
+	Register chan *Client
+
+	// Unregister requests from clients
+	Unregister chan *Client
+
+	// Broadcast messages to specific users
+	Broadcast chan *BroadcastMessage
+
+	// Message handlers by message type
+	handlers map[string]MessageHandler
+
+	// Mutex for thread-safe operations
+	mu sync.RWMutex
+}
+
+// BroadcastMessage represents a message to be broadcast
+type BroadcastMessage struct {
+	Target   string   // "user", "ride", "all"
+	TargetID string   // User ID or Ride ID
+	Message  *Message // Message to send
+}
+
+// NewHub creates a new Hub instance
+func NewHub() *Hub {
+	return &Hub{
+		clients:      make(map[string]*Client),
+		rides:        make(map[string]map[string]*Client),
+		negotiations: make(map[string]map[string]*Client),
+		Register:     make(chan *Client),
+		Unregister:   make(chan *Client),
+		Broadcast:    make(chan *BroadcastMessage, 256),
+		handlers:     make(map[string]MessageHandler),
+	}
+}
+
+// Run starts the hub's main loop
+func (h *Hub) Run() {
+	logger.Info("WebSocket Hub started")
+	for {
+		select {
+		case client := <-h.Register:
+			h.registerClient(client)
+
+		case client := <-h.Unregister:
+			h.unregisterClient(client)
+
+		case broadcast := <-h.Broadcast:
+			h.broadcastMessage(broadcast)
+		}
+	}
+}
+
+// registerClient adds a client to the hub
+func (h *Hub) registerClient(client *Client) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	// Remove existing client with same ID (e.g., reconnection)
+	if existingClient, ok := h.clients[client.ID]; ok {
+		// Safely close the old client's channel
+		existingClient.mu.Lock()
+		existingClient.closed = true
+		existingClient.mu.Unlock()
+		existingClient.closeOnce.Do(func() {
+			close(existingClient.Send)
+		})
+		logger.Info("Replaced existing client connection", zap.String("client_id", client.ID))
+	}
+
+	h.clients[client.ID] = client
+	logger.Info("Client registered", zap.String("client_id", client.ID), zap.String("role", client.Role))
+}
+
+// unregisterClient removes a client from the hub
+func (h *Hub) unregisterClient(client *Client) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	existingClient, ok := h.clients[client.ID]
+	if ok && existingClient == client {
+		// Remove from clients map only if it's the same instance
+		// (a reconnected client may have already replaced this one)
+		delete(h.clients, client.ID)
+
+		// Remove from ride room if in one
+		rideID := client.GetRide()
+		if rideID != "" {
+			if ride, ok := h.rides[rideID]; ok {
+				delete(ride, client.ID)
+				if len(ride) == 0 {
+					delete(h.rides, rideID)
+				}
+			}
+		}
+
+		// Close channel using sync.Once to prevent double-close
+		client.mu.Lock()
+		client.closed = true
+		client.mu.Unlock()
+		client.closeOnce.Do(func() {
+			close(client.Send)
+		})
+		logger.Info("Client unregistered", zap.String("client_id", client.ID))
+	} else if ok && existingClient != client {
+		// Old client trying to unregister after being replaced by a new connection
+		logger.Info("Ignoring unregister for replaced client", zap.String("client_id", client.ID))
+	}
+}
+
+// broadcastMessage sends a message to target clients
+func (h *Hub) broadcastMessage(broadcast *BroadcastMessage) {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	switch broadcast.Target {
+	case "user":
+		// Send to specific user
+		if client, ok := h.clients[broadcast.TargetID]; ok {
+			logger.Info("Delivering message to user", zap.String("user_id", broadcast.TargetID), zap.String("type", broadcast.Message.Type))
+			client.SendMessage(broadcast.Message)
+		} else {
+			logger.Warn("User not found in hub for message delivery", zap.String("user_id", broadcast.TargetID), zap.String("type", broadcast.Message.Type), zap.Int("total_clients", len(h.clients)))
+		}
+
+	case "ride":
+		// Send to all clients in a ride
+		if ride, ok := h.rides[broadcast.TargetID]; ok {
+			for _, client := range ride {
+				client.SendMessage(broadcast.Message)
+			}
+		}
+
+	case "negotiation":
+		// Send to all clients in a negotiation session
+		if negotiation, ok := h.negotiations[broadcast.TargetID]; ok {
+			for _, client := range negotiation {
+				client.SendMessage(broadcast.Message)
+			}
+		}
+
+	case "all":
+		// Send to all connected clients
+		for _, client := range h.clients {
+			client.SendMessage(broadcast.Message)
+		}
+	}
+}
+
+// HandleMessage routes incoming messages to appropriate handlers
+func (h *Hub) HandleMessage(client *Client, msg *Message) {
+	h.mu.RLock()
+	handler, exists := h.handlers[msg.Type]
+	h.mu.RUnlock()
+
+	if exists {
+		handler(client, msg)
+	} else {
+		logger.Warn("No handler for message type", zap.String("type", msg.Type))
+	}
+}
+
+// RegisterHandler registers a message handler for a specific type
+func (h *Hub) RegisterHandler(msgType string, handler MessageHandler) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.handlers[msgType] = handler
+	logger.Info("Registered handler for message type", zap.String("type", msgType))
+}
+
+// AddClientToRide adds a client to a ride room
+func (h *Hub) AddClientToRide(clientID, rideID string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	client, ok := h.clients[clientID]
+	if !ok {
+		return
+	}
+
+	// Create ride room if doesn't exist
+	if _, ok := h.rides[rideID]; !ok {
+		h.rides[rideID] = make(map[string]*Client)
+	}
+
+	// Add client to ride room
+	h.rides[rideID][clientID] = client
+	client.SetRide(rideID)
+
+	logger.Info("Client joined ride", zap.String("client_id", clientID), zap.String("ride_id", rideID))
+}
+
+// RemoveClientFromRide removes a client from a ride room
+func (h *Hub) RemoveClientFromRide(clientID, rideID string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	if ride, ok := h.rides[rideID]; ok {
+		delete(ride, clientID)
+		if len(ride) == 0 {
+			delete(h.rides, rideID)
+		}
+	}
+
+	if client, ok := h.clients[clientID]; ok {
+		client.SetRide("")
+	}
+
+	logger.Info("Client left ride", zap.String("client_id", clientID), zap.String("ride_id", rideID))
+}
+
+// SendToUser sends a message to a specific user
+func (h *Hub) SendToUser(userID string, msg *Message) {
+	h.Broadcast <- &BroadcastMessage{
+		Target:   "user",
+		TargetID: userID,
+		Message:  msg,
+	}
+}
+
+// SendToRide sends a message to all clients in a ride
+func (h *Hub) SendToRide(rideID string, msg *Message) {
+	h.Broadcast <- &BroadcastMessage{
+		Target:   "ride",
+		TargetID: rideID,
+		Message:  msg,
+	}
+}
+
+// SendToAll broadcasts a message to all connected clients
+func (h *Hub) SendToAll(msg *Message) {
+	h.Broadcast <- &BroadcastMessage{
+		Target:  "all",
+		Message: msg,
+	}
+}
+
+// GetClient returns a client by ID
+func (h *Hub) GetClient(clientID string) (*Client, bool) {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	client, ok := h.clients[clientID]
+	return client, ok
+}
+
+// GetClientsInRide returns all clients in a ride
+func (h *Hub) GetClientsInRide(rideID string) []*Client {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	clients := make([]*Client, 0)
+	if ride, ok := h.rides[rideID]; ok {
+		for _, client := range ride {
+			clients = append(clients, client)
+		}
+	}
+	return clients
+}
+
+// GetClientCount returns the number of connected clients
+func (h *Hub) GetClientCount() int {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	return len(h.clients)
+}
+
+// GetRideCount returns the number of active rides
+func (h *Hub) GetRideCount() int {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	return len(h.rides)
+}
+
+// ========================================
+// NEGOTIATION ROOM METHODS
+// ========================================
+
+// AddClientToNegotiation adds a client to a negotiation session room
+func (h *Hub) AddClientToNegotiation(clientID, sessionID string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	client, ok := h.clients[clientID]
+	if !ok {
+		return
+	}
+
+	// Create negotiation room if doesn't exist
+	if _, ok := h.negotiations[sessionID]; !ok {
+		h.negotiations[sessionID] = make(map[string]*Client)
+	}
+
+	// Add client to negotiation room
+	h.negotiations[sessionID][clientID] = client
+
+	logger.Info("Client joined negotiation", zap.String("client_id", clientID), zap.String("session_id", sessionID))
+}
+
+// RemoveClientFromNegotiation removes a client from a negotiation room
+func (h *Hub) RemoveClientFromNegotiation(clientID, sessionID string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	if negotiation, ok := h.negotiations[sessionID]; ok {
+		delete(negotiation, clientID)
+		if len(negotiation) == 0 {
+			delete(h.negotiations, sessionID)
+		}
+	}
+
+	logger.Info("Client left negotiation", zap.String("client_id", clientID), zap.String("session_id", sessionID))
+}
+
+// SendToNegotiation sends a message to all clients in a negotiation session
+func (h *Hub) SendToNegotiation(sessionID string, msg *Message) {
+	h.Broadcast <- &BroadcastMessage{
+		Target:   "negotiation",
+		TargetID: sessionID,
+		Message:  msg,
+	}
+}
+
+// GetClientsInNegotiation returns all clients in a negotiation session
+func (h *Hub) GetClientsInNegotiation(sessionID string) []*Client {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	clients := make([]*Client, 0)
+	if negotiation, ok := h.negotiations[sessionID]; ok {
+		for _, client := range negotiation {
+			clients = append(clients, client)
+		}
+	}
+	return clients
+}
+
+// GetNegotiationCount returns the number of active negotiation sessions
+func (h *Hub) GetNegotiationCount() int {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	return len(h.negotiations)
+}
+
+// CloseNegotiation closes a negotiation room and notifies all participants
+func (h *Hub) CloseNegotiation(sessionID string, reason string) {
+	// Collect clients and remove room under lock
+	h.mu.Lock()
+	negotiation, ok := h.negotiations[sessionID]
+	var clients []*Client
+	if ok {
+		clients = make([]*Client, 0, len(negotiation))
+		for _, client := range negotiation {
+			clients = append(clients, client)
+		}
+		delete(h.negotiations, sessionID)
+		logger.Info("Negotiation closed", zap.String("session_id", sessionID), zap.String("reason", reason))
+	}
+	h.mu.Unlock()
+
+	// Send messages after releasing the lock to avoid deadlock
+	if len(clients) > 0 {
+		closeMsg := &Message{
+			Type: "negotiation.closed",
+			Data: map[string]interface{}{
+				"session_id": sessionID,
+				"reason":     reason,
+			},
+		}
+		for _, client := range clients {
+			client.SendMessage(closeMsg)
+		}
+	}
+}
+
+// SendToMultipleUsers sends a message to multiple users
+func (h *Hub) SendToMultipleUsers(userIDs []string, msg *Message) {
+	// Collect clients under lock
+	h.mu.RLock()
+	clients := make([]*Client, 0, len(userIDs))
+	for _, userID := range userIDs {
+		if client, ok := h.clients[userID]; ok {
+			clients = append(clients, client)
+		}
+	}
+	h.mu.RUnlock()
+
+	// Send messages after releasing the lock to avoid deadlock
+	for _, client := range clients {
+		client.SendMessage(msg)
+	}
+}

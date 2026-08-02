@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="AC7 Ride">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#A50C0C"/>
+      <stop offset="52%" stop-color="#8B0000"/>
+      <stop offset="100%" stop-color="#5E0000"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="114" fill="url(#g)"/>
+  <path d="M-20 400 Q 150 320 260 360 T 560 250" fill="none" stroke="#fff" stroke-opacity="0.14" stroke-width="54" stroke-linecap="round"/>
+  <text x="256" y="300" font-family="-apple-system, Inter, Segoe UI, sans-serif" font-size="150" font-weight="800" letter-spacing="-6" fill="#fff" text-anchor="middle">AC7</text>
+</svg>

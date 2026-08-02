@@ -1,0 +1,29 @@
+{
+  "folders": [
+    { "name": "ACT",        "path": "." },
+    { "name": "frontend",   "path": "frontend" },
+    { "name": "backend",    "path": "backend" },
+    { "name": "database",   "path": "database" },
+    { "name": "docs",       "path": "docs" }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/dist": true
+    },
+    "typescript.tsdk": "frontend/node_modules/typescript/lib",
+    "editor.formatOnSave": false,
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/package-lock.json": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "bradlc.vscode-tailwindcss",
+      "golang.go"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.vercel/
+*.tsbuildinfo
+
+# Environment. Every variant, because .env.*.local does NOT match .env.local
+# and that gap is how a key reaches a public repository.
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.production.local
+
+logs/
+*.log
