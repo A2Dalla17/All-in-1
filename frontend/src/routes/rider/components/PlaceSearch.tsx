@@ -1,8 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { MapPin, Search, X } from 'lucide-react';
 
-import { geoApi } from '@/api';
-import type { LatLng, PlaceSuggestion } from '@/api/types';
+import { searchPlaces, SEARCH_DEBOUNCE_MS, type PlaceSuggestion } from '@/lib/geocode';
+import type { LatLng } from '@/api/types';
 import { Spinner } from '@/components/ui/Spinner';
 import { cn } from '@/lib/utils';
 
@@ -12,8 +12,9 @@ export interface SelectedPlace {
 }
 
 /**
- * Destination search backed by the Go geo service
- * (`/geo/geocode/autocomplete` → `/geo/geocode/place`).
+ * Destination search
+ * Backed by OpenStreetMap's Nominatim (see lib/geocode.ts), not the Go geo
+ * service — that one is deployed nowhere and every search failed silently.
  *
  * Deliberately not using the Google Places JS widget: routing every lookup
  * through the backend keeps the privileged key server-side and gives you one
@@ -69,8 +70,12 @@ export function PlaceSearch({
     setError(null);
 
     const timer = setTimeout(() => {
-      geoApi
-        .autocomplete(trimmed, near ?? undefined)
+      /* Was geoApi.autocomplete on the Go backend, which is deployed nowhere:
+         the request returned the SPA shell and failed on a JSON parse, so the
+         box accepted typing and then did nothing. Now OpenStreetMap's own
+         geocoder — the same data as the map tiles, so a pin and its label
+         agree. */
+      searchPlaces(trimmed)
         .then((results) => {
           if (cancelled) return;
           setSuggestions(results ?? []);
@@ -85,7 +90,7 @@ export function PlaceSearch({
         .finally(() => {
           if (!cancelled) setLoading(false);
         });
-    }, 280);
+    }, SEARCH_DEBOUNCE_MS);
 
     return () => {
       cancelled = true;
@@ -107,10 +112,12 @@ export function PlaceSearch({
     setLoading(true);
 
     try {
-      const detail = await geoApi.placeDetails(suggestion.place_id);
+      /* The search result already carries coordinates, so the old second
+         round trip for "place details" is gone — one fewer request, one fewer
+         thing to fail, and it keeps us inside the rate limit. */
       onSelect({
-        address: detail.formatted_address || suggestion.description,
-        position: { lat: detail.latitude, lng: detail.longitude },
+        address: [suggestion.label, suggestion.address].filter(Boolean).join(', '),
+        position: { lat: suggestion.lat, lng: suggestion.lng },
       });
       setQuery('');
       setSuggestions([]);
@@ -210,7 +217,7 @@ export function PlaceSearch({
           className="absolute inset-x-0 top-full z-20 mt-2 max-h-72 overflow-y-auto rounded-xl border border-line bg-bg py-1 shadow-lifted"
         >
           {suggestions.map((suggestion, index) => (
-            <li key={suggestion.place_id} id={`${listId}-option-${index}`} role="option" aria-selected={index === activeIndex}>
+            <li key={suggestion.id} id={`${listId}-option-${index}`} role="option" aria-selected={index === activeIndex}>
               <button
                 type="button"
                 onClick={() => void choose(suggestion)}
@@ -223,11 +230,11 @@ export function PlaceSearch({
                 <MapPin size={17} className="mt-0.5 shrink-0 text-ink-subtle" aria-hidden />
                 <span className="min-w-0">
                   <span className="block truncate text-body font-medium text-ink">
-                    {suggestion.main_text ?? suggestion.description}
+                    {suggestion.label}
                   </span>
-                  {suggestion.secondary_text && (
+                  {suggestion.address && (
                     <span className="block truncate text-sm text-ink-muted">
-                      {suggestion.secondary_text}
+                      {suggestion.address}
                     </span>
                   )}
                 </span>

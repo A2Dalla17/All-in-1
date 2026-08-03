@@ -31,7 +31,7 @@ import { VehicleSelector } from './components/VehicleSelector';
  * tier → request. Every step hits the real backend:
  *
  *   /geo/geocode/reverse       resolve the GPS fix to an address
- *   /geo/geocode/autocomplete  destination search
+ *   destination search now uses OpenStreetMap directly — see lib/geocode.ts
  *   /geo/drivers/nearby        the cars moving on the map
  *   /ride-types/available      vehicle tiers
  *   /pricing/bulk-estimate     a real price for each tier

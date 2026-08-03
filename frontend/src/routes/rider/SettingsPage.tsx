@@ -19,11 +19,11 @@ import {
   Bell,
   CalendarDays,
   ChevronRight,
-  CreditCard,
   FileText,
   Gift,
   Globe,
   Languages,
+  MessageCircle,
   LifeBuoy,
   Lock,
   LogOut,
@@ -43,7 +43,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { cn } from '@/lib/utils';
 
 export function RiderSettingsPage() {
-  const { logout, email } = useAuth();
+  const { logout, email, user } = useAuth();
   const navigate = useNavigate();
   const [section, setSection] = useState<'root' | 'account'>('root');
 
@@ -57,9 +57,43 @@ export function RiderSettingsPage() {
 
       <div className="space-y-6 px-gutter">
         {email && (
-          <p className="text-body-sm text-ink-muted">
-            Signed in as <span className="font-medium text-ink">{email}</span>
-          </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-body-sm text-ink-muted">
+            <span>
+              Signed in as <span className="font-medium text-ink">{email}</span>
+            </span>
+            {user?.rider_code && (
+              <span className="rounded-pill bg-surface px-2 py-0.5 font-mono text-caption text-brand-ink">
+                {user.rider_code}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Finish setting up.
+            Shown only while onboarded_at is null. A prompt that never goes
+            away is ignored within a day; one that disappears the moment it is
+            satisfied still gets read the second time it appears. */}
+        {user && !user.onboarded_at && (
+          <Link
+            to="/taxi/onboarding"
+            className="flex items-center gap-3.5 rounded-card border border-warning/30 bg-warning-soft p-4"
+          >
+            <span
+              aria-hidden
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-tile bg-warning/15 text-warning-ink"
+            >
+              <UserCog size={20} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-body font-semibold text-warning-ink">
+                Finish setting up your account
+              </span>
+              <span className="mt-0.5 block text-body-sm text-warning-ink/80">
+                Add your mobile number and choose how we message you.
+              </span>
+            </span>
+            <ChevronRight size={18} className="shrink-0 text-warning-ink" aria-hidden />
+          </Link>
         )}
 
         <Group>
@@ -69,8 +103,14 @@ export function RiderSettingsPage() {
             hint="Messages, calendar, language and theme"
             onClick={() => setSection('account')}
           />
-          <Row icon={<CreditCard size={19} />} label="Payment" to="/taxi/app/wallet" />
-          <Row icon={<Wallet size={19} />} label="Wallet" to="/taxi/app/wallet" />
+          {/* Payment and Wallet were two rows going to the same screen, which
+              reads as two features and is really one. Merged. */}
+          <Row
+            icon={<Wallet size={19} />}
+            label="Payment and wallet"
+            hint="Cards, balance and receipts"
+            to="/taxi/app/wallet"
+          />
           <Row icon={<Gift size={19} />} label="Your promotions" to="/taxi/app/refer" />
         </Group>
 
@@ -113,7 +153,15 @@ export function RiderSettingsPage() {
 
 /* -------------------------------------------------------------------------- */
 
+const CHANNEL_LABEL: Record<'none' | 'whatsapp' | 'sms' | 'both', string> = {
+  none: 'Not set — app only',
+  whatsapp: 'WhatsApp',
+  sms: 'SMS',
+  both: 'WhatsApp and SMS',
+};
+
 function AccountSection({ onBack }: { onBack: () => void }) {
+  const { user } = useAuth();
   /* Theme lives in ThemeProvider, not the cookie-preferences store —
      they are different concerns and were briefly conflated here. */
   const { preference, setPreference } = useTheme();
@@ -124,7 +172,13 @@ function AccountSection({ onBack }: { onBack: () => void }) {
 
       <div className="space-y-6 px-gutter">
         <Group heading="Communication">
-          <Row icon={<Bell size={19} />} label="Messages and notifications" to="/taxi/app/notifications" />
+          <Row icon={<Bell size={19} />} label="Notifications" to="/taxi/app/notifications" />
+          <Row
+            icon={<MessageCircle size={19} />}
+            label="WhatsApp and SMS"
+            hint={CHANNEL_LABEL[user?.messaging_channel ?? 'none']}
+            to="/taxi/onboarding"
+          />
           <Row icon={<CalendarDays size={19} />} label="Calendar" hint="Sync scheduled rides" />
           <Row icon={<Languages size={19} />} label="Language" hint="English (UK)" />
         </Group>

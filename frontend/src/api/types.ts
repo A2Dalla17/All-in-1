@@ -26,6 +26,13 @@ export interface User {
   is_active: boolean;
   is_verified: boolean;
   profile_image?: string | null;
+  /** Short identifier for the control room. ACR prefix; drivers use AC7. */
+  rider_code?: string | null;
+  /** Which channel they agreed to be messaged on, and when. */
+  messaging_channel?: 'none' | 'whatsapp' | 'sms' | 'both';
+  messaging_consent_at?: string | null;
+  /** Null until phone + consent are done, which is what gates the prompt. */
+  onboarded_at?: string | null;
   created_at: string;
   updated_at: string;
 }

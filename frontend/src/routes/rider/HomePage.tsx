@@ -1,330 +1,260 @@
-import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  ArrowRight, Bell, Briefcase, ChevronRight, Clock, Heart,
-  Home as HomeIcon, MapPin, Menu, MessageSquare, Moon, Sun,
-} from 'lucide-react';
-
-import type { FavoritePlace } from '@/api/types';
-import { IconButton } from '@/components/ui/Button';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useFavorites, useMyRides } from '@/hooks/queries';
-import { cn, fullName } from '@/lib/utils';
-import { useAuth } from '@/providers/AuthProvider';
-import { useTheme } from '@/providers/ThemeProvider';
-
 /**
- * Rider home.
+ * ACT — rider home
  *
- * The whole screen exists to get someone to one action: entering a
- * destination. Everything else — greeting, hero, shortcuts — earns its place
- * by making that action feel closer, not by competing with it.
+ * The map, where you are, and where you are going.
  *
- * The route card overlaps the hero by design. That overlap is what pulls the
- * eye down from the brand panel into the input, and it is why the card carries
- * the heaviest shadow on the screen.
+ * ── Why the map is the page rather than a card on it ───────────────────────
+ * The previous version had no map at all — a brand panel, a greeting and an
+ * input that navigated away. Every transport app a rider has used puts the map
+ * behind everything and floats the controls over it, and that is not fashion:
+ * the map answers "is there a car near me" before a single word is read, and
+ * somebody standing on a kerb is looking at their surroundings, not at a form.
+ *
+ * ── Why location is asked for with a button, not on load ───────────────────
+ * A permission prompt that fires the instant a page opens gets refused, and
+ * once refused the browser will not ask again — the rider has to dig through
+ * site settings to undo it. Asking after a deliberate tap, with the reason
+ * visible above it, is the difference between a yes and a permanent no.
  */
+
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Crosshair, Loader2, Lock, MapPin, Navigation, Search, ShoppingBag } from 'lucide-react';
+
+import { MapView } from '@/components/map/MapView';
+import { Card } from '@/components/ui/Card';
+import { env } from '@/config/env';
+import { useGeolocation } from '@/hooks/useGeolocation';
+import {
+  reverseGeocode,
+  searchPlaces,
+  SEARCH_DEBOUNCE_MS,
+  type PlaceSuggestion,
+} from '@/lib/geocode';
+import { useAuth } from '@/providers/AuthProvider';
+
 export function HomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { theme, toggle } = useTheme();
+  const { position, permission, isLocating, error: geoError } = useGeolocation();
 
-  const { data: favorites, isLoading: loadingFavorites } = useFavorites();
-  const { data: rides } = useMyRides({ per_page: 1 });
+  const [askedForLocation, setAskedForLocation] = useState(false);
+  const [pickupLabel, setPickupLabel] = useState<string | null>(null);
 
-  const greeting = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
-  }, []);
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<PlaceSuggestion[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
-  const firstName = user?.first_name || fullName(user) || 'there';
-  const activeRide = rides?.items?.find((r) => !['completed', 'cancelled'].includes(r.status));
+  const centre = position ?? env.defaultMapCenter;
+  const hasLocation = Boolean(position);
+
+  /* Name the pickup once a fix arrives. Cosmetic — the coordinates work
+     regardless — so a failure here is swallowed rather than surfaced. */
+  useEffect(() => {
+    if (!position) return;
+    let cancelled = false;
+    void reverseGeocode(position.lat, position.lng).then((place) => {
+      if (!cancelled && place) setPickupLabel(place.label);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [position]);
+
+  /* Debounced search. The delay is Nominatim's rate limit rather than a UX
+     choice, and the previous request is aborted so a slow early response
+     cannot overwrite a newer one. */
+  useEffect(() => {
+    if (query.trim().length < 3) {
+      setResults([]);
+      setSearchError(null);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      setSearching(true);
+      setSearchError(null);
+
+      searchPlaces(query, controller.signal)
+        .then(setResults)
+        .catch((e: unknown) => {
+          if (e instanceof DOMException && e.name === 'AbortError') return;
+          setSearchError('Address search is unavailable right now.');
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setSearching(false);
+        });
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const choose = useCallback(
+    (place: PlaceSuggestion) => {
+      const params = new URLSearchParams({
+        to: place.label,
+        lat: String(place.lat),
+        lng: String(place.lng),
+      });
+      navigate(`/taxi/app/book?${params.toString()}`);
+    },
+    [navigate],
+  );
 
   return (
-    <div className="min-h-full bg-surface pb-[calc(7rem+var(--safe-bottom))]">
-      {/* ---- Header ----------------------------------------------------- */}
-      <header className="flex items-center justify-between px-5 pb-1 pt-[calc(0.75rem+var(--safe-top))]">
-        <IconButton label="Open menu">
-          <Menu size={20} />
-        </IconButton>
+    <div className="relative min-h-screen">
+      {/* Map fills the screen behind everything. */}
+      <div className="absolute inset-0">
+        <MapView
+          center={centre}
+          zoom={hasLocation ? 15 : 12}
+          {...(position ? { pickup: position } : {})}
+          halo={hasLocation}
+          fitBounds={false}
+          className="h-full w-full"
+        />
+      </div>
 
-        <div className="text-center">
-          <p className="text-body-lg font-extrabold leading-none tracking-[-0.035em] text-ink">
-            AC7 <span className="text-brand-ink">RIDE</span>
-          </p>
-          <p className="mt-1 text-[0.5625rem] font-semibold uppercase tracking-[0.22em] text-ink-subtle">
-            Premium rides
-          </p>
+      <div className="relative flex min-h-screen flex-col justify-between pb-tabbar pt-safe-top">
+        <div className="px-gutter pt-4">
+          {user?.rider_code && (
+            <span className="inline-flex items-center gap-1.5 rounded-pill bg-card/90 px-3 py-1.5 text-caption font-semibold shadow-card backdrop-blur">
+              <span className="text-ink-subtle">Your code</span>
+              <span className="font-mono text-brand-ink">{user.rider_code}</span>
+            </span>
+          )}
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <IconButton
-            label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            onClick={toggle}
-          >
-            {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
-          </IconButton>
-
-          <IconButton label="Messages" onClick={() => navigate('/taxi/app/messages')}>
-            <MessageSquare size={19} />
-          </IconButton>
-
-          <IconButton
-            label="Notifications"
-            className="relative"
-            onClick={() => navigate('/taxi/app/notifications')}
-          >
-            <Bell size={19} />
-            <span
-              aria-hidden
-              className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-brand ring-[2.5px] ring-bg"
-            />
-          </IconButton>
-        </div>
-      </header>
-
-      <div className="stagger">
-        {/* ---- Greeting ------------------------------------------------- */}
-        <section className="px-5 pt-7">
-          <h1 className="text-[1.75rem] font-bold leading-[1.15] tracking-[-0.035em] text-ink">
-            {greeting},
-          </h1>
-          <p className="text-[1.75rem] font-bold leading-[1.15] tracking-[-0.035em] text-brand-ink">
-            {firstName}
-          </p>
-          <p className="mt-2.5 text-caption font-medium tracking-wide text-ink-muted">
-            Safe · Reliable · Premium
-          </p>
-        </section>
-
-        {/* ---- Active ride ---------------------------------------------- */}
-        {activeRide && (
-          <section className="px-5 pt-5">
-            <button
-              type="button"
-              onClick={() => navigate(`/taxi/app/track/${activeRide.id}`)}
-              className="liftable flex w-full items-center gap-3.5 rounded-card border border-brand/20 bg-brand/[0.05] p-4 text-left"
-            >
-              <span aria-hidden className="relative grid h-11 w-11 shrink-0 place-items-center">
-                <span className="absolute inset-0 animate-pulse-ring rounded-full bg-brand/30" />
-                <span className="relative grid h-11 w-11 place-items-center rounded-full brand-gradient text-white shadow-brand">
-                  <MapPin size={18} />
+        <div className="space-y-3 px-gutter">
+          {!hasLocation && (
+            <Card tone="raised">
+              <div className="flex items-start gap-3.5">
+                <span
+                  aria-hidden
+                  className="grid h-11 w-11 shrink-0 place-items-center rounded-tile bg-brand-soft text-brand-ink"
+                >
+                  <Navigation size={20} />
                 </span>
-              </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-body font-semibold text-ink">
+                    {permission === 'denied' ? 'Location is switched off' : 'Where are you now?'}
+                  </p>
+                  <p className="mt-0.5 text-body-sm text-ink-muted">
+                    {permission === 'denied'
+                      ? 'Turn it back on in your browser settings, or type your pickup address instead.'
+                      : 'We use it to show your pickup point and find the nearest car.'}
+                  </p>
+                </div>
+              </div>
 
-              <span className="min-w-0 flex-1">
-                <span className="block text-body font-semibold text-ink">
-                  Ride in progress
-                </span>
-                <span className="mt-0.5 block truncate text-caption text-ink-muted">
-                  {activeRide.dropoff_address}
-                </span>
-              </span>
+              {permission !== 'denied' && (
+                <button
+                  type="button"
+                  disabled={askedForLocation && isLocating}
+                  onClick={() => setAskedForLocation(true)}
+                  className="brand-gradient mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-control text-body font-semibold text-white shadow-brand transition-[filter] hover:brightness-[1.06] disabled:opacity-60"
+                >
+                  {askedForLocation && isLocating ? (
+                    <>
+                      <Loader2 size={17} className="animate-spin" aria-hidden />
+                      Finding you
+                    </>
+                  ) : (
+                    <>
+                      <Crosshair size={17} aria-hidden />
+                      Allow location
+                    </>
+                  )}
+                </button>
+              )}
 
-              <ChevronRight size={18} className="shrink-0 text-brand-ink" aria-hidden />
-            </button>
-          </section>
-        )}
+              {geoError && askedForLocation && (
+                <p className="mt-2 text-body-sm text-danger-ink">{geoError}</p>
+              )}
+            </Card>
+          )}
 
-        {/* ---- Hero ------------------------------------------------------ */}
-        <section className="px-5 pt-6">
-          <div className="edge-light relative overflow-hidden rounded-[1.5rem] brand-gradient px-6 pb-16 pt-7 shadow-brand-lg">
-            {/* Road arc — the one decorative element, kept faint */}
-            <svg
-              aria-hidden
-              viewBox="0 0 420 220"
-              className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.18]"
-              preserveAspectRatio="xMaxYMax slice"
-            >
-              <path
-                d="M-40 200 Q 130 130 230 165 T 460 95"
-                fill="none"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M-40 224 Q 150 152 250 188 T 460 118"
-                fill="none"
-                stroke="white"
-                strokeWidth="1"
-                strokeOpacity="0.55"
-              />
-              <circle cx="330" cy="128" r="46" fill="white" fillOpacity="0.06" />
-            </svg>
-
-            <div className="relative">
-              <p className="text-[1.375rem] font-bold leading-tight tracking-[-0.03em] text-white">
-                Premium rides
+          <Card tone="raised">
+            {hasLocation && (
+              <p className="mb-3 flex items-center gap-2 text-body-sm text-ink-muted">
+                <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-accent" />
+                <span className="truncate">{pickupLabel ?? 'Your current location'}</span>
               </p>
+            )}
 
-              <ul className="mt-3.5 space-y-1.5">
-                {['Reliable drivers', 'Your comfort', 'Our standard'].map((line) => (
-                  <li key={line} className="text-body-sm leading-relaxed text-white/75">
-                    {line}
+            <label className="flex h-12 items-center gap-2.5 rounded-control border border-line bg-bg px-3.5">
+              <Search size={18} className="shrink-0 text-ink-subtle" aria-hidden />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Where to?"
+                aria-label="Where to?"
+                className="h-full w-full bg-transparent text-body text-ink outline-none placeholder:text-ink-subtle"
+              />
+              {searching && (
+                <Loader2 size={16} className="shrink-0 animate-spin text-ink-subtle" aria-hidden />
+              )}
+            </label>
+
+            {searchError && (
+              <p role="alert" className="mt-2 text-body-sm text-danger-ink">
+                {searchError}
+              </p>
+            )}
+
+            {results.length > 0 && (
+              <ul className="mt-2 max-h-64 overflow-y-auto">
+                {results.map((place) => (
+                  <li key={place.id}>
+                    <button
+                      type="button"
+                      onClick={() => choose(place)}
+                      className="flex min-h-14 w-full items-center gap-3 rounded-tile px-2 py-2 text-left hover:bg-surface"
+                    >
+                      <MapPin size={17} className="shrink-0 text-ink-subtle" aria-hidden />
+                      <span className="min-w-0">
+                        <span className="block truncate text-body font-medium text-ink">
+                          {place.label}
+                        </span>
+                        <span className="block truncate text-body-sm text-ink-muted">
+                          {place.address}
+                        </span>
+                      </span>
+                    </button>
                   </li>
                 ))}
               </ul>
+            )}
+          </Card>
 
-              <span aria-hidden className="mt-5 block h-[3px] w-11 rounded-full bg-white/80" />
-            </div>
-          </div>
-        </section>
-
-        {/* ---- Route card — overlaps the hero on purpose ------------------ */}
-        <section className="-mt-11 px-5">
-          <div className="relative z-10 rounded-[1.25rem] bg-card p-3.5 shadow-lifted">
-            <button
-              type="button"
-              onClick={() => navigate('/taxi/app/book')}
-              className="w-full text-left"
-              aria-label="Choose pickup and destination"
-            >
-              <div className="flex items-center gap-3.5 rounded-tile px-2 py-3.5 transition-colors hover:bg-surface">
-                <span aria-hidden className="grid h-5 w-5 shrink-0 place-items-center">
-                  <span className="h-3 w-3 rounded-full border-[3px] border-brand bg-card" />
-                </span>
-                <span className="flex-1 text-body font-medium text-ink-muted">
-                  Where from?
-                </span>
-                <ChevronRight size={17} className="text-ink-subtle" aria-hidden />
-              </div>
-
-              <div className="ml-[1.9rem] h-px bg-line" />
-
-              <div className="flex items-center gap-3.5 rounded-tile px-2 py-3.5 transition-colors hover:bg-surface">
-                <span aria-hidden className="grid h-5 w-5 shrink-0 place-items-center text-brand-ink">
-                  <MapPin size={17} />
-                </span>
-                <span className="flex-1 text-body font-medium text-ink-muted">
-                  Where to?
-                </span>
-                <ChevronRight size={17} className="text-ink-subtle" aria-hidden />
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigate('/taxi/app/book')}
-              className="pressable mt-3 flex h-[3.5rem] w-full items-center justify-center gap-3 rounded-pill brand-gradient text-body font-semibold tracking-[-0.01em] text-white shadow-brand transition-shadow hover:shadow-brand-lg"
-            >
-              Find a ride
-              <span
-                aria-hidden
-                className="grid h-8 w-8 place-items-center rounded-full bg-white/20"
-              >
-                <ArrowRight size={16} />
-              </span>
-            </button>
-          </div>
-        </section>
-
-        {/* ---- Shortcuts -------------------------------------------------- */}
-        <section className="px-5 pt-6">
-          <div className="grid grid-cols-4 gap-2.5">
-            {loadingFavorites
-              ? [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-[5.75rem] rounded-tile" />)
-              : buildShortcuts(favorites).map((action) => (
-                  <button
-                    key={action.label}
-                    type="button"
-                    onClick={() => navigate(action.to)}
-                    className="liftable group flex flex-col items-center gap-2.5 rounded-tile bg-card px-2 py-4 shadow-card"
-                  >
-                    <span
-                      aria-hidden
-                      className="grid h-11 w-11 place-items-center rounded-full bg-brand-soft text-brand-ink transition-transform duration-300 ease-smooth group-hover:scale-110"
-                    >
-                      {action.icon}
-                    </span>
-                    <span className="text-[0.6875rem] font-semibold tracking-wide text-ink">
-                      {action.label}
-                    </span>
-                  </button>
-                ))}
-          </div>
-        </section>
-
-        {/* ---- Promo ------------------------------------------------------ */}
-        <section className="px-5 pt-5">
-          <div className="edge-light relative overflow-hidden rounded-card bg-gradient-to-br from-brand-800 via-brand-700 to-brand-900 p-6">
-            <svg
+          <div className="flex items-center gap-3.5 rounded-card border border-line bg-card/90 p-4 opacity-80 shadow-card backdrop-blur">
+            <span
               aria-hidden
-              viewBox="0 0 320 170"
-              className="pointer-events-none absolute right-0 top-0 h-full w-52 opacity-30"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-tile bg-surface text-ink-subtle"
             >
-              <path
-                d="M45 135 L95 82 L135 112 L185 52 L250 74"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeDasharray="5 5"
-                strokeLinecap="round"
-              />
-              <circle cx="45" cy="135" r="6.5" fill="white" />
-              <circle cx="250" cy="74" r="6.5" fill="white" />
-            </svg>
-
-            <div className="relative max-w-[62%]">
-              <p className="text-body-lg font-bold leading-snug tracking-[-0.02em] text-white">
-                Premium rides
+              <ShoppingBag size={20} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="flex items-center gap-2 text-body font-semibold text-ink">
+                AC7 Deliveries
+                <span className="inline-flex items-center gap-1 rounded-pill bg-surface px-2 py-0.5 text-micro font-medium text-ink-subtle">
+                  <Lock size={10} aria-hidden />
+                  Coming soon
+                </span>
               </p>
-              <p className="text-body-lg font-bold leading-snug tracking-[-0.02em] text-white">
-                Better experience
+              <p className="mt-0.5 text-body-sm text-ink-muted">
+                Food, shops and parcels across London.
               </p>
-              <p className="text-body-lg font-bold leading-snug tracking-[-0.02em] text-white/60">
-                Every time
-              </p>
-
-              <button
-                type="button"
-                onClick={() => navigate('/taxi/app/book')}
-                className="pressable mt-4 inline-flex items-center gap-2 rounded-pill bg-white px-4 py-2.5 text-caption font-semibold text-brand shadow-sm"
-              >
-                Learn more
-                <ArrowRight size={14} aria-hidden />
-              </button>
             </div>
           </div>
-        </section>
+        </div>
       </div>
     </div>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-
-interface Shortcut {
-  label: string;
-  icon: React.ReactNode;
-  to: string;
-}
-
-/**
- * Home and Work point at the saved place when one exists, and at the saved
- * places screen when it does not — so the tile is always useful rather than
- * sometimes dead.
- */
-function buildShortcuts(favorites: FavoritePlace[] | undefined): Shortcut[] {
-  const has = (label: string) =>
-    favorites?.some((p) => p.label.toLowerCase() === label.toLowerCase());
-
-  return [
-    {
-      label: 'Home',
-      icon: <HomeIcon size={19} />,
-      to: has('home') ? '/taxi/app/book?favourite=home' : '/taxi/app/favourites',
-    },
-    {
-      label: 'Work',
-      icon: <Briefcase size={19} />,
-      to: has('work') ? '/taxi/app/book?favourite=work' : '/taxi/app/favourites',
-    },
-    { label: 'Saved', icon: <Heart size={19} />, to: '/taxi/app/favourites' },
-    { label: 'History', icon: <Clock size={19} />, to: '/taxi/app/trips' },
-  ];
-}
-
-export const homePageClassNames = cn;
