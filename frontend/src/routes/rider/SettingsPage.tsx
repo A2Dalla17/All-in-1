@@ -1,0 +1,235 @@
+/**
+ * ACT — rider settings
+ *
+ * ── Why this is a list of destinations and not one long form ───────────────
+ * Settings screens fail by becoming a wall. Grouping into Account, Payment,
+ * Safety and so on means somebody looking for "change my language" scans six
+ * headings instead of forty rows. Each group opens its own screen, so no
+ * single view is ever longer than a thumb's reach.
+ *
+ * ── Why Log out sits alone at the bottom ───────────────────────────────────
+ * It is the one irreversible-feeling action here. Putting it in a group
+ * invites a mis-tap while browsing; alone, below everything, in danger
+ * colouring, it can only be reached deliberately.
+ */
+
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  Bell,
+  CalendarDays,
+  ChevronRight,
+  CreditCard,
+  FileText,
+  Gift,
+  Globe,
+  Languages,
+  LifeBuoy,
+  Lock,
+  LogOut,
+  MapPin,
+  Moon,
+  ShieldCheck,
+  ShoppingBag,
+  Sun,
+  UserCog,
+  Wallet,
+} from 'lucide-react';
+
+import { Card } from '@/components/ui/Card';
+import { ScreenHeader } from '@/components/ui/PageHeader';
+import { useTheme } from '@/providers/ThemeProvider';
+import { useAuth } from '@/providers/AuthProvider';
+import { cn } from '@/lib/utils';
+
+export function RiderSettingsPage() {
+  const { logout, email } = useAuth();
+  const navigate = useNavigate();
+  const [section, setSection] = useState<'root' | 'account'>('root');
+
+  if (section === 'account') {
+    return <AccountSection onBack={() => setSection('root')} />;
+  }
+
+  return (
+    <div className="pb-tabbar">
+      <ScreenHeader title="Settings" />
+
+      <div className="space-y-6 px-gutter">
+        {email && (
+          <p className="text-body-sm text-ink-muted">
+            Signed in as <span className="font-medium text-ink">{email}</span>
+          </p>
+        )}
+
+        <Group>
+          <Row
+            icon={<UserCog size={19} />}
+            label="Account"
+            hint="Messages, calendar, language and theme"
+            onClick={() => setSection('account')}
+          />
+          <Row icon={<CreditCard size={19} />} label="Payment" to="/taxi/app/wallet" />
+          <Row icon={<Wallet size={19} />} label="Wallet" to="/taxi/app/wallet" />
+          <Row icon={<Gift size={19} />} label="Your promotions" to="/taxi/app/refer" />
+        </Group>
+
+        <Group>
+          <Row icon={<MapPin size={19} />} label="Saved places" to="/taxi/app/favourites" />
+          <Row icon={<ShieldCheck size={19} />} label="Safety" to="/taxi/app/safety" />
+          <Row icon={<LifeBuoy size={19} />} label="Support" to="/taxi/app/support" />
+        </Group>
+
+        <Group>
+          <Row
+            icon={<ShoppingBag size={19} />}
+            label="AC7 Deliveries"
+            hint="Food, shops and community delivery"
+            locked
+          />
+        </Group>
+
+        <Group>
+          <Row icon={<Lock size={19} />} label="Privacy" to="/privacy" />
+          <Row icon={<ShieldCheck size={19} />} label="Sign in and security" to="/taxi/app/profile" />
+          <Row icon={<FileText size={19} />} label="Legal" to="/terms" />
+        </Group>
+
+        <button
+          type="button"
+          onClick={() => {
+            void logout();
+            navigate('/taxi', { replace: true });
+          }}
+          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-card border border-danger/30 bg-danger-soft text-body font-semibold text-danger-ink transition-colors hover:bg-danger/10"
+        >
+          <LogOut size={17} aria-hidden />
+          Log out
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+
+function AccountSection({ onBack }: { onBack: () => void }) {
+  /* Theme lives in ThemeProvider, not the cookie-preferences store —
+     they are different concerns and were briefly conflated here. */
+  const { preference, setPreference } = useTheme();
+
+  return (
+    <div className="pb-tabbar">
+      <ScreenHeader title="Account" onBack={onBack} />
+
+      <div className="space-y-6 px-gutter">
+        <Group heading="Communication">
+          <Row icon={<Bell size={19} />} label="Messages and notifications" to="/taxi/app/notifications" />
+          <Row icon={<CalendarDays size={19} />} label="Calendar" hint="Sync scheduled rides" />
+          <Row icon={<Languages size={19} />} label="Language" hint="English (UK)" />
+        </Group>
+
+        <div>
+          <h2 className="mb-2 px-1 text-caption font-semibold uppercase tracking-wide text-ink-subtle">
+            Theme
+          </h2>
+          <Card tone="flat" padded={false} className="overflow-hidden">
+            <div className="grid grid-cols-3 gap-1 p-1.5">
+              {(
+                [
+                  { value: 'light', label: 'Light', icon: <Sun size={17} /> },
+                  { value: 'dark', label: 'Dark', icon: <Moon size={17} /> },
+                  { value: 'system', label: 'Auto', icon: <Globe size={17} /> },
+                ] as const
+              ).map((option) => {
+                const active = preference === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setPreference(option.value)}
+                    className={cn(
+                      'flex min-h-16 flex-col items-center justify-center gap-1.5 rounded-tile transition-colors',
+                      active
+                        ? 'bg-brand-soft text-brand-ink'
+                        : 'text-ink-muted hover:bg-surface hover:text-ink',
+                    )}
+                  >
+                    {option.icon}
+                    <span className="text-body-sm font-semibold">{option.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+          <p className="mt-2 px-1 text-caption text-ink-subtle">
+            Auto follows your phone, switching to dark in the evening.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+
+function Group({ heading, children }: { heading?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      {heading && (
+        <h2 className="mb-2 px-1 text-caption font-semibold uppercase tracking-wide text-ink-subtle">
+          {heading}
+        </h2>
+      )}
+      <Card tone="flat" padded={false} className="divide-y divide-line overflow-hidden">
+        {children}
+      </Card>
+    </div>
+  );
+}
+
+function Row({
+  icon,
+  label,
+  hint,
+  to,
+  onClick,
+  locked,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  hint?: string;
+  to?: string;
+  onClick?: () => void;
+  locked?: boolean;
+}) {
+  const body = (
+    <span className="flex min-h-14 w-full items-center gap-3.5 px-4 py-3 text-left">
+      <span aria-hidden className="shrink-0 text-ink-muted">
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-2 text-body font-medium text-ink">
+          {label}
+          {locked && (
+            <span className="inline-flex items-center gap-1 rounded-pill bg-surface px-2 py-0.5 text-micro text-ink-subtle">
+              <Lock size={10} aria-hidden />
+              Coming soon
+            </span>
+          )}
+        </span>
+        {hint && <span className="mt-0.5 block text-body-sm text-ink-muted">{hint}</span>}
+      </span>
+      {!locked && <ChevronRight size={17} className="shrink-0 text-ink-subtle" aria-hidden />}
+    </span>
+  );
+
+  if (locked) return <div className="opacity-70">{body}</div>;
+  if (to) return <Link to={to} className="block hover:bg-surface">{body}</Link>;
+  return (
+    <button type="button" onClick={onClick} className="block w-full hover:bg-surface">
+      {body}
+    </button>
+  );
+}

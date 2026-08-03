@@ -1,9 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import {
-  Bell, ChevronRight, Gift, Heart, LifeBuoy, LogOut, Shield, ShieldAlert, UserPlus,
-} from 'lucide-react';
+import { Bell, ChevronRight, Gift, Heart, LifeBuoy, LogOut, Settings, Shield, ShieldAlert, UserPlus } from 'lucide-react';
 
 import { authApi, ratingsApi, safetyApi } from '@/api';
 import { AvatarUpload } from '@/components/ui/AvatarUpload';
@@ -130,7 +128,22 @@ export function ProfilePage() {
 
   return (
     <div className="min-h-full bg-surface pb-tabbar">
-      <ScreenHeader title="Profile" onBack={false} />
+      <ScreenHeader
+        title="Profile"
+        onBack={false}
+        /* The gear sits in the header rather than as a row in the list: it is
+           the one control on this screen that leads somewhere else entirely,
+           and people look for it top-right by habit. */
+        trailing={
+          <Link
+            to="/taxi/app/settings"
+            aria-label="Settings"
+            className="grid h-11 w-11 place-items-center rounded-control text-ink-muted transition-colors hover:bg-surface hover:text-ink"
+          >
+            <Settings size={20} aria-hidden />
+          </Link>
+        }
+      />
 
       <div className="stagger">
         {/* ---- Identity — centred ------------------------------------- */}

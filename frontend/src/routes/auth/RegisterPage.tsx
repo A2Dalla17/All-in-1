@@ -73,7 +73,13 @@ export function RegisterPage() {
          no session yet, so there is no role to branch on. Riders are the
          default; a driver signing up lands in the rider app until their
          profile row confirms the role. */
-      navigate(user?.role === 'driver' ? '/taxi/driver' : '/taxi/app', { replace: true });
+      /* A driver goes to their document checklist; a rider goes through
+         onboarding to give a phone number and choose how we may message
+         them. Neither can be skipped by deep-linking past it: the rider
+         app checks onboarded_at. */
+      navigate(user?.role === 'driver' ? '/taxi/driver/application' : '/taxi/onboarding', {
+        replace: true,
+      });
     } catch (cause) {
       setError(
         cause instanceof ApiError

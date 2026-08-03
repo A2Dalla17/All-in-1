@@ -94,6 +94,12 @@ const DriverLayout = lazy(() =>
 const DriverLookupPage = lazy(() =>
   import('@/routes/DriverLookupPage').then((m) => ({ default: m.DriverLookupPage })),
 );
+const TaxiGatewayPage = lazy(() =>
+  import('@/routes/taxi/TaxiGatewayPage').then((m) => ({ default: m.TaxiGatewayPage })),
+);
+const OnboardingPage = lazy(() =>
+  import('@/routes/taxi/OnboardingPage').then((m) => ({ default: m.OnboardingPage })),
+);
 const CardsPage = lazy(() =>
   import('@/routes/CardsPage').then((m) => ({ default: m.CardsPage })),
 );
@@ -137,11 +143,10 @@ function TaxiEntry() {
   if (isLoading) return <FullPageSpinner label="Loading" />;
   if (isAuthenticated && role) return <Navigate to={HOME_FOR_ROLE[role]} replace />;
 
-  /* Signed out: ask which side of the service they are on before sending them
-     to sign-in. It is not a marketing page — it is the one question the app
-     genuinely cannot infer, and asking it here means the sign-in and register
-     screens can be phrased for the right person rather than staying generic. */
-  return <ChooseRoleScreen />;
+  /* Signed out: offer the two real ways in — use the app, or ring the control
+     room. Plenty of AC7's customers will always prefer the phone, and hiding
+     the number behind the app would turn them away at the door. */
+  return <TaxiGatewayPage />;
 }
 
 /**
@@ -256,6 +261,15 @@ export function App() {
               marketing page at this path — the landing site is the only front
               door the platform has. */}
           <Route path="/taxi" element={<TaxiEntry />} />
+          <Route path="/taxi/download" element={<ChooseRoleScreen />} />
+          <Route
+            path="/taxi/onboarding"
+            element={
+              <RequireAuth allow={['rider', 'driver', 'admin']}>
+                <OnboardingPage />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/taxi/login"
             element={

@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { Car, Home, User, Wallet } from 'lucide-react';
+import { Car, Home, LayoutGrid, User } from 'lucide-react';
 
 import { Spinner } from '@/components/ui/Spinner';
 import { ToastProvider } from '@/components/ui/Toast';
@@ -28,6 +28,11 @@ const SupportPage = lazy(() => import('./SupportPage').then((m) => ({ default: m
 const ReferPage = lazy(() =>
   import('../shared/ReferPage').then((m) => ({ default: m.ReferPage })),
 );
+const RidesPage = lazy(() => import('./RidesPage').then((m) => ({ default: m.RidesPage })));
+const ServicePage = lazy(() => import('./ServicePage').then((m) => ({ default: m.ServicePage })));
+const RiderSettingsPage = lazy(() =>
+  import('./SettingsPage').then((m) => ({ default: m.RiderSettingsPage })),
+);
 const MessagesPage = lazy(() =>
   import('../shared/MessagesPage').then((m) => ({ default: m.MessagesPage })),
 );
@@ -38,11 +43,11 @@ const ChatThreadPage = lazy(() =>
 /** Left of the centre action, then right — matching the mockup's tab order. */
 const LEFT_TABS = [
   { to: '/taxi/app', label: 'Home', icon: Home, end: true },
-  { to: '/taxi/app/trips', label: 'My rides', icon: Car, end: false },
+  { to: '/taxi/app/rides', label: 'Rides', icon: Car, end: false },
 ] as const;
 
 const RIGHT_TABS = [
-  { to: '/taxi/app/wallet', label: 'Wallet', icon: Wallet, end: false },
+  { to: '/taxi/app/service', label: 'Service', icon: LayoutGrid, end: false },
   { to: '/taxi/app/profile', label: 'Profile', icon: User, end: false },
 ] as const;
 
@@ -74,6 +79,9 @@ export function RiderLayout() {
               <Route index element={<HomePage />} />
               <Route path="book" element={<BookRidePage />} />
               <Route path="track/:rideId" element={<TrackRidePage />} />
+              <Route path="rides" element={<RidesPage />} />
+              <Route path="settings" element={<RiderSettingsPage />} />
+              <Route path="service" element={<ServicePage />} />
               <Route path="trips" element={<TripsPage />} />
               <Route path="wallet" element={<WalletPage />} />
               <Route path="profile" element={<ProfilePage />} />
