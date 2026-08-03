@@ -109,8 +109,24 @@ export function HomePage() {
 
   return (
     <div className="relative min-h-screen">
-      {/* Map fills the screen behind everything. */}
-      <div className="absolute inset-0">
+      {/*
+        Map fills the screen behind everything.
+
+        `isolate` is load-bearing, not decoration. Leaflet assigns its own
+        z-indexes internally — tile pane 200, markers 600, popups 700,
+        controls 800, up to 1000 — and those are absolute values in whatever
+        stacking context they land in. Without isolation they sat above the
+        overlay below (z-index auto) and above the bottom tab bar (z-40), so
+        the map covered the entire interface: no search box, no location
+        prompt, no navigation. The only thing visible was Leaflet's own zoom
+        control, which was the clue.
+
+        `isolation: isolate` creates a stacking context here, so all of
+        Leaflet's numbers are scoped inside this element and the element as a
+        whole sits at z-0 — beneath the overlay at z-10 and the tab bar at
+        z-40, which is what the layering was always meant to be.
+      */}
+      <div className="absolute inset-0 isolate z-0">
         <MapView
           center={centre}
           zoom={hasLocation ? 15 : 12}
@@ -121,7 +137,7 @@ export function HomePage() {
         />
       </div>
 
-      <div className="relative flex min-h-screen flex-col justify-between pb-tabbar pt-safe-top">
+      <div className="relative z-10 flex min-h-screen flex-col justify-between pb-tabbar pt-safe-top">
         <div className="px-gutter pt-4">
           {user?.rider_code && (
             <span className="inline-flex items-center gap-1.5 rounded-pill bg-card/90 px-3 py-1.5 text-caption font-semibold shadow-card backdrop-blur">
