@@ -105,18 +105,13 @@ const CardsPage = lazy(() =>
 const AdminLayout = lazy(() =>
   import('@/routes/admin/AdminLayout').then((m) => ({ default: m.AdminLayout })),
 );
-const AdvertsPage = lazy(() =>
-  import('@/routes/landing/adverts-admin/AdvertsPage').then((m) => ({ default: m.AdvertsPage })),
-);
 const AdminSignInPage = lazy(() =>
   import('@/routes/landing/adverts-admin/SignInPage').then((m) => ({ default: m.SignInPage })),
 );
-const PinGate = lazy(() =>
-  import('@/routes/landing/adverts-admin/PinGate').then((m) => ({ default: m.PinGate })),
-);
-const RequireAdmin = lazy(() =>
-  import('@/routes/landing/adverts-admin/RequireAdmin').then((m) => ({ default: m.RequireAdmin })),
-);
+
+/* The old landing-site advert editor, its PIN gate and its admin guard are no
+   longer imported here. Advertising is managed inside AdminLayout now; keeping
+   these around meant the old page kept winning the route match. */
 
 /* -------------------------------------------------------------------------- */
 /* Guards                                                                     */
@@ -311,16 +306,15 @@ export function App() {
               Taxi operations and the landing site's advert showcase are one
               console: they are the same job done by the same people. */}
           <Route path="/admin/signin" element={<AdminSignInPage />} />
-          <Route
-            path="/admin/adverts"
-            element={
-              <RequireAdmin>
-                <PinGate>
-                  <AdvertsPage />
-                </PinGate>
-              </RequireAdmin>
-            }
-          />
+
+          {/* NOTE: there is deliberately no explicit /admin/adverts route here.
+              There used to be one, pointing at the old landing-site advert
+              editor behind a PIN gate. Because React Router matches the more
+              specific path first, it shadowed the new Advertising manager that
+              lives inside AdminLayout — the new page deployed successfully and
+              was simply unreachable, so the console looked unchanged. Anything
+              under /admin now falls through to AdminLayout, which owns its own
+              routes. */}
           <Route
             path="/admin/*"
             element={
