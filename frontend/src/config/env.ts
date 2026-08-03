@@ -94,7 +94,24 @@ export const env = {
    * tiles are not licensed for commercial use and need swapping before launch.
    * That is a tile decision and does not affect anything below.
    */
-  googlePlacesKey: readString(import.meta.env['VITE_GOOGLE_PLACES_KEY'], ''),
+  googlePlacesKey: readString(
+    import.meta.env['VITE_GOOGLE_PLACES_KEY'],
+    /* Falls back to the older variable name.
+     *
+     * VITE_GOOGLE_MAPS_BROWSER_KEY predates this integration and is what an
+     * existing setup — or anyone following an older guide — will already have
+     * filled in. Without this fallback, putting a perfectly good key in the
+     * obvious-looking variable does nothing at all: no error, no warning, the
+     * app just quietly keeps using the free geocoder. That already happened
+     * once, and a silent no-op is the worst possible failure for a config
+     * value somebody has just gone to the trouble of obtaining.
+     *
+     * Using one key for both is acceptable but not ideal: it means the same
+     * key must be allowed to call every API in use, so a leak exposes all of
+     * them rather than one. Two separately restricted keys are better. This
+     * fallback exists so the app works either way, not to recommend it. */
+    readString(import.meta.env['VITE_GOOGLE_MAPS_BROWSER_KEY'], ''),
+  ),
 
   /**
    * Optional server-side proxy for every Google call.
