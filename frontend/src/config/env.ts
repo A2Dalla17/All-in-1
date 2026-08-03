@@ -68,6 +68,77 @@ export const env = {
   googleMapsLibraries: ['places', 'geometry'] as const,
 
   /**
+   * Google Maps Platform — Places, Geocoding and Routes.
+   *
+   * ── Why this is a different key from googleMapsBrowserKey ─────────────────
+   * That one is for the Maps JavaScript API and is currently unused: the map
+   * itself renders with Leaflet against OpenStreetMap tiles, which cost
+   * nothing however many times they load. This key is for the web-service
+   * REST endpoints — Autocomplete, Place Details, Geocoding, Routes — which
+   * are the calls actually worth paying for.
+   *
+   * Separating them is what lets each be restricted to only the APIs it
+   * needs in Cloud Console. A single key allowed to call everything is one
+   * stolen key away from a bill on every product at once.
+   *
+   * ── Why the map deliberately stays off Google ─────────────────────────────
+   * Google's Dynamic Maps SKU bills per map load with 10,000 free per month,
+   * roughly 330 a day. The rider home screen IS a map, and one ride touches
+   * home, booking and tracking. Putting the map on Google would spend the
+   * entire free allowance on tiles, leaving nothing for address search — which
+   * is the part Google is genuinely better at, and the part Nominatim is worst
+   * at for UK postcodes.
+   *
+   * The tiles come from a raster provider instead (see MapView). Note the open
+   * licensing item recorded in docs/GOOGLE-MAPS-SETUP.md: the current CARTO
+   * tiles are not licensed for commercial use and need swapping before launch.
+   * That is a tile decision and does not affect anything below.
+   */
+  googlePlacesKey: readString(import.meta.env['VITE_GOOGLE_PLACES_KEY'], ''),
+
+  /**
+   * Optional server-side proxy for every Google call.
+   *
+   * ── The upgrade path, wired in from the start ─────────────────────────────
+   * A browser key is public by definition. HTTP referrer restrictions raise
+   * the effort required to misuse one but do not eliminate it: a referrer
+   * header is set by the caller and can simply be forged. That is tolerable
+   * while a daily quota cap bounds the damage to a known number.
+   *
+   * When volume makes that ceiling too expensive to leave exposed, set this
+   * to a Supabase Edge Function holding an unrestricted key server-side. Every
+   * request in src/lib/maps/google.ts is routed through resolveEndpoint(), so
+   * moving to a proxy is this one variable and no code change — which is the
+   * whole reason it exists before it is needed.
+   */
+  googleMapsProxyUrl: readString(import.meta.env['VITE_GOOGLE_MAPS_PROXY_URL'], '').replace(
+    /\/+$/,
+    '',
+  ),
+
+  /**
+   * Monthly ceiling this app will impose on itself, per Google SKU.
+   *
+   * ── Why below 10,000, and why a client-side number at all ─────────────────
+   * Each Essentials SKU gets 10,000 free calls a month and they do NOT pool:
+   * ten thousand for Geocoding, a separate ten thousand for Autocomplete
+   * sessions, and so on. Going one call over starts a charge.
+   *
+   * The real, unbypassable stop is the per-API daily quota set in Cloud
+   * Console — see docs/GOOGLE-MAPS-SETUP.md. This is the layer above it, and
+   * it exists for a reason the quota cannot serve: a quota rejects the call
+   * with an error, whereas this predicts the rejection and takes the free
+   * OpenStreetMap path instead, so the rider sees a working address search
+   * rather than a failure.
+   *
+   * The default leaves a deliberate 15% margin. Two clients can each believe
+   * they are under the cap — this counter is per browser, not global — so the
+   * margin absorbs that drift. It is a cost optimisation, not a guarantee;
+   * the guarantee is the Cloud Console quota.
+   */
+  googleMapsMonthlyBudget: Number(import.meta.env['VITE_GOOGLE_MAPS_MONTHLY_BUDGET'] ?? 8500),
+
+  /**
    * Where the map opens before the user's location is known — Charing Cross,
    * the point all distances from London are officially measured from.
    *
@@ -184,3 +255,14 @@ export const env = {
 
 /** True when a browser Maps key is configured; drives the map fallback. */
 export const hasGoogleMapsKey = (): boolean => env.googleMapsBrowserKey.length > 0;
+
+/**
+ * True when Google can serve address search and routing.
+ *
+ * A proxy URL counts on its own: in that setup the key lives on the server and
+ * the browser is never given one, which is the point of a proxy. Checking only
+ * for a key would disable Google in exactly the deployment that is most
+ * correctly configured.
+ */
+export const hasGooglePlaces = (): boolean =>
+  env.googlePlacesKey.length > 0 || env.googleMapsProxyUrl.length > 0;

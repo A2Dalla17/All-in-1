@@ -31,6 +31,8 @@ import { DragSheet } from '@/components/ui/DragSheet';
 import { env } from '@/config/env';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import {
+  AutocompleteSession,
+  resolve,
   reverseGeocode,
   searchPlaces,
   SEARCH_DEBOUNCE_MS,
@@ -55,6 +57,21 @@ export function HomePage() {
      jumping. It also gets the field clear of the on-screen keyboard. */
   const [searchFocused, setSearchFocused] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+
+  /**
+   * The billing session for this search.
+   *
+   * Google groups every Autocomplete request carrying the same token, plus the
+   * one Place Details call that closes it, into a single billable session — so
+   * typing "Heathrow Terminal 5" costs the same as typing "T5". Without a
+   * token each debounced keystroke is billed on its own.
+   *
+   * A ref rather than state: changing it must not re-render, and it has to
+   * survive the renders that happen while the rider types. It is replaced only
+   * when a session ends, which is what keeps one search on one token.
+   */
+  const sessionRef = useRef<AutocompleteSession>(new AutocompleteSession());
+  const [resolving, setResolving] = useState<string | null>(null);
 
   const centre = position ?? env.defaultMapCenter;
   const hasLocation = Boolean(position);
@@ -90,7 +107,7 @@ export function HomePage() {
       setSearching(true);
       setSearchError(null);
 
-      searchPlaces(query, controller.signal)
+      searchPlaces(query, controller.signal, sessionRef.current, position ?? undefined)
         .then(setResults)
         .catch((e: unknown) => {
           if (e instanceof DOMException && e.name === 'AbortError') return;
@@ -102,16 +119,43 @@ export function HomePage() {
     }, SEARCH_DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [query, position]);
 
+  /**
+   * Commit to a destination.
+   *
+   * A Google suggestion arrives with a place ID and no coordinates — fetching
+   * them for all six results would be six paid calls to fill a list the rider
+   * takes one item from. `resolve` fetches the one they chose and closes the
+   * billing session. A Nominatim suggestion already has its coordinates, so
+   * resolve returns it untouched and nothing is spent.
+   */
   const choose = useCallback(
-    (place: PlaceSuggestion) => {
-      const params = new URLSearchParams({
-        to: place.label,
-        lat: String(place.lat),
-        lng: String(place.lng),
-      });
-      navigate(`/taxi/app/book?${params.toString()}`);
+    async (place: PlaceSuggestion) => {
+      setResolving(place.id);
+      try {
+        const resolved = await resolve(place, sessionRef.current);
+
+        /* The session is spent either way, so the next search starts a new
+           one. Reusing a closed token is billed by Google as though no token
+           had been sent at all — full price, per keystroke, with nothing on
+           screen to indicate it. */
+        sessionRef.current = new AutocompleteSession();
+
+        if (!resolved) {
+          setSearchError('That address could not be located. Try another.');
+          return;
+        }
+
+        const params = new URLSearchParams({
+          to: resolved.label,
+          lat: String(resolved.lat),
+          lng: String(resolved.lng),
+        });
+        navigate(`/taxi/app/book?${params.toString()}`);
+      } finally {
+        setResolving(null);
+      }
     },
     [navigate],
   );
@@ -186,10 +230,19 @@ export function HomePage() {
                 <li key={place.id}>
                   <button
                     type="button"
-                    onClick={() => choose(place)}
-                    className="flex min-h-14 w-full items-center gap-3 rounded-tile px-2 py-2 text-left hover:bg-surface"
+                    onClick={() => void choose(place)}
+                    disabled={resolving !== null}
+                    className="flex min-h-14 w-full items-center gap-3 rounded-tile px-2 py-2 text-left hover:bg-surface disabled:opacity-60"
                   >
-                    <MapPin size={17} className="shrink-0 text-ink-subtle" aria-hidden />
+                    {resolving === place.id ? (
+                      <Loader2
+                        size={17}
+                        className="shrink-0 animate-spin text-ink-subtle"
+                        aria-hidden
+                      />
+                    ) : (
+                      <MapPin size={17} className="shrink-0 text-ink-subtle" aria-hidden />
+                    )}
                     <span className="min-w-0">
                       <span className="block truncate text-body font-medium text-ink">
                         {place.label}
