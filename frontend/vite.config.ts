@@ -134,6 +134,34 @@ export default defineConfig(({ command, mode }) => {
     server: {
       host: true,
       port: 3000,
+
+      /**
+       * Poll the filesystem instead of relying on inotify.
+       *
+       * -- Why this is not optional here ---------------------------------
+       * This project lives on a Windows drive under OneDrive, and the dev
+       * server is normally started from WSL, where that drive is a drvfs
+       * mount at /mnt/c. drvfs does not forward Windows filesystem events to
+       * inotify. Chokidar's watcher therefore registers successfully and then
+       * never fires, so Vite keeps serving whatever it transformed when it
+       * started. Editing a file changes nothing on screen, and — worse — the
+       * server reports no error at all.
+       *
+       * This cost a full round of "I checked and everything is still the
+       * same": the files on disk were correct, the build was correct, and the
+       * running dev server was serving a snapshot from whenever it booted.
+       * Confirmed by fetching /src/routes/rider/HomePage.tsx from the dev
+       * server and finding source that no longer existed on disk.
+       *
+       * Polling is more CPU than inotify. On a project this size the interval
+       * below is unnoticeable, and it is the only thing that makes editing
+       * work at all on this setup.
+       */
+      watch: {
+        usePolling: true,
+        interval: 300,
+      },
+
       proxy: {
         '/api': {
           target: gateway,

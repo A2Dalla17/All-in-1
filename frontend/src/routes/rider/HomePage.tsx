@@ -3,12 +3,17 @@
  *
  * The map, where you are, and where you are going.
  *
- * ── Why the map is the page rather than a card on it ───────────────────────
- * The previous version had no map at all — a brand panel, a greeting and an
- * input that navigated away. Every transport app a rider has used puts the map
- * behind everything and floats the controls over it, and that is not fashion:
- * the map answers "is there a car near me" before a single word is read, and
- * somebody standing on a kerb is looking at their surroundings, not at a form.
+ * ── Map above, sheet below ─────────────────────────────────────────────────
+ * The first attempt floated cards over a full-bleed map. On a phone that left
+ * the controls stranded in the middle of nowhere; on a desktop the cards
+ * stretched the full width of the window. Uber and Bolt both solve it the
+ * same way and for the same reason: the map takes the top, a sheet owns the
+ * bottom, and the sheet can be dragged up when the rider needs more room —
+ * for a list of search results — or pushed down when they want to see where
+ * they are.
+ *
+ * The sheet is capped at max-w-lg so a wide monitor gets a panel rather than
+ * a control strip two feet across.
  *
  * ── Why location is asked for with a button, not on load ───────────────────
  * A permission prompt that fires the instant a page opens gets refused, and
@@ -22,7 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import { Crosshair, Loader2, Lock, MapPin, Navigation, Search, ShoppingBag } from 'lucide-react';
 
 import { MapView } from '@/components/map/MapView';
-import { Card } from '@/components/ui/Card';
+import { DragSheet } from '@/components/ui/DragSheet';
 import { env } from '@/config/env';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import {
@@ -45,6 +50,10 @@ export function HomePage() {
   const [results, setResults] = useState<PlaceSuggestion[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  /* Raising the sheet on focus rather than on results means the list has room
+     the moment it arrives, instead of appearing under the fold and then
+     jumping. It also gets the field clear of the on-screen keyboard. */
+  const [searchFocused, setSearchFocused] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   const centre = position ?? env.defaultMapCenter;
@@ -108,25 +117,18 @@ export function HomePage() {
   );
 
   return (
-    <div className="relative min-h-screen">
+    <div className="fixed inset-0 flex flex-col">
       {/*
-        Map fills the screen behind everything.
+        Map takes the top and is never covered by the sheet.
 
-        `isolate` is load-bearing, not decoration. Leaflet assigns its own
-        z-indexes internally — tile pane 200, markers 600, popups 700,
-        controls 800, up to 1000 — and those are absolute values in whatever
-        stacking context they land in. Without isolation they sat above the
-        overlay below (z-index auto) and above the bottom tab bar (z-40), so
-        the map covered the entire interface: no search box, no location
-        prompt, no navigation. The only thing visible was Leaflet's own zoom
-        control, which was the clue.
-
-        `isolation: isolate` creates a stacking context here, so all of
-        Leaflet's numbers are scoped inside this element and the element as a
-        whole sits at z-0 — beneath the overlay at z-10 and the tab bar at
-        z-40, which is what the layering was always meant to be.
+        `isolate` is load-bearing. Leaflet assigns its own z-indexes — tile
+        pane 200, markers 600, popups 700, controls 800, up to 1000 — and
+        those are absolute values in whatever stacking context they land in.
+        Without isolation they painted over the entire interface, leaving only
+        Leaflet's own zoom control visible. Isolating scopes those numbers
+        inside this element so ordinary application layering works again.
       */}
-      <div className="absolute inset-0 isolate z-0">
+      <div className="relative isolate z-0 flex-1">
         <MapView
           center={centre}
           zoom={hasLocation ? 15 : 12}
@@ -135,80 +137,33 @@ export function HomePage() {
           fitBounds={false}
           className="h-full w-full"
         />
+
+        {user?.rider_code && (
+          <span className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-pill bg-card/90 px-3 py-1.5 text-caption font-semibold shadow-card backdrop-blur">
+            <span className="text-ink-subtle">Your code</span>
+            <span className="font-mono text-brand-ink">{user.rider_code}</span>
+          </span>
+        )}
       </div>
 
-      <div className="relative z-10 flex min-h-screen flex-col justify-between pb-tabbar pt-safe-top">
-        <div className="px-gutter pt-4">
-          {user?.rider_code && (
-            <span className="inline-flex items-center gap-1.5 rounded-pill bg-card/90 px-3 py-1.5 text-caption font-semibold shadow-card backdrop-blur">
-              <span className="text-ink-subtle">Your code</span>
-              <span className="font-mono text-brand-ink">{user.rider_code}</span>
-            </span>
-          )}
-        </div>
-
-        <div className="space-y-3 px-gutter">
-          {!hasLocation && (
-            <Card tone="raised">
-              <div className="flex items-start gap-3.5">
-                <span
-                  aria-hidden
-                  className="grid h-11 w-11 shrink-0 place-items-center rounded-tile bg-brand-soft text-brand-ink"
-                >
-                  <Navigation size={20} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-body font-semibold text-ink">
-                    {permission === 'denied' ? 'Location is switched off' : 'Where are you now?'}
-                  </p>
-                  <p className="mt-0.5 text-body-sm text-ink-muted">
-                    {permission === 'denied'
-                      ? 'Turn it back on in your browser settings, or type your pickup address instead.'
-                      : 'We use it to show your pickup point and find the nearest car.'}
-                  </p>
-                </div>
-              </div>
-
-              {permission !== 'denied' && (
-                <button
-                  type="button"
-                  disabled={askedForLocation && isLocating}
-                  onClick={() => setAskedForLocation(true)}
-                  className="brand-gradient mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-control text-body font-semibold text-white shadow-brand transition-[filter] hover:brightness-[1.06] disabled:opacity-60"
-                >
-                  {askedForLocation && isLocating ? (
-                    <>
-                      <Loader2 size={17} className="animate-spin" aria-hidden />
-                      Finding you
-                    </>
-                  ) : (
-                    <>
-                      <Crosshair size={17} aria-hidden />
-                      Allow location
-                    </>
-                  )}
-                </button>
-              )}
-
-              {geoError && askedForLocation && (
-                <p className="mt-2 text-body-sm text-danger-ink">{geoError}</p>
-              )}
-            </Card>
-          )}
-
-          <Card tone="raised">
+      <DragSheet expandWhen={searchFocused || results.length > 0}>
+        <div className="space-y-4">
+          {/* Where to — the reason the sheet exists, so it leads. */}
+          <div>
             {hasLocation && (
-              <p className="mb-3 flex items-center gap-2 text-body-sm text-ink-muted">
+              <p className="mb-2 flex items-center gap-2 text-body-sm text-ink-muted">
                 <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-accent" />
                 <span className="truncate">{pickupLabel ?? 'Your current location'}</span>
               </p>
             )}
 
-            <label className="flex h-12 items-center gap-2.5 rounded-control border border-line bg-bg px-3.5">
+            <label className="flex h-12 items-center gap-2.5 rounded-control border border-line bg-surface px-3.5">
               <Search size={18} className="shrink-0 text-ink-subtle" aria-hidden />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
                 placeholder="Where to?"
                 aria-label="Where to?"
                 className="h-full w-full bg-transparent text-body text-ink outline-none placeholder:text-ink-subtle"
@@ -223,54 +178,106 @@ export function HomePage() {
                 {searchError}
               </p>
             )}
-
-            {results.length > 0 && (
-              <ul className="mt-2 max-h-64 overflow-y-auto">
-                {results.map((place) => (
-                  <li key={place.id}>
-                    <button
-                      type="button"
-                      onClick={() => choose(place)}
-                      className="flex min-h-14 w-full items-center gap-3 rounded-tile px-2 py-2 text-left hover:bg-surface"
-                    >
-                      <MapPin size={17} className="shrink-0 text-ink-subtle" aria-hidden />
-                      <span className="min-w-0">
-                        <span className="block truncate text-body font-medium text-ink">
-                          {place.label}
-                        </span>
-                        <span className="block truncate text-body-sm text-ink-muted">
-                          {place.address}
-                        </span>
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
-
-          <div className="flex items-center gap-3.5 rounded-card border border-line bg-card/90 p-4 opacity-80 shadow-card backdrop-blur">
-            <span
-              aria-hidden
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-tile bg-surface text-ink-subtle"
-            >
-              <ShoppingBag size={20} />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="flex items-center gap-2 text-body font-semibold text-ink">
-                AC7 Deliveries
-                <span className="inline-flex items-center gap-1 rounded-pill bg-surface px-2 py-0.5 text-micro font-medium text-ink-subtle">
-                  <Lock size={10} aria-hidden />
-                  Coming soon
-                </span>
-              </p>
-              <p className="mt-0.5 text-body-sm text-ink-muted">
-                Food, shops and parcels across London.
-              </p>
-            </div>
           </div>
+
+          {results.length > 0 && (
+            <ul className="-mx-2">
+              {results.map((place) => (
+                <li key={place.id}>
+                  <button
+                    type="button"
+                    onClick={() => choose(place)}
+                    className="flex min-h-14 w-full items-center gap-3 rounded-tile px-2 py-2 text-left hover:bg-surface"
+                  >
+                    <MapPin size={17} className="shrink-0 text-ink-subtle" aria-hidden />
+                    <span className="min-w-0">
+                      <span className="block truncate text-body font-medium text-ink">
+                        {place.label}
+                      </span>
+                      <span className="block truncate text-body-sm text-ink-muted">
+                        {place.address}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Location. Below the search box, because typing an address works
+              whether or not location is granted — it is a help, not a gate. */}
+          {!hasLocation && results.length === 0 && (
+            <div className="rounded-card border border-line bg-surface p-4">
+              <div className="flex items-start gap-3">
+                <span
+                  aria-hidden
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-tile bg-brand-soft text-brand-ink"
+                >
+                  <Navigation size={18} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-body-sm font-semibold text-ink">
+                    {permission === 'denied' ? 'Location is switched off' : 'Use my location'}
+                  </p>
+                  <p className="mt-0.5 text-body-sm text-ink-muted">
+                    {permission === 'denied'
+                      ? 'Turn it on in your browser settings, or just type your pickup address.'
+                      : 'Sets your pickup automatically and finds the nearest car.'}
+                  </p>
+                </div>
+              </div>
+
+              {permission !== 'denied' && (
+                <button
+                  type="button"
+                  disabled={askedForLocation && isLocating}
+                  onClick={() => setAskedForLocation(true)}
+                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-control border border-brand-ink/35 text-body-sm font-semibold text-brand-ink transition-colors hover:bg-brand-soft disabled:opacity-60"
+                >
+                  {askedForLocation && isLocating ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" aria-hidden />
+                      Finding you
+                    </>
+                  ) : (
+                    <>
+                      <Crosshair size={16} aria-hidden />
+                      Allow location
+                    </>
+                  )}
+                </button>
+              )}
+
+              {geoError && askedForLocation && (
+                <p className="mt-2 text-body-sm text-danger-ink">{geoError}</p>
+              )}
+            </div>
+          )}
+
+          {results.length === 0 && (
+            <div className="flex items-center gap-3 rounded-card border border-line bg-surface p-3.5 opacity-80">
+              <span
+                aria-hidden
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-tile bg-card text-ink-subtle"
+              >
+                <ShoppingBag size={18} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="flex items-center gap-2 text-body-sm font-semibold text-ink">
+                  AC7 Deliveries
+                  <span className="inline-flex items-center gap-1 rounded-pill bg-card px-2 py-0.5 text-micro font-medium text-ink-subtle">
+                    <Lock size={10} aria-hidden />
+                    Coming soon
+                  </span>
+                </p>
+                <p className="mt-0.5 text-body-sm text-ink-muted">
+                  Food, shops and parcels across London.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      </DragSheet>
     </div>
   );
 }
