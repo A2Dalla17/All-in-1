@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Lock, Menu, Phone, Settings, X } from 'lucide-react';
+import {
+  ChevronDown,
+  Lock,
+  Menu,
+  Phone,
+  Settings,
+  X,
+} from 'lucide-react';
 
 import { Logo } from '@/components/layout/Logo';
 import { Container } from '@/components/ui/Container';
@@ -92,7 +99,7 @@ export function Header() {
           <div className="flex items-center gap-1.5">
             <a
               href={`tel:${env.controlCentre.tel}`}
-              className="hidden items-center gap-2 rounded-control px-3 py-2 text-body-sm font-medium text-ink transition-colors hover:bg-surface md:inline-flex"
+              className="hidden min-h-11 items-center gap-2 rounded-control px-3 py-2 text-body-sm font-medium text-ink transition-colors hover:bg-surface md:inline-flex"
             >
               <Phone size={15} aria-hidden />
               <span className="tabular">{env.controlCentre.display}</span>
@@ -101,7 +108,7 @@ export function Header() {
             <Link
               to="/settings"
               aria-label="Settings"
-              className="grid h-10 w-10 place-items-center rounded-control text-ink-muted transition-colors hover:bg-surface hover:text-ink"
+              className="grid h-11 w-11 place-items-center rounded-control text-ink-muted transition-colors hover:bg-surface hover:text-ink"
             >
               <Settings size={19} aria-hidden />
             </Link>
@@ -113,7 +120,7 @@ export function Header() {
               aria-expanded={open}
               aria-controls="mobile-nav"
               onClick={() => setOpen((value) => !value)}
-              className="grid h-10 w-10 place-items-center rounded-control text-ink-muted transition-colors hover:bg-surface hover:text-ink lg:hidden"
+              className="grid h-11 w-11 place-items-center rounded-control text-ink-muted transition-colors hover:bg-surface hover:text-ink lg:hidden"
             >
               {open ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
             </button>
@@ -158,11 +165,60 @@ interface NavItemProps {
   to?: string;
   href?: string;
   comingSoon?: boolean;
+  children?: readonly NavItemProps[];
 }
 
-function NavItem({ label, to, href, comingSoon }: NavItemProps) {
+function NavItem({ label, to, href, comingSoon, children }: NavItemProps) {
   const base =
-    'inline-flex items-center gap-1.5 rounded-control px-3 py-2 text-body-sm font-medium transition-colors';
+    /* min-h-11 is the 44px minimum touch target. These measured 39px:
+       fine under a mouse, marginal under a thumb on a tablet, and the
+       header is the one component every page shares. Raising the floor
+       rather than the padding keeps the visual density unchanged. */
+    'inline-flex min-h-11 items-center gap-1.5 rounded-control px-3 py-2 text-body-sm font-medium transition-colors';
+
+  /* A group opens a submenu instead of navigating. Built on <details> rather
+     than React state: it closes on Escape, is keyboard operable and is
+     announced as expandable by screen readers, all without a single event
+     handler. A hand-rolled dropdown has to reimplement every one of those and
+     usually forgets Escape. */
+  if (children && children.length > 0) {
+    return (
+      <details className="group relative">
+        <summary
+          className={cn(
+            base,
+            'cursor-pointer list-none text-ink-muted hover:bg-surface hover:text-ink',
+            'marker:hidden [&::-webkit-details-marker]:hidden',
+          )}
+        >
+          {label}
+          <ChevronDown
+            size={14}
+            aria-hidden
+            className="transition-transform group-open:rotate-180"
+          />
+        </summary>
+
+        <ul className="absolute left-0 top-full z-50 mt-1 min-w-[13rem] rounded-card border border-line bg-card p-1.5 shadow-lifted">
+          {children.map((child) => (
+            <li key={child.label}>
+              <NavLink
+                to={child.to as string}
+                className={({ isActive }) =>
+                  cn(
+                    'flex min-h-11 items-center gap-2 rounded-control px-3 py-2 text-body-sm font-medium',
+                    isActive ? 'bg-brand-soft text-brand-ink' : 'text-ink hover:bg-surface',
+                  )
+                }
+              >
+                {child.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </details>
+    );
+  }
 
   if (comingSoon) {
     return (

@@ -1,3 +1,8 @@
+/* The Staff / Admin console card was removed from this public page.
+   The console is reached at /admin directly; advertising it on a page
+   any visitor can open told strangers where the door is without making
+   the door any stronger. Row level security is what protects it, but
+   there is no reason to hand out the address. */
 import { Link } from 'react-router-dom';
 import { Accessibility, ChevronRight, Cookie, Mail, Phone, ShieldCheck } from 'lucide-react';
 
@@ -7,7 +12,6 @@ import { env } from '@/config/env';
 import { LEGAL_NAV } from '@/config/navigation';
 import { usePageMeta } from '@/lib/seo';
 import { usePreferences } from '@/lib/preferences';
-import { useAuth } from '@/providers/AuthProvider';
 
 /**
  * Settings.
@@ -24,7 +28,6 @@ import { useAuth } from '@/providers/AuthProvider';
 export function SettingsPage() {
   usePageMeta('Settings', 'Manage your cookie and accessibility preferences.');
   const { preferences, update } = usePreferences();
-  const { isAdmin } = useAuth();
 
   return (
     <Container size="narrow" className="py-16 sm:py-20">
@@ -104,37 +107,6 @@ export function SettingsPage() {
       </section>
 
       {/* Staff */}
-      <section className="mt-4">
-        <Card>
-          <CardHeader
-            title="Staff"
-            description="Manage homepage advertising and featured drivers."
-          />
-
-          <Link to="/admin" className="block">
-            <div className="flex items-center gap-4 rounded-tile border border-line bg-elevated p-4 transition-colors hover:border-brand/40">
-              <span
-                aria-hidden
-                className="grid h-11 w-11 shrink-0 place-items-center rounded-tile bg-brand-soft text-brand-ink"
-              >
-                <ShieldCheck size={20} />
-              </span>
-
-              <span className="min-w-0 flex-1">
-                <span className="block text-body font-medium text-ink">Admin console</span>
-                <span className="mt-0.5 block text-body-sm text-ink-muted">
-                  {isAdmin
-                    ? 'Signed in — open the advertising manager.'
-                    : 'Sign in with your email, password and access code.'}
-                </span>
-              </span>
-
-              <ChevronRight size={17} aria-hidden className="shrink-0 text-ink-subtle" />
-            </div>
-          </Link>
-        </Card>
-      </section>
-
       {/* Contact */}
       <section className="mt-4">
         <Card>

@@ -142,7 +142,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
       )}
 
       <aside
-        aria-label="Admin navigation"
+        aria-label="Restricted area navigation"
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-line bg-bg',
           'transition-transform duration-300 ease-smooth',

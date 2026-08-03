@@ -51,11 +51,34 @@ const VARIANTS: Record<Variant, string> = {
   inverse: 'bg-white text-brand shadow-lifted hover:bg-white/90 disabled:opacity-50',
 };
 
+/**
+ * Height scale: 40 / 44 / 48 / 56.
+ *
+ * ── Why lg and xl came down ────────────────────────────────────────────────
+ * They were 56px and 64px. A 64px button is taller than a row of the on-screen
+ * keyboard; two of them stacked on an iPhone SE consume a fifth of the
+ * viewport, which is what made the app read as oversized and shouty rather
+ * than premium. Nothing else on a phone is that tall, so the buttons stopped
+ * looking like part of the same interface.
+ *
+ * ── Why nothing goes below 40 ──────────────────────────────────────────────
+ * Apple's minimum touch target is 44pt and Material's is 48dp. `sm` at 40px
+ * sits just under, and is deliberately kept for dense admin toolbars used with
+ * a mouse — never for a primary action on a phone. `md` at 44px is the
+ * smallest size that is safe under a thumb, and is the default.
+ *
+ * The horizontal padding shrank with the heights. Padding that stays wide
+ * while the height drops produces a lozenge, and a row of lozenges is exactly
+ * the "inconsistent, crowded" feel the redesign is meant to remove.
+ */
 const SIZES: Record<Size, string> = {
-  sm: 'h-9 px-4 text-caption gap-1.5',
-  md: 'h-11 px-5 text-body-sm gap-2',
-  lg: 'h-14 px-7 text-body gap-2.5',
-  xl: 'h-16 px-8 text-body-lg gap-3',
+  /* Tailwind's spacing scale has 3.5 and 4 but no 4.5 — px-4.5 compiles to
+     nothing at all, which is a silent bug rather than a visible one. Only
+     values that exist are used here. */
+  sm: 'h-10 px-3.5 text-caption gap-1.5',
+  md: 'h-11 px-4 text-body-sm gap-2',
+  lg: 'h-12 px-6 text-body gap-2',
+  xl: 'h-14 px-7 text-body gap-2.5',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(

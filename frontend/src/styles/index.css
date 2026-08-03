@@ -279,6 +279,42 @@
 }
 
 @layer components {
+  /**
+   * Skip link.
+   *
+   * It had no styles at all, so it rendered as plain visible text above the
+   * header on every page — which is why it looked like a stray button.
+   *
+   * Deleting it was the request; hiding it properly is the better answer. It
+   * is the WCAG 2.4.1 "bypass blocks" affordance: a keyboard or screen-reader
+   * user who does not want to tab through eight nav links presses Tab once and
+   * jumps to the content. Removing it would cost them that and save nobody
+   * anything, because when it works correctly it is invisible.
+   *
+   * Off-screen rather than display:none — a display:none element is not
+   * focusable, so the link would never appear for the people it exists for.
+   */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    padding: 0.75rem 1.25rem;
+    background: rgb(var(--brand));
+    color: #fff;                 /* 10.0:1 on #8B0000 */
+    border-radius: 0 0 0.75rem 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    left: 0;
+    outline: 2px solid #fff;
+    outline-offset: -4px;
+  }
+
   /* ---- Surfaces ------------------------------------------------------ */
 
   /* Frosted navigation — the map stays partly visible behind it. */

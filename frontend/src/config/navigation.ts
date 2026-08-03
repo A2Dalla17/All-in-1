@@ -85,14 +85,45 @@ export const SERVICES: readonly ServiceLink[] = [
 ] as const;
 
 /** Header navigation: the four services, then About Us. */
-export const HEADER_NAV: ReadonlyArray<{
+export interface NavEntry {
   label: string;
   to?: string;
   href?: string;
   comingSoon?: boolean;
   icon?: LucideIcon;
-}> = [
-  ...SERVICES.map((service) => ({
+  /** Present when this entry opens a submenu rather than navigating. */
+  children?: readonly NavEntry[];
+}
+
+/**
+ * Header navigation.
+ *
+ * ── Why Taxi and School Runs sit under Transport ───────────────────────────
+ * They are two ways of buying the same thing: a licensed driver and a vehicle.
+ * Listing them beside Bookings and Marketplace put four items at the same
+ * level that are not the same kind of thing, and it grows worse as the group
+ * fills out — Transport will hold at least a third service. One heading keeps
+ * the top level short, which matters most on a phone where every extra item is
+ * another row of the menu.
+ */
+export const HEADER_NAV: readonly NavEntry[] = [
+  {
+    label: 'Transport',
+    icon: Car,
+    children: [
+      {
+        label: 'Taxi',
+        to: env.services.taxi,
+        icon: Car,
+      },
+      {
+        label: 'School Runs',
+        to: env.services.schoolRuns,
+        icon: Bus,
+      },
+    ],
+  },
+  ...SERVICES.filter((s) => s.id !== 'taxi' && s.id !== 'school-runs').map((service) => ({
     label: service.label,
     ...(service.to ? { to: service.to } : {}),
     ...(service.href ? { href: service.href } : {}),

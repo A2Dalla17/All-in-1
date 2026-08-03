@@ -1,12 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { Car, Eye, EyeOff, FlaskConical, Lock, Mail, ShieldCheck, User } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 
-import type { UserRole } from '@/api/types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 // DEMO_MODE — delete this import with src/dev/.
-import { DEMO_ENABLED, startDemoSession } from '@/dev/demoSession';
 import { ApiError } from '@/lib/http';
 import { useAuth } from '@/providers/AuthProvider';
 import { AuthShell } from './AuthShell';
@@ -137,70 +135,7 @@ export function LoginPage() {
       </form>
 
       {/* DEMO_MODE — delete this line and the component below with src/dev/. */}
-      <DemoSkipPanel />
     </AuthShell>
   );
 }
 
-/* ========================================================================== */
-/* ⚠️  TEMPORARY — DELETE WITH src/dev/  ⚠️                                   */
-/*                                                                            */
-/* Opens any part of the app without an account so the screens can be          */
-/* reviewed. Renders only under `vite dev`; in a production build              */
-/* `import.meta.env.DEV` is the literal false and the minifier removes the     */
-/* whole component.                                                           */
-/* ========================================================================== */
-
-const DEMO_ROLES = [
-  { role: 'rider' as const, label: 'Rider', icon: User, hint: 'Book, track, wallet' },
-  { role: 'driver' as const, label: 'Driver', icon: Car, hint: 'Dashboard, earnings' },
-  { role: 'admin' as const, label: 'Admin', icon: ShieldCheck, hint: 'Console, analytics' },
-];
-
-function DemoSkipPanel() {
-  const navigate = useNavigate();
-
-  if (!DEMO_ENABLED) return null;
-
-  function skip(role: UserRole) {
-    startDemoSession(role);
-    navigate(HOME_FOR_ROLE[role], { replace: true });
-  }
-
-  return (
-    <section
-      aria-label="Development shortcuts"
-      className="mt-8 rounded-card border border-dashed border-warning/50 bg-warning/[0.06] p-4"
-    >
-      <div className="flex items-start gap-2.5">
-        <FlaskConical size={16} className="mt-0.5 shrink-0 text-warning-ink" aria-hidden />
-        <div className="min-w-0">
-          <p className="text-caption font-bold text-ink">Skip sign-in (development only)</p>
-          <p className="mt-0.5 text-micro leading-relaxed text-ink-muted">
-            Opens the app with a fake account so you can review every screen. The backend
-            rejects this token, so live data will show empty and error states.
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-3.5 grid grid-cols-3 gap-2">
-        {DEMO_ROLES.map(({ role, label, icon: Icon, hint }) => (
-          <button
-            key={role}
-            type="button"
-            onClick={() => skip(role)}
-            className="group flex flex-col items-center gap-1.5 rounded-tile border border-line bg-card px-2 py-3 transition-all duration-200 ease-smooth hover:border-brand hover:bg-brand/[0.04]"
-          >
-            <Icon
-              size={17}
-              aria-hidden
-              className="text-ink-muted transition-colors group-hover:text-brand-ink"
-            />
-            <span className="text-micro font-semibold text-ink">{label}</span>
-            <span className="text-[0.625rem] leading-tight text-ink-subtle">{hint}</span>
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}

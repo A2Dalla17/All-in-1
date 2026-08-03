@@ -194,7 +194,12 @@ export default {
         'safe-top': 'var(--safe-top)',
         'safe-bottom': 'var(--safe-bottom)',
         /* Clearance for the floating tab bar plus the home indicator. */
-        tabbar: 'calc(7rem + var(--safe-bottom))',
+        /* Height the fixed tab bar occupies, so page content can clear it.
+           Was 7rem: on an iPhone SE that is 17% of the viewport gone before
+           any content, which is most of why the app felt cramped. The bar
+           itself is ~5.25rem including the raised centre action; 6rem leaves
+           a little breathing room without wasting a fifth of the screen. */
+        tabbar: 'calc(6rem + var(--safe-bottom))',
       },
 
       maxWidth: {

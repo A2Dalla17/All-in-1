@@ -101,7 +101,7 @@ export function RiderLayout() {
 function RiderTabBar() {
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 pb-[var(--safe-bottom)]">
-      <div className="glass mx-3 mb-3 flex items-end justify-around rounded-card border border-line px-2 pb-2 pt-2.5 shadow-lifted">
+      <div className="glass mx-3 mb-2 flex items-end justify-around rounded-card border border-line px-2 pb-1.5 pt-2 shadow-lifted">
         {LEFT_TABS.map((tab) => (
           <Tab key={tab.to} {...tab} />
         ))}
@@ -109,11 +109,11 @@ function RiderTabBar() {
         {/* Centre action — raised, matching the mockup */}
         <NavLink
           to="/taxi/app/book"
-          className="pressable -mt-7 flex flex-col items-center gap-1"
+          className="pressable -mt-6 flex flex-col items-center gap-1"
           aria-label="Book a ride"
         >
-          <span className="grid h-14 w-14 place-items-center rounded-full brand-gradient text-white shadow-brand-lg ring-4 ring-bg">
-            <Car size={24} aria-hidden />
+          <span className="grid h-12 w-12 place-items-center rounded-full brand-gradient text-white shadow-brand-lg ring-4 ring-bg">
+            <Car size={21} aria-hidden />
           </span>
           <span className="text-[0.625rem] font-semibold text-ink">Book ride</span>
         </NavLink>
