@@ -1,20 +1,54 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Car, Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 // DEMO_MODE — delete this import with src/dev/.
 import { ApiError } from '@/lib/http';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/providers/AuthProvider';
 import { AuthShell } from './AuthShell';
 
-/** Where each role lands after a successful sign-in. */
+type Intent = 'rider' | 'driver';
+
+/** The default home for an account, used when no intent was chosen. */
 const HOME_FOR_ROLE = {
   rider: '/taxi/app',
   driver: '/taxi/driver',
   admin: '/admin',
 } as const;
+
+/**
+ * Where to land after signing in.
+ *
+ * ── Why the choice on this screen can override the account's home ─────────
+ * An admin account is also a person who books taxis. Sending every admin
+ * straight to the control centre meant there was no way to open the rider app
+ * at all without editing the URL — which is exactly the complaint this fixes.
+ *
+ * The intent only ever picks between surfaces the account is already allowed
+ * to open. It grants nothing: the route guards and, underneath them, row level
+ * security still decide what the person can actually see. A rider selecting
+ * "Driver" does not become a driver — they are sent to the application form,
+ * because wanting to drive and being allowed to drive are different things.
+ */
+function destinationFor(role: 'rider' | 'driver' | 'admin' | undefined, intent: Intent | null): string {
+  if (!role) return '/taxi/app';
+
+  if (intent === 'driver') {
+    if (role === 'driver' || role === 'admin') return '/taxi/driver';
+    return '/taxi/driver/application';
+  }
+
+  if (intent === 'rider') {
+    /* Every signed-in role may use the rider app — drivers and admins book
+       taxis too, and RequireAuth on /taxi/app already allows all three. */
+    return '/taxi/app';
+  }
+
+  return HOME_FOR_ROLE[role];
+}
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -29,6 +63,13 @@ export function LoginPage() {
     searchParams.get('expired') ? 'Your session expired. Please sign in again.' : null,
   );
   const [submitting, setSubmitting] = useState(false);
+
+  /* Preselected from ?as= when they arrived from a link that already knew, and
+     changeable here so nobody is trapped by an earlier tap. */
+  const initialIntent = searchParams.get('as');
+  const [intent, setIntent] = useState<Intent>(
+    initialIntent === 'driver' ? 'driver' : 'rider',
+  );
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -48,7 +89,7 @@ export function LoginPage() {
          public.users row is linked to it yet. The rider app is the safe
          landing spot: it is the least-privileged surface, and the guard
          there will bounce them onward once the profile appears. */
-      const home = user ? HOME_FOR_ROLE[user.role] : '/taxi/app';
+      const home = destinationFor(user?.role, intent);
       navigate(intended ?? home, { replace: true });
     } catch (cause) {
       setError(
@@ -77,6 +118,48 @@ export function LoginPage() {
       }
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
+        {/* Rider or driver.
+            A segmented control rather than two separate sign-in screens: the
+            credentials are identical, so splitting the form would duplicate
+            everything to change one destination. */}
+        <div>
+          <span className="mb-1.5 block text-body-sm font-medium text-ink">
+            I am signing in as
+          </span>
+          <div
+            role="radiogroup"
+            aria-label="Sign in as"
+            className="flex gap-1 rounded-control bg-surface p-1"
+          >
+            {(
+              [
+                { value: 'rider' as const, label: 'Rider', icon: <User size={16} /> },
+                { value: 'driver' as const, label: 'Driver', icon: <Car size={16} /> },
+              ]
+            ).map((option) => {
+              const active = intent === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setIntent(option.value)}
+                  className={cn(
+                    'flex min-h-11 flex-1 items-center justify-center gap-2 rounded-control text-body-sm font-semibold transition-colors',
+                    active
+                      ? 'bg-card text-ink shadow-xs'
+                      : 'text-ink-muted hover:text-ink',
+                  )}
+                >
+                  {option.icon}
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {error && (
           <div
             role="alert"

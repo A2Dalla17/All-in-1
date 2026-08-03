@@ -35,8 +35,7 @@
  */
 
 import { lazy, Suspense, useEffect } from 'react';
-import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import type { UserRole } from '@/api/types';
 import { CookieBanner } from '@/components/layout/CookieBanner';
@@ -149,66 +148,6 @@ function TaxiEntry() {
   return <TaxiGatewayPage />;
 }
 
-/**
- * Rider or driver.
- *
- * The choice is carried to sign-in as `?as=`, which register reads to preselect
- * the account type. It is a hint about intent, never authority: the signup
- * trigger downgrades anything except 'driver' to 'rider', so a crafted link
- * cannot mint a privileged account.
- */
-function ChooseRoleScreen() {
-  return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-gutter py-12">
-      <div className="mb-8 text-center">
-        <span
-          aria-hidden
-          className="mx-auto grid h-14 w-14 place-items-center rounded-card brand-gradient text-h3 font-bold text-white shadow-brand"
-        >
-          A7
-        </span>
-        <h1 className="mt-5 text-h2 text-ink">AC7 Ride</h1>
-        <p className="mt-2 text-body text-ink-muted">How would you like to continue?</p>
-      </div>
-
-      <div className="space-y-3">
-        <RoleChoice
-          to="/taxi/login?as=rider"
-          title="I need a ride"
-          hint="Book a taxi, track your driver and pay in the app."
-        />
-        <RoleChoice
-          to="/taxi/login?as=driver"
-          title="I want to drive"
-          hint="Take jobs, run shifts and get paid. Documents are checked first."
-        />
-      </div>
-
-      <Link
-        to="/"
-        className="mt-8 text-center text-body-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline"
-      >
-        Back to AC7 GROUP
-      </Link>
-    </main>
-  );
-}
-
-function RoleChoice({ to, title, hint }: { to: string; title: string; hint: string }) {
-  return (
-    <Link
-      to={to}
-      className="flex items-center justify-between gap-4 rounded-card border border-line bg-card p-5 shadow-card transition-colors hover:border-brand hover:bg-brand-soft"
-    >
-      <span className="min-w-0">
-        <span className="block text-body-lg font-semibold text-ink">{title}</span>
-        <span className="mt-1 block text-body-sm text-ink-muted">{hint}</span>
-      </span>
-      <ChevronRight size={20} className="shrink-0 text-brand-ink" aria-hidden />
-    </Link>
-  );
-}
-
 function RequireAuth({ allow, children }: { allow: UserRole[]; children: React.ReactNode }) {
   const { isAuthenticated, isLoading, role } = useAuth();
   const location = useLocation();
@@ -261,7 +200,9 @@ export function App() {
               marketing page at this path — the landing site is the only front
               door the platform has. */}
           <Route path="/taxi" element={<TaxiEntry />} />
-          <Route path="/taxi/download" element={<ChooseRoleScreen />} />
+          {/* Kept as a redirect so anything already linking here still works.
+              The rider/driver choice moved onto the sign-in screen. */}
+          <Route path="/taxi/download" element={<Navigate to="/taxi/login" replace />} />
           <Route
             path="/taxi/onboarding"
             element={
