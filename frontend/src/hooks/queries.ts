@@ -12,10 +12,8 @@ import {
   earningsApi,
   favoritesApi,
   geoApi,
-  mapsApi,
   paymentsApi,
   pricingApi,
-  rideTypesApi,
   ridesApi,
   driverRidesApi,
   safetyApi,
@@ -23,6 +21,8 @@ import {
 } from '@/api';
 import type { LatLng, RideRequestPayload } from '@/api/types';
 import type { EstimateRequest } from '@/api';
+import { computeRoute } from '@/lib/geocode';
+import { quoteAll, tariffsAsRideTypes } from '@/lib/pricing';
 
 /* -------------------------------------------------------------------------- */
 /* Cache keys                                                                  */
@@ -51,24 +51,58 @@ export const keys = {
 /* Ride types & pricing                                                        */
 /* -------------------------------------------------------------------------- */
 
-/** Vehicle tiers. Rarely change, so cached for the session. */
+/**
+ * The vehicle tiers a rider can choose from.
+ *
+ * From the local tariff table for the same reason as the fares: the endpoint
+ * this used to call is on the undeployed Go service, so the selector rendered
+ * empty and there was nothing to book. Resolved rather than fetched, so the
+ * tiers appear instantly and cannot fail.
+ */
 export function useRideTypes() {
   return useQuery({
     queryKey: keys.rideTypes,
-    queryFn: () => rideTypesApi.available(),
+    queryFn: () => Promise.resolve(tariffsAsRideTypes()),
     staleTime: 15 * 60_000,
   });
 }
 
 /**
- * Fare estimates for every tier at once, so the selector can show real prices
+ * Fare estimates for every tier at once, so the selector shows real prices
  * rather than placeholders. Only runs when both ends of the trip are known.
+ *
+ * ── Why this no longer calls the backend ──────────────────────────────────
+ * It called /pricing/bulk-estimate on the Go service, which is deployed
+ * nowhere. The request resolved to the SPA's own index.html, failed on a JSON
+ * parse, and the booking screen showed no price at all — permanently, with
+ * nothing on screen to explain it. A minicab app that cannot quote a fare is
+ * not a minicab app.
+ *
+ * The fare is now computed from the route Google returns, using the tariff in
+ * lib/pricing.ts. It needs no backend, and it is honest: the same distance and
+ * duration the rider can see on the screen are the numbers the price is
+ * derived from.
+ *
+ * When the pricing service does exist, this reverts to one line — the shape it
+ * returns is unchanged.
  */
 export function useFareEstimates(request: EstimateRequest | null) {
+  const { data: route } = useRoute(
+    request ? { lat: request.pickup_latitude, lng: request.pickup_longitude } : null,
+    request ? { lat: request.dropoff_latitude, lng: request.dropoff_longitude } : null,
+  );
+
   return useQuery({
-    queryKey: keys.estimates(request!),
-    queryFn: () => pricingApi.bulkEstimate(request!),
-    enabled: request !== null,
+    queryKey: [...keys.estimates(request!), route?.distance_meters, route?.duration_seconds],
+    queryFn: () =>
+      quoteAll(
+        route!.distance_meters,
+        route!.duration_in_traffic_seconds ?? route!.duration_seconds,
+      ),
+    /* Only once the route is known. Quoting from a straight-line guess would
+       under-price every journey that crosses the river, and a rider quoted £12
+       who is charged £19 does not come back. */
+    enabled: request !== null && route != null,
     staleTime: 60_000,
   });
 }
@@ -100,11 +134,35 @@ export function useNearbyDrivers(position: LatLng | null, enabled = true) {
   });
 }
 
-/** Route geometry and distance from the backend maps service. */
+/**
+ * Route geometry, distance and duration.
+ *
+ * ── Why this no longer calls the backend either ───────────────────────────
+ * Same story as the fares: /maps/route lives on the undeployed Go service, so
+ * the booking screen showed neither miles nor minutes. This asks Google Routes
+ * directly. `computeRoute` caches for two minutes and counts against the
+ * monthly budget, so a re-render costs nothing and a runaway cannot bill.
+ *
+ * The response is reshaped to the old wire format rather than changing the
+ * callers, so BookRidePage, TrackRidePage and the driver screens are all
+ * untouched — and switching back to a real routing service later is one
+ * function, not a sweep through five screens.
+ */
 export function useRoute(from: LatLng | null, to: LatLng | null) {
   return useQuery({
     queryKey: keys.route(from!, to!),
-    queryFn: () => mapsApi.route(from!, to!),
+    queryFn: async () => {
+      const result = await computeRoute(from!, to!);
+      if (!result) return null;
+      return {
+        polyline: result.polyline,
+        distance_meters: result.distance,
+        duration_seconds: result.duration,
+        /* Google's TRAFFIC_AWARE duration already accounts for current
+           conditions, so there is no separate free-flow figure to report. */
+        duration_in_traffic_seconds: result.duration,
+      };
+    },
     enabled: from !== null && to !== null,
     staleTime: 5 * 60_000,
   });
