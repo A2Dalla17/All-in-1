@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bell, ChevronRight, Clock, Crosshair, Menu, Moon, Star, Sun, TrendingUp, Wallet,
@@ -56,16 +56,40 @@ export function DriverDashboard() {
   const [accepting, setAccepting] = useState<string | null>(null);
   const [declined, setDeclined] = useState<Set<string>>(new Set());
 
-  /* -- Push location while online ----------------------------------------- */
+  /* -- Push location while online -----------------------------------------
+   *
+   * The interval is the whole point of this effect: a driver's position goes
+   * to the server every env.driverLocationPingMs, and no faster.
+   *
+   * That is why position and heading are read through a ref instead of being
+   * dependencies. useGeolocation runs `watchPosition`, which produces a new
+   * object on every GPS update — so listing it here tore the effect down and
+   * rebuilt it on each fix, and the rebuild calls push() immediately. The
+   * interval never got to run: the app pushed on every GPS update instead of
+   * every few seconds, and driverLocationPingMs did nothing at all. On a
+   * moving vehicle that is a request per second per driver, all day.
+   *
+   * Depending only on `online` means the timer is created when the driver
+   * goes online and destroyed when they go offline, which is what it is for.
+   */
+  const fixRef = useRef({ position, heading });
+  fixRef.current = { position, heading };
+
   useEffect(() => {
-    if (!online || !position) return;
+    if (!online) return;
 
     let cancelled = false;
 
     const push = () => {
       if (cancelled) return;
+      const fix = fixRef.current;
+      /* No fix yet — skip this tick rather than abandoning the timer. The
+         driver may still be waiting on their first GPS lock, and the next
+         tick will have it. */
+      if (!fix.position) return;
+
       geoApi
-        .pushLocation({ ...position, heading: heading ?? undefined })
+        .pushLocation({ ...fix.position, heading: fix.heading ?? undefined })
         .catch(() => {
           // A dropped ping is not worth interrupting the driver over; the next
           // one succeeds. Persistent failure surfaces via the ride list.
@@ -79,7 +103,7 @@ export function DriverDashboard() {
       cancelled = true;
       clearInterval(timer);
     };
-  }, [online, position, heading]);
+  }, [online]);
 
   /* -- Actions ------------------------------------------------------------ */
 

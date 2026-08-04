@@ -85,18 +85,61 @@ export function HomePage() {
   const centre = position ?? env.defaultMapCenter;
   const hasLocation = Boolean(position);
 
-  /* Name the pickup once a fix arrives. Cosmetic — the coordinates work
-     regardless — so a failure here is swallowed rather than surfaced. */
+  /**
+   * Latest position, held where an effect can read it without depending on it.
+   *
+   * ── The bug this fixes ────────────────────────────────────────────────────
+   * The search is debounced, and the debounce lives in an effect. Adding
+   * `position` to that effect's dependencies looked harmless — the search
+   * biases results toward where the rider is — but useGeolocation runs
+   * `watchPosition`, which fires on every GPS update and builds a NEW
+   * `{lat, lng}` object each time.
+   *
+   * A new object is a new dependency identity, so the effect tore down and
+   * rebuilt on every fix, and its cleanup cleared the pending timer. With
+   * fixes arriving faster than the 1100 ms debounce, the timeout was reset
+   * before it could ever fire: typing produced no request at all, no error,
+   * and nothing on screen. Confirmed by watching the network — zero calls to
+   * Google or Nominatim while typing.
+   *
+   * A ref carries the value without participating in the dependency list, so
+   * the search still biases to the rider's location and the timer is only
+   * reset by what should reset it: the query changing.
+   */
+  const positionRef = useRef(position);
+  positionRef.current = position;
+
+  /**
+   * Name the pickup once a fix arrives.
+   *
+   * ── Why this depends on a COARSE position, not the exact one ─────────────
+   * This is a billed Geocoding call. useGeolocation runs `watchPosition`, so
+   * depending on the position object re-ran this on every GPS update — and in
+   * a moving car that is roughly one paid call per second. Three hours of
+   * driving would have burned the entire monthly free tier, and the only
+   * symptom would have been a bill.
+   *
+   * Rounding to three decimal places is about 110 m, so the effect fires when
+   * the rider has actually moved somewhere with a different name, not when
+   * the GPS jitters by a few metres while they stand still. The cache in
+   * lib/maps/cache.ts rounds harder still (~11 m) and catches the rest.
+   *
+   * Cosmetic either way — the coordinates work regardless of the label — so a
+   * failure here is swallowed rather than surfaced.
+   */
+  const coarseLat = position ? Math.round(position.lat * 1000) / 1000 : null;
+  const coarseLng = position ? Math.round(position.lng * 1000) / 1000 : null;
+
   useEffect(() => {
-    if (!position) return;
+    if (coarseLat === null || coarseLng === null) return;
     let cancelled = false;
-    void reverseGeocode(position.lat, position.lng).then((place) => {
+    void reverseGeocode(coarseLat, coarseLng).then((place) => {
       if (!cancelled && place) setPickupLabel(place.label);
     });
     return () => {
       cancelled = true;
     };
-  }, [position]);
+  }, [coarseLat, coarseLng]);
 
   /* Debounced search. The delay is Nominatim's rate limit rather than a UX
      choice, and the previous request is aborted so a slow early response
@@ -116,7 +159,7 @@ export function HomePage() {
       setSearching(true);
       setSearchError(null);
 
-      searchPlaces(query, controller.signal, sessionRef.current, position ?? undefined)
+      searchPlaces(query, controller.signal, sessionRef.current, positionRef.current ?? undefined)
         .then(setResults)
         .catch((e: unknown) => {
           if (e instanceof DOMException && e.name === 'AbortError') return;
@@ -127,8 +170,11 @@ export function HomePage() {
         });
     }, SEARCH_DEBOUNCE_MS);
 
+    /* `query` ONLY. Anything else in here that changes on a timer — and a GPS
+       position does exactly that — cancels the pending search before it can
+       fire. See the note on positionRef above. */
     return () => clearTimeout(timer);
-  }, [query, position]);
+  }, [query]);
 
   /**
    * Commit to a destination.
