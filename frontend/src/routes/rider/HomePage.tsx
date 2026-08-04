@@ -170,7 +170,14 @@ export function HomePage() {
   );
 
   return (
-    <div className="fixed inset-0 flex flex-col">
+    /*
+      Phone: map strip on top, sheet below — column order, sheet last.
+      Desktop: panel on the left, map filling the rest — row order REVERSED,
+      because the sheet is written second in the markup but belongs first on a
+      wide screen. Reversing the flex direction gets the visual order right
+      without duplicating the whole tree for two layouts.
+    */
+    <div className="fixed inset-0 flex flex-col md:flex-row-reverse">
       {/*
         Map takes the top and is never covered by the sheet.
 
@@ -181,7 +188,7 @@ export function HomePage() {
         Leaflet's own zoom control visible. Isolating scopes those numbers
         inside this element so ordinary application layering works again.
       */}
-      <div className="relative isolate z-0 flex-1">
+      <div className="relative isolate z-0 min-h-0 min-w-0 flex-1">
         <MapView
           center={centre}
           zoom={hasLocation ? 15 : 12}

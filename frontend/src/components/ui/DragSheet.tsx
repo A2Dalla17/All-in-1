@@ -72,6 +72,30 @@ export function DragSheet({
   useEffect(() => {
     if (expandWhen) setSnap('expanded');
   }, [expandWhen]);
+
+  /*
+   * A dragging sheet is a phone idea, and on a wide screen it is the wrong
+   * one. Centred and capped at a readable width it became a floating card
+   * marooned in the middle of the window with map on all four sides — which
+   * is precisely the "map is taking the whole page" complaint, just at a
+   * different screen size.
+   *
+   * From `md` up this becomes a side panel instead: full height, fixed width,
+   * map beside it. That is what Uber and Bolt do on the web, and it is the
+   * only arrangement where a mouse user can both read the panel and see a
+   * useful amount of map at once. There is nothing to drag, because with the
+   * panel beside the map rather than over it there is nothing in the way.
+   */
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches,
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 768px)');
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
   const [dragOffset, setDragOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
 
@@ -157,6 +181,25 @@ export function DragSheet({
   );
 
   const toggle = () => setSnap((s) => (s === 'expanded' ? 'collapsed' : 'expanded'));
+
+  /* Desktop: a side panel, sitting in the page's flex row rather than floating
+     over it. No fixed positioning, no measured height, no handle. */
+  if (isDesktop) {
+    return (
+      <aside
+        className={cn(
+          'flex h-full w-[26rem] shrink-0 flex-col overflow-hidden border-r border-line bg-bg',
+          className,
+        )}
+      >
+        {/* pb-tabbar because the navigation is fixed to the bottom of the
+            window at every width, so without it the last row of this panel
+            sits permanently underneath the tabs and cannot be scrolled into
+            view. */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-gutter pb-tabbar pt-5">{children}</div>
+      </aside>
+    );
+  }
 
   return (
     <div
