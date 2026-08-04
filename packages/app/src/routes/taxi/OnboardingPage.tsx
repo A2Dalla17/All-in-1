@@ -58,7 +58,7 @@ export function OnboardingPage() {
         p_channel: chosen,
       });
       if (rpcError) throw new Error(rpcError.message);
-      navigate('/taxi/app', { replace: true });
+      navigate('/rider', { replace: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save that. Try again.');
     } finally {

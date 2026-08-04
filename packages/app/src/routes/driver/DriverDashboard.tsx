@@ -35,7 +35,7 @@ import { SlideToToggle } from './components/SlideToToggle';
  * and styled to stay that way.
  *
  * While online the app pushes position to `POST /geo/location` on the interval
- * from `env.driverLocationPingMs`, and polls `/taxi/driver/rides/available`. Both
+ * from `env.driverLocationPingMs`, and polls `/driver/rides/available`. Both
  * stop entirely when offline — continuous GPS is the largest battery cost in a
  * driver app, and running it while offline earns nothing.
  */
@@ -126,7 +126,7 @@ export function DriverDashboard() {
     setAccepting(rideId);
     try {
       await driverRidesApi.accept(rideId);
-      navigate(`/taxi/driver/trip/${rideId}`);
+      navigate(`/driver/trip/${rideId}`);
     } catch (error) {
       toast.error(
         'Could not accept',
@@ -233,7 +233,7 @@ export function DriverDashboard() {
 
                 <button
                   type="button"
-                  onClick={() => navigate('/taxi/driver/earnings')}
+                  onClick={() => navigate('/driver/earnings')}
                   className="pressable mt-4 inline-flex items-center gap-1.5 rounded-pill bg-white/15 px-3.5 py-1.5 text-micro font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/25"
                 >
                   <TrendingUp size={13} aria-hidden />
@@ -318,7 +318,7 @@ export function DriverDashboard() {
             {pending.length > 1 && (
               <button
                 type="button"
-                onClick={() => navigate('/taxi/driver/requests')}
+                onClick={() => navigate('/driver/requests')}
                 className="pressable text-caption font-semibold text-brand-ink"
               >
                 View all {pending.length}
@@ -364,22 +364,22 @@ export function DriverDashboard() {
             <Shortcut
               icon={<Wallet size={19} />}
               label="Wallet"
-              onClick={() => navigate('/taxi/driver/wallet')}
+              onClick={() => navigate('/driver/wallet')}
             />
             <Shortcut
               icon={<TripIcon />}
               label="Trips"
-              onClick={() => navigate('/taxi/driver/trips')}
+              onClick={() => navigate('/driver/trips')}
             />
             <Shortcut
               icon={<TrendingUp size={19} />}
               label="Earnings"
-              onClick={() => navigate('/taxi/driver/earnings')}
+              onClick={() => navigate('/driver/earnings')}
             />
             <Shortcut
               icon={<Star size={19} />}
               label="Profile"
-              onClick={() => navigate('/taxi/driver/profile')}
+              onClick={() => navigate('/driver/profile')}
             />
           </div>
         </section>

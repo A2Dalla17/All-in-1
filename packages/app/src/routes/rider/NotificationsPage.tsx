@@ -104,7 +104,7 @@ export function NotificationsPage() {
               icon={<Bell size={22} />}
               title="Nothing new"
               description="Trip updates, payment receipts and offers will appear here."
-              action={<Button onClick={() => navigate('/taxi/app')}>Book a ride</Button>}
+              action={<Button onClick={() => navigate('/rider')}>Book a ride</Button>}
             />
           </Card>
         ) : (

@@ -136,7 +136,7 @@ export function ProfilePage() {
            and people look for it top-right by habit. */
         trailing={
           <Link
-            to="/taxi/app/settings"
+            to="/rider/settings"
             aria-label="Settings"
             className="grid h-11 w-11 place-items-center rounded-control text-ink-muted transition-colors hover:bg-surface hover:text-ink"
           >
@@ -218,10 +218,10 @@ export function ProfilePage() {
         {/* ---- Shortcuts ----------------------------------------------- */}
         <section className="mt-4 px-gutter">
           <div className="grid grid-cols-4 gap-2.5">
-            <Shortcut icon={<Heart size={19} />} label="Places" to="/taxi/app/favourites" />
-            <Shortcut icon={<Bell size={19} />} label="Alerts" to="/taxi/app/notifications" />
-            <Shortcut icon={<ShieldAlert size={19} />} label="Safety" to="/taxi/app/safety" />
-            <Shortcut icon={<LifeBuoy size={19} />} label="Help" to="/taxi/app/support" />
+            <Shortcut icon={<Heart size={19} />} label="Places" to="/rider/favourites" />
+            <Shortcut icon={<Bell size={19} />} label="Alerts" to="/rider/notifications" />
+            <Shortcut icon={<ShieldAlert size={19} />} label="Safety" to="/rider/safety" />
+            <Shortcut icon={<LifeBuoy size={19} />} label="Help" to="/rider/support" />
           </div>
         </section>
 
@@ -234,7 +234,7 @@ export function ProfilePage() {
                 description="Your last five journeys"
                 action={
                   <Link
-                    to="/taxi/app/trips"
+                    to="/rider/trips"
                     className="inline-flex items-center gap-0.5 text-caption font-semibold text-brand-ink"
                   >
                     All
@@ -255,7 +255,7 @@ export function ProfilePage() {
                 title="No trips yet"
                 description="Book your first ride and it will appear here with the route and fare."
                 action={
-                  <Link to="/taxi/app">
+                  <Link to="/rider">
                     <Button>Book a ride</Button>
                   </Link>
                 }
@@ -264,7 +264,7 @@ export function ProfilePage() {
               <ul className="space-y-2.5 px-5 pb-5">
                 {trips.map((ride) => (
                   <li key={ride.id}>
-                    <TripCard ride={ride} to={`/taxi/app/track/${ride.id}`} />
+                    <TripCard ride={ride} to={`/rider/track/${ride.id}`} />
                   </li>
                 ))}
               </ul>
@@ -275,7 +275,7 @@ export function ProfilePage() {
         {/* ---- Refer a driver ------------------------------------------ */}
         <section className="mt-4 px-gutter">
           <Link
-            to="/taxi/app/refer"
+            to="/rider/refer"
             className="liftable edge-light relative flex w-full items-center gap-4 overflow-hidden rounded-panel brand-gradient p-5 text-left text-white shadow-brand"
           >
             <span
@@ -407,7 +407,7 @@ export function ProfilePage() {
         <section className="mt-4 px-gutter">
           <Card padded={false}>
             <Link
-              to="/taxi/app/support"
+              to="/rider/support"
               className="flex items-center gap-3 border-b border-line px-5 py-4 transition-colors hover:bg-surface"
             >
               <LifeBuoy size={18} className="shrink-0 text-ink-muted" aria-hidden />

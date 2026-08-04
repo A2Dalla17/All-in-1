@@ -42,13 +42,13 @@ const ChatThreadPage = lazy(() =>
 );
 
 const LEFT_TABS = [
-  { to: '/taxi/driver', label: 'Home', icon: Home, end: true },
-  { to: '/taxi/driver/shifts', label: 'Shifts', icon: CalendarClock, end: false },
+  { to: '/driver', label: 'Home', icon: Home, end: true },
+  { to: '/driver/shifts', label: 'Shifts', icon: CalendarClock, end: false },
 ] as const;
 
 const RIGHT_TABS = [
-  { to: '/taxi/driver/rank', label: 'Rank', icon: Trophy, end: false },
-  { to: '/taxi/driver/profile', label: 'Profile', icon: User, end: false },
+  { to: '/driver/rank', label: 'Rank', icon: Trophy, end: false },
+  { to: '/driver/profile', label: 'Profile', icon: User, end: false },
 ] as const;
 
 /**
@@ -83,7 +83,7 @@ export function DriverLayout() {
               <Route path="refer" element={<ReferPage />} />
               <Route path="messages" element={<MessagesPage />} />
               <Route path="chat/:threadId" element={<ChatThreadPage />} />
-              <Route path="*" element={<Navigate to="/taxi/driver" replace />} />
+              <Route path="*" element={<Navigate to="/driver" replace />} />
             </Routes>
           </Suspense>
         </main>

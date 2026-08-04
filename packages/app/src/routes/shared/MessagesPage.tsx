@@ -41,7 +41,7 @@ export function MessagesPage() {
   }, [queryClient]);
 
   const items = threads.data ?? [];
-  const base = isDriver ? '/taxi/driver' : '/taxi/app';
+  const base = isDriver ? '/driver' : '/rider';
 
   return (
     <div className="min-h-full bg-surface pb-tabbar">
@@ -74,7 +74,7 @@ export function MessagesPage() {
               }
               action={
                 isDriver ? undefined : (
-                  <Link to="/taxi/d">
+                  <Link to="/d">
                     <Button leadingIcon={<ScanLine size={16} />}>Find a driver by code</Button>
                   </Link>
                 )

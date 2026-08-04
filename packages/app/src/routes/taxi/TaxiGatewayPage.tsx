@@ -39,7 +39,7 @@ export function TaxiGatewayPage() {
              screen now — a separate page to answer one question, before a
              form that asks the same person for two more things, was a step
              for its own sake. */
-          to="/taxi/login"
+          to="/login"
           className="flex items-center gap-4 rounded-card brand-gradient p-5 text-white shadow-brand transition-[filter] hover:brightness-[1.06]"
         >
           <span

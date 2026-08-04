@@ -9,7 +9,7 @@ import {
   X,
 } from 'lucide-react';
 
-import { Logo } from '@/components/layout/Logo';
+import { Logo } from '@shared/components/ui/Logo';
 import { Container } from '@shared/components/ui/Container';
 import { env } from '@shared/config/env';
 import { HEADER_NAV } from '@shared/config/navigation';

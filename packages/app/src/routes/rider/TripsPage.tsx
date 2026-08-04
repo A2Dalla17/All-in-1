@@ -97,7 +97,7 @@ export function TripsPage() {
               }
               action={
                 filter === 'all' ? (
-                  <Link to="/taxi/app">
+                  <Link to="/rider">
                     <Button>Book a ride</Button>
                   </Link>
                 ) : (
@@ -114,7 +114,7 @@ export function TripsPage() {
           {visible.map((ride) => (
             <li key={ride.id}>
               <Link
-                to={`/taxi/app/track/${ride.id}`}
+                to={`/rider/track/${ride.id}`}
                 className="liftable group block rounded-card border border-line bg-card p-4"
               >
                 <div className="flex items-center justify-between gap-3">

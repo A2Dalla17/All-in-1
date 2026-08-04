@@ -79,7 +79,7 @@ export function RidesPage() {
               nested in a <button> is invalid HTML and browsers disagree about
               which one handles the click. */}
           <Link
-            to="/taxi/app/book?schedule=1"
+            to="/rider/book?schedule=1"
             className="brand-gradient mt-4 flex h-12 w-full items-center justify-center rounded-control text-body font-semibold text-white shadow-brand transition-[filter] hover:brightness-[1.06]"
           >
             Schedule a ride
@@ -105,7 +105,7 @@ export function RidesPage() {
             </p>
             {tab === 'upcoming' && (
               <Link
-                to="/taxi/app/book"
+                to="/rider/book"
                 className="brand-gradient mt-5 inline-flex h-12 items-center gap-2 rounded-control px-6 text-body font-semibold text-white shadow-brand transition-[filter] hover:brightness-[1.06]"
               >
                 <MapPin size={16} aria-hidden />

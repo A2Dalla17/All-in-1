@@ -123,7 +123,7 @@ export function BookRidePage() {
         is_scheduled: false,
       });
 
-      navigate(`/taxi/app/track/${ride.id}`);
+      navigate(`/rider/track/${ride.id}`);
     } catch (error) {
       toast.error(
         'Could not request your ride',

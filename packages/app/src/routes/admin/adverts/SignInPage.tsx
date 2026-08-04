@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { Lock, ShieldCheck } from 'lucide-react';
 
-import { Logo } from '@/components/layout/Logo';
+import { Logo } from '@shared/components/ui/Logo';
 import { Button } from '@shared/components/ui/Button';
 import { Container } from '@shared/components/ui/Container';
 import { useAuth } from '@shared/providers/AuthProvider';

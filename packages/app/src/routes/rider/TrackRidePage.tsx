@@ -104,7 +104,7 @@ export function TrackRidePage() {
       await cancelRide.mutateAsync({ rideId, reason: 'Cancelled by rider' });
       setCancelOpen(false);
       toast.info('Ride cancelled');
-      navigate('/taxi/app');
+      navigate('/rider');
     } catch (error) {
       toast.error(
         'Could not cancel',
@@ -153,7 +153,7 @@ export function TrackRidePage() {
     try {
       await rateRide.mutateAsync({ rideId, rating: value });
       toast.success('Thanks for the feedback');
-      navigate('/taxi/app');
+      navigate('/rider');
     } catch (error) {
       toast.error(
         'Could not submit your rating',
@@ -179,7 +179,7 @@ export function TrackRidePage() {
         icon={<AlertTriangle size={24} />}
         title="We couldn't load this trip"
         description="It may have been removed, or you may not have access to it."
-        action={<Button onClick={() => navigate('/taxi/app')}>Back to booking</Button>}
+        action={<Button onClick={() => navigate('/rider')}>Back to booking</Button>}
       />
     );
   }
@@ -316,7 +316,7 @@ export function TrackRidePage() {
 
           {/* Primary action */}
           {isFinished ? (
-            <Button size="lg" fullWidth onClick={() => navigate('/taxi/app')}>
+            <Button size="lg" fullWidth onClick={() => navigate('/rider')}>
               Book another ride
             </Button>
           ) : (

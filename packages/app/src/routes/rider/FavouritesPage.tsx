@@ -121,7 +121,7 @@ export function FavouritesPage() {
 
                   <button
                     type="button"
-                    onClick={() => navigate('/taxi/app/book')}
+                    onClick={() => navigate('/rider/book')}
                     className="min-w-0 flex-1 text-left"
                   >
                     <p className="truncate font-semibold text-ink">{f.label}</p>

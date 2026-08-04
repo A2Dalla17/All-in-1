@@ -14,8 +14,8 @@ type Intent = 'rider' | 'driver';
 
 /** The default home for an account, used when no intent was chosen. */
 const HOME_FOR_ROLE = {
-  rider: '/taxi/app',
-  driver: '/taxi/driver',
+  rider: '/rider',
+  driver: '/driver',
   admin: '/admin',
 } as const;
 
@@ -34,17 +34,17 @@ const HOME_FOR_ROLE = {
  * because wanting to drive and being allowed to drive are different things.
  */
 function destinationFor(role: 'rider' | 'driver' | 'admin' | undefined, intent: Intent | null): string {
-  if (!role) return '/taxi/app';
+  if (!role) return '/rider';
 
   if (intent === 'driver') {
-    if (role === 'driver' || role === 'admin') return '/taxi/driver';
-    return '/taxi/driver/application';
+    if (role === 'driver' || role === 'admin') return '/driver';
+    return '/driver/application';
   }
 
   if (intent === 'rider') {
     /* Every signed-in role may use the rider app — drivers and admins book
-       taxis too, and RequireAuth on /taxi/app already allows all three. */
-    return '/taxi/app';
+       taxis too, and RequireAuth on /rider already allows all three. */
+    return '/rider';
   }
 
   return HOME_FOR_ROLE[role];
@@ -111,7 +111,7 @@ export function LoginPage() {
       footer={
         <>
           New to AC7 Ride?{' '}
-          <Link to="/taxi/register" className="font-semibold text-brand-ink hover:text-brand-hover">
+          <Link to="/register" className="font-semibold text-brand-ink hover:text-brand-hover">
             Create an account
           </Link>
         </>
@@ -205,7 +205,7 @@ export function LoginPage() {
 
         <div className="flex justify-end">
           <Link
-            to="/taxi/forgot-password"
+            to="/forgot-password"
             className="text-sm font-medium text-brand-ink hover:text-brand-hover"
           >
             Forgot password?

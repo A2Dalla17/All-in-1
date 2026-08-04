@@ -178,8 +178,8 @@ export function DriverLookupPage() {
           <DriverResultCard
             driver={result}
             canMessage={isAuthenticated}
-            onMessage={() => navigate(`/taxi/app/chat/new?driver=${result.driver_code}`)}
-            onSignIn={() => navigate('/taxi/login', { state: { from: `/taxi/d/${result.driver_code}` } })}
+            onMessage={() => navigate(`/rider/chat/new?driver=${result.driver_code}`)}
+            onSignIn={() => navigate('/login', { state: { from: `/d/${result.driver_code}` } })}
           />
         )}
 

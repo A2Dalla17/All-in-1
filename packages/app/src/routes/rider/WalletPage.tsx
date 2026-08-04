@@ -73,7 +73,7 @@ export function WalletPage() {
       <header className="flex items-center justify-between px-5 pb-1 pt-[calc(0.75rem+var(--safe-top))]">
         <span className="w-11" />
         <h1 className="text-body-lg font-bold tracking-[-0.02em] text-ink">Wallet</h1>
-        <IconButton label="Trip receipts" onClick={() => navigate('/taxi/app/trips')}>
+        <IconButton label="Trip receipts" onClick={() => navigate('/rider/trips')}>
           <Receipt size={19} />
         </IconButton>
       </header>

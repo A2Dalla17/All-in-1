@@ -42,13 +42,13 @@ const ChatThreadPage = lazy(() =>
 
 /** Left of the centre action, then right — matching the mockup's tab order. */
 const LEFT_TABS = [
-  { to: '/taxi/app', label: 'Home', icon: Home, end: true },
-  { to: '/taxi/app/rides', label: 'Rides', icon: Car, end: false },
+  { to: '/rider', label: 'Home', icon: Home, end: true },
+  { to: '/rider/rides', label: 'Rides', icon: Car, end: false },
 ] as const;
 
 const RIGHT_TABS = [
-  { to: '/taxi/app/service', label: 'Service', icon: LayoutGrid, end: false },
-  { to: '/taxi/app/profile', label: 'Profile', icon: User, end: false },
+  { to: '/rider/service', label: 'Service', icon: LayoutGrid, end: false },
+  { to: '/rider/profile', label: 'Profile', icon: User, end: false },
 ] as const;
 
 /**
@@ -62,7 +62,7 @@ export function RiderLayout() {
   const location = useLocation();
 
   const immersive =
-    location.pathname.startsWith('/taxi/app/book') || location.pathname.startsWith('/taxi/app/track');
+    location.pathname.startsWith('/rider/book') || location.pathname.startsWith('/rider/track');
 
   return (
     <ToastProvider>
@@ -95,7 +95,7 @@ export function RiderLayout() {
                   page resolves it into a real thread on arrival. */}
               <Route path="chat/new" element={<ChatThreadPage />} />
               <Route path="chat/:threadId" element={<ChatThreadPage />} />
-              <Route path="*" element={<Navigate to="/taxi/app" replace />} />
+              <Route path="*" element={<Navigate to="/rider" replace />} />
             </Routes>
           </Suspense>
         </main>
@@ -144,7 +144,7 @@ function RiderTabBar() {
 
         {/* Centre action — raised, and inverted so it reads on the red. */}
         <NavLink
-          to="/taxi/app/book"
+          to="/rider/book"
           className="pressable -mt-6 flex flex-col items-center gap-1"
           aria-label="Book a ride"
         >

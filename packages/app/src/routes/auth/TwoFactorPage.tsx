@@ -89,7 +89,7 @@ export function TwoFactorPage() {
         setError('That code is incorrect. Please try again.');
         return;
       }
-      navigate(role === 'driver' ? '/taxi/driver' : role === 'admin' ? '/admin' : '/taxi/app', {
+      navigate(role === 'driver' ? '/driver' : role === 'admin' ? '/admin' : '/rider', {
         replace: true,
       });
     } catch (cause) {

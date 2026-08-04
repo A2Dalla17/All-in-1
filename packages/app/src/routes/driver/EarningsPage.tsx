@@ -23,7 +23,7 @@ const PERIODS: Array<{ id: Period; label: string }> = [
  *
  * Matches the mockup: period tabs, headline total with a trend sparkline,
  * three stat tiles, and a breakdown table. Every figure comes from
- * `/taxi/driver/earnings/*` — there is no client-side estimation.
+ * `/driver/earnings/*` — there is no client-side estimation.
  */
 export function EarningsPage() {
   const navigate = useNavigate();
@@ -173,7 +173,7 @@ export function EarningsPage() {
       <section className="mt-3 px-5">
         <button
           type="button"
-          onClick={() => navigate('/taxi/driver/wallet')}
+          onClick={() => navigate('/driver/wallet')}
           className="pressable flex w-full items-center justify-center gap-2.5 rounded-card border border-line bg-card py-4 text-body font-semibold text-ink"
         >
           <ListOrdered size={17} aria-hidden />

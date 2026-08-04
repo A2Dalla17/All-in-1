@@ -77,7 +77,7 @@ export function RegisterPage() {
          onboarding to give a phone number and choose how we may message
          them. Neither can be skipped by deep-linking past it: the rider
          app checks onboarded_at. */
-      navigate(user?.role === 'driver' ? '/taxi/driver/application' : '/taxi/onboarding', {
+      navigate(user?.role === 'driver' ? '/driver/application' : '/onboarding', {
         replace: true,
       });
     } catch (cause) {
@@ -100,7 +100,7 @@ export function RegisterPage() {
       footer={
         <>
           Already have an account?{' '}
-          <Link to="/taxi/login" className="font-semibold text-brand-ink hover:text-brand-hover">
+          <Link to="/login" className="font-semibold text-brand-ink hover:text-brand-hover">
             Sign in
           </Link>
         </>

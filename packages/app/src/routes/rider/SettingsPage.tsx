@@ -77,7 +77,7 @@ export function RiderSettingsPage() {
             satisfied still gets read the second time it appears. */}
         {user && !user.onboarded_at && (
           <Link
-            to="/taxi/onboarding"
+            to="/onboarding"
             className="flex items-center gap-3.5 rounded-card border border-warning/30 bg-warning-soft p-4"
           >
             <span
@@ -111,15 +111,15 @@ export function RiderSettingsPage() {
             icon={<Wallet size={19} />}
             label="Payment and wallet"
             hint="Cards, balance and receipts"
-            to="/taxi/app/wallet"
+            to="/rider/wallet"
           />
-          <Row icon={<Gift size={19} />} label="Your promotions" to="/taxi/app/refer" />
+          <Row icon={<Gift size={19} />} label="Your promotions" to="/rider/refer" />
         </Group>
 
         <Group>
-          <Row icon={<MapPin size={19} />} label="Saved places" to="/taxi/app/favourites" />
-          <Row icon={<ShieldCheck size={19} />} label="Safety" to="/taxi/app/safety" />
-          <Row icon={<LifeBuoy size={19} />} label="Support" to="/taxi/app/support" />
+          <Row icon={<MapPin size={19} />} label="Saved places" to="/rider/favourites" />
+          <Row icon={<ShieldCheck size={19} />} label="Safety" to="/rider/safety" />
+          <Row icon={<LifeBuoy size={19} />} label="Support" to="/rider/support" />
         </Group>
 
         {/*
@@ -157,7 +157,7 @@ export function RiderSettingsPage() {
 
         <Group>
           <Row icon={<Lock size={19} />} label="Privacy" to="/privacy" />
-          <Row icon={<ShieldCheck size={19} />} label="Sign in and security" to="/taxi/app/profile" />
+          <Row icon={<ShieldCheck size={19} />} label="Sign in and security" to="/rider/profile" />
           <Row icon={<FileText size={19} />} label="Legal" to="/terms" />
         </Group>
 
@@ -165,7 +165,7 @@ export function RiderSettingsPage() {
           type="button"
           onClick={() => {
             void logout();
-            navigate('/taxi', { replace: true });
+            navigate('/login', { replace: true });
           }}
           className="flex min-h-12 w-full items-center justify-center gap-2 rounded-card border border-danger/30 bg-danger-soft text-body font-semibold text-danger-ink transition-colors hover:bg-danger/10"
         >
@@ -198,12 +198,12 @@ function AccountSection({ onBack }: { onBack: () => void }) {
 
       <div className="space-y-6 px-gutter">
         <Group heading="Communication">
-          <Row icon={<Bell size={19} />} label="Notifications" to="/taxi/app/notifications" />
+          <Row icon={<Bell size={19} />} label="Notifications" to="/rider/notifications" />
           <Row
             icon={<MessageCircle size={19} />}
             label="WhatsApp and SMS"
             hint={CHANNEL_LABEL[user?.messaging_channel ?? 'none']}
-            to="/taxi/onboarding"
+            to="/onboarding"
           />
           <Row icon={<CalendarDays size={19} />} label="Calendar" hint="Sync scheduled rides" />
           <Row icon={<Languages size={19} />} label="Language" hint="English (UK)" />

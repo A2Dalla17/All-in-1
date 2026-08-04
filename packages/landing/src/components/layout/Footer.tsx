@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Mail, MapPin, Phone } from 'lucide-react';
 
-import { Logo } from '@/components/layout/Logo';
+import { Logo } from '@shared/components/ui/Logo';
 import { Container } from '@shared/components/ui/Container';
 import { env } from '@shared/config/env';
 import { LEGAL_NAV, SERVICES } from '@shared/config/navigation';

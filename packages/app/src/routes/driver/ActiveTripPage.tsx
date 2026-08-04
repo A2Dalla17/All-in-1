@@ -140,13 +140,13 @@ export function DriverActiveTripPage() {
         icon={<AlertTriangle size={24} />}
         title="Couldn't load this job"
         description="It may have been reassigned or cancelled."
-        action={<Button onClick={() => navigate('/taxi/driver')}>Back to dashboard</Button>}
+        action={<Button onClick={() => navigate('/driver')}>Back to dashboard</Button>}
       />
     );
   }
 
   if (stage === 'completed') {
-    return <TripCompleted ride={ride} onDone={() => navigate('/taxi/driver')} />;
+    return <TripCompleted ride={ride} onDone={() => navigate('/driver')} />;
   }
 
   return (
@@ -258,7 +258,7 @@ export function DriverActiveTripPage() {
 
           <button
             type="button"
-            onClick={() => navigate('/taxi/driver/safety')}
+            onClick={() => navigate('/driver/safety')}
             className="flex w-full items-center justify-center gap-2 py-2 text-caption font-semibold text-danger-ink"
           >
             <ShieldAlert size={15} aria-hidden />

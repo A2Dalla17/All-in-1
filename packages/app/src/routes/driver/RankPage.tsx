@@ -278,7 +278,7 @@ export function DriverRankPage() {
         <section className="mt-4 px-gutter">
           <button
             type="button"
-            onClick={() => navigate('/taxi/driver/hall-of-fame')}
+            onClick={() => navigate('/driver/hall-of-fame')}
             className="liftable flex w-full items-center justify-center gap-2.5 rounded-card border border-line bg-card py-4 text-body font-semibold text-ink"
           >
             <Trophy size={17} aria-hidden className="text-brand-ink" />

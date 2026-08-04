@@ -36,7 +36,7 @@ export function ForgotPasswordPage() {
     try {
       // Will 401 for a logged-out user — which is the accurate outcome today.
       await otpApi.send('password_reset', 'email');
-      navigate('/taxi/two-factor?type=password_reset&via=email');
+      navigate('/two-factor?type=password_reset&via=email');
     } catch (error) {
       if (error instanceof ApiError) setStatus('unavailable');
       else setStatus('unavailable');
@@ -48,7 +48,7 @@ export function ForgotPasswordPage() {
       title="Reset your password"
       subtitle="We'll help you get back into your account."
       footer={
-        <Link to="/taxi/login" className="font-semibold text-brand-ink hover:text-brand-hover">
+        <Link to="/login" className="font-semibold text-brand-ink hover:text-brand-hover">
           Back to sign in
         </Link>
       }

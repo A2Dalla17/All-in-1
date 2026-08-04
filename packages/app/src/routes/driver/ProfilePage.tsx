@@ -180,7 +180,7 @@ export function DriverProfilePage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => navigate('/taxi/driver/ratings')}
+                  onClick={() => navigate('/driver/ratings')}
                   trailingIcon={<ChevronRight size={14} />}
                 >
                   All
@@ -271,7 +271,7 @@ export function DriverProfilePage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => navigate('/taxi/driver/trips')}
+                    onClick={() => navigate('/driver/trips')}
                     trailingIcon={<ChevronRight size={14} />}
                   >
                     All
@@ -291,7 +291,7 @@ export function DriverProfilePage() {
                 art={<NoTripsArt />}
                 title="No trips yet"
                 description="Once you complete a job it appears here with what you earned."
-                action={<Button onClick={() => navigate('/taxi/driver')}>Go online</Button>}
+                action={<Button onClick={() => navigate('/driver')}>Go online</Button>}
               />
             ) : (
               <ul className="divide-y divide-line">
@@ -404,7 +404,7 @@ export function DriverProfilePage() {
         {/* ---- Refer a driver ----------------------------------------- */}
         <section className="mt-4 px-gutter">
           <Link
-            to="/taxi/driver/refer"
+            to="/driver/refer"
             className="liftable edge-light relative flex w-full items-center gap-4 overflow-hidden rounded-panel brand-gradient p-5 text-left text-white shadow-brand"
           >
             <span
@@ -457,17 +457,17 @@ export function DriverProfilePage() {
             <LinkRow
               icon={<FileText size={18} />}
               label="Documents"
-              onClick={() => navigate('/taxi/driver/documents')}
+              onClick={() => navigate('/driver/documents')}
             />
             <LinkRow
               icon={<ShieldCheck size={18} />}
               label="Safety"
-              onClick={() => navigate('/taxi/driver/safety')}
+              onClick={() => navigate('/driver/safety')}
             />
             <LinkRow
               icon={<Gift size={18} />}
               label="Refer a driver"
-              onClick={() => navigate('/taxi/driver/refer')}
+              onClick={() => navigate('/driver/refer')}
             />
             <LinkRow
               icon={<LifeBuoy size={18} />}

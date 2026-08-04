@@ -200,7 +200,7 @@ export function HomePage() {
   const goTo = useCallback(
     (label: string, lat: number, lng: number) => {
       const params = new URLSearchParams({ to: label, lat: String(lat), lng: String(lng) });
-      navigate(`/taxi/app/book?${params.toString()}`);
+      navigate(`/rider/book?${params.toString()}`);
     },
     [navigate],
   );
