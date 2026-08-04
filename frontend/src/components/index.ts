@@ -59,4 +59,5 @@ export { VehicleOption } from './domain/VehicleOption';
 
 /* ---- Map ---------------------------------------------------------------- */
 export { MapView } from './map/MapView';
+export type { MapViewProps } from './map/types';
 export { NavigateButton } from './map/NavigateButton';

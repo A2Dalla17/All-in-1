@@ -53,7 +53,16 @@ export type MapsSku =
   /** Geocoding API, forward and reverse. */
   | 'geocoding'
   /** Routes API — Compute Routes Essentials. */
-  | 'routes';
+  | 'routes'
+  /**
+   * Maps JavaScript API — Dynamic Maps.
+   *
+   * Billed per map CONSTRUCTION, not per tile, per pan or per minute. This is
+   * why components/map/googleMapInstance.ts keeps one map alive for the whole
+   * session: without that, one rider moving between home, booking and tracking
+   * is four billable loads instead of one.
+   */
+  | 'dynamic-maps';
 
 const STORAGE_KEY = 'act.maps.budget.v1';
 
@@ -152,6 +161,7 @@ export function snapshot(): { month: string; limit: number; counts: Record<MapsS
     'place-details',
     'geocoding',
     'routes',
+    'dynamic-maps',
   ];
 
   const counts = Object.fromEntries(skus.map((s) => [s, state.counts[s] ?? 0])) as Record<

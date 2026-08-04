@@ -62,7 +62,17 @@ export const env = {
    * When unset the app degrades to a static map placeholder rather than
    * crashing, so the whole product remains usable without a key.
    */
-  googleMapsBrowserKey: readString(import.meta.env['VITE_GOOGLE_MAPS_BROWSER_KEY'], ''),
+  googleMapsBrowserKey: readString(
+    import.meta.env['VITE_GOOGLE_MAPS_BROWSER_KEY'],
+    /* One key configured for everything is the common case, and requiring a
+       second variable to be filled with the same value would only produce a
+       map that silently refuses to load. Whichever is set, wins.
+
+       What this does NOT do is grant permission: the key must still have Maps
+       JavaScript API enabled on the project and ticked under its API
+       restrictions, or the script 403s and the app falls back to Leaflet. */
+    readString(import.meta.env['VITE_GOOGLE_PLACES_KEY'], ''),
+  ),
 
   /** Map libraries to load. `places` powers destination autocomplete fallback. */
   googleMapsLibraries: ['places', 'geometry'] as const,
