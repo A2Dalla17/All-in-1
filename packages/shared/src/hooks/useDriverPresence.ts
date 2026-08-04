@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { driversApi, type DriverPresence, type DriverRecord } from '@/api/drivers';
-import { supabase } from '@/lib/supabase';
+import { driversApi, type DriverPresence, type DriverRecord } from '@shared/api/drivers';
+import { supabase } from '@shared/lib/supabase';
 
 /**
  * The driver's own record and their online/offline state.

@@ -12,9 +12,9 @@
 import { Link } from 'react-router-dom';
 import { Bus, CalendarCheck, ChevronRight, Globe, Lock, Phone, ShoppingBag } from 'lucide-react';
 
-import { Card } from '@/components/ui/Card';
-import { ScreenHeader } from '@/components/ui/PageHeader';
-import { env } from '@/config/env';
+import { Card } from '@shared/components/ui/Card';
+import { ScreenHeader } from '@shared/components/ui/PageHeader';
+import { env } from '@shared/config/env';
 
 export function ServicePage() {
   return (

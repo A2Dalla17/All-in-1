@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronsRight, Power } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Slide-to-confirm control, as in the driver mockup.

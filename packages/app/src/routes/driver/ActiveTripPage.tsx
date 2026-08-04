@@ -5,20 +5,20 @@ import {
   AlertTriangle, Check, ChevronRight, MessageCircle, Phone, ShieldAlert,
 } from 'lucide-react';
 
-import { driverRidesApi, ridesApi } from '@/api';
-import type { LatLng, Ride } from '@/api/types';
-import { Avatar } from '@/components/ui/Avatar';
-import { Button, IconButton } from '@/components/ui/Button';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { driverRidesApi, ridesApi } from '@shared/api';
+import type { LatLng, Ride } from '@shared/api/types';
+import { Avatar } from '@shared/components/ui/Avatar';
+import { Button, IconButton } from '@shared/components/ui/Button';
+import { EmptyState } from '@shared/components/ui/EmptyState';
 import { MapView } from '@/components/map/MapView';
 import { NavigateButton } from '@/components/map/NavigateButton';
-import { RouteRail } from '@/components/ui/RouteRail';
-import { Sheet } from '@/components/ui/Sheet';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useToast } from '@/components/ui/Toast';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { ApiError } from '@/lib/http';
-import { cn, formatCurrency, formatDistance, formatDuration } from '@/lib/utils';
+import { RouteRail } from '@shared/components/ui/RouteRail';
+import { Sheet } from '@shared/components/ui/Sheet';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { useToast } from '@shared/components/ui/Toast';
+import { useGeolocation } from '@shared/hooks/useGeolocation';
+import { ApiError } from '@shared/lib/http';
+import { cn, formatCurrency, formatDistance, formatDuration } from '@shared/lib/utils';
 
 /**
  * The driver's active job.

@@ -1,6 +1,6 @@
 import { LegalPage, LegalSection } from '@/components/layout/LegalPage';
-import { env } from '@/config/env';
-import { usePageMeta } from '@/lib/seo';
+import { env } from '@shared/config/env';
+import { usePageMeta } from '@shared/lib/seo';
 
 export function PrivacyPage() {
   usePageMeta('Privacy policy', 'How AC7 GROUP collects, uses and protects your personal data.');

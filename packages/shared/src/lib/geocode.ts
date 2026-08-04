@@ -28,7 +28,7 @@
  * Unrelated to the code here, but recorded so it is not forgotten.
  */
 
-import { env, hasGooglePlaces } from '@/config/env';
+import { env, hasGooglePlaces } from '@shared/config/env';
 
 import * as google from './maps/google';
 import { AutocompleteSession, MapsBudgetExhaustedError } from './maps/google';

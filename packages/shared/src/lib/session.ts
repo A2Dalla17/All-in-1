@@ -15,7 +15,7 @@
  * that we never render un-escaped HTML anywhere in this app.
  */
 
-import type { User, UserRole } from '@/api/types';
+import type { User, UserRole } from '@shared/api/types';
 
 const TOKEN_KEY = 'ac7.token';
 const USER_KEY = 'ac7.user';

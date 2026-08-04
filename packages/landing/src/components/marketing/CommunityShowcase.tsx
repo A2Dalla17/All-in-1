@@ -11,10 +11,10 @@ import {
   Store,
 } from 'lucide-react';
 
-import { bannersApi, KIND_LABEL, type BannerKind, type FeaturedBanner } from '@/api/banners';
-import { Button } from '@/components/ui/Button';
-import { env } from '@/config/env';
-import { cn } from '@/lib/utils';
+import { bannersApi, KIND_LABEL, type BannerKind, type FeaturedBanner } from '@shared/api/banners';
+import { Button } from '@shared/components/ui/Button';
+import { env } from '@shared/config/env';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Community Advertising Showcase — an image-led billboard.

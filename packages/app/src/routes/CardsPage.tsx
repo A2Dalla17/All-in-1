@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Printer, Scissors } from 'lucide-react';
 
-import { QrCode } from '@/components/ui/QrCode';
-import { env } from '@/config/env';
+import { QrCode } from '@shared/components/ui/QrCode';
+import { env } from '@shared/config/env';
 
 /**
  * Printable cards to hand out in the street.

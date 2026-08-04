@@ -2,12 +2,12 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, ChevronRight, Clock } from 'lucide-react';
 
-import { RideStatusBadge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { SkeletonList } from '@/components/ui/Skeleton';
-import { useMyRides } from '@/hooks/queries';
-import { cn, formatCurrency, formatDateTime, formatDistance } from '@/lib/utils';
+import { RideStatusBadge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { SkeletonList } from '@shared/components/ui/Skeleton';
+import { useMyRides } from '@shared/hooks/queries';
+import { cn, formatCurrency, formatDateTime, formatDistance } from '@shared/lib/utils';
 
 type Filter = 'all' | 'active' | 'completed' | 'cancelled';
 

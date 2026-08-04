@@ -2,12 +2,12 @@ import { useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Car, Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Button } from '@shared/components/ui/Button';
+import { Input } from '@shared/components/ui/Input';
 // DEMO_MODE — delete this import with src/dev/.
-import { ApiError } from '@/lib/http';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/providers/AuthProvider';
+import { ApiError } from '@shared/lib/http';
+import { cn } from '@shared/lib/utils';
+import { useAuth } from '@shared/providers/AuthProvider';
 import { AuthShell } from './AuthShell';
 
 type Intent = 'rider' | 'driver';

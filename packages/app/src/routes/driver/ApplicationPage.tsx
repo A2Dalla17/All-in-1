@@ -48,13 +48,13 @@ import {
   type DocumentRow,
   type DriverCompliance,
   type VehicleCategory,
-} from '@/api/compliance';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { PageHeader, SectionHeader } from '@/components/ui/PageHeader';
-import { cn } from '@/lib/utils';
+} from '@shared/api/compliance';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { Input } from '@shared/components/ui/Input';
+import { PageHeader, SectionHeader } from '@shared/components/ui/PageHeader';
+import { cn } from '@shared/lib/utils';
 
 /* -------------------------------------------------------------------------- */
 
@@ -427,7 +427,7 @@ export function ApplicationPage() {
 /* -------------------------------------------------------------------------- */
 
 async function supabaseSetCategory(driverId: string, category: VehicleCategory) {
-  const { supabase } = await import('@/lib/supabase');
+  const { supabase } = await import('@shared/lib/supabase');
   await supabase.from('drivers').update({ vehicle_category: category }).eq('id', driverId);
 }
 

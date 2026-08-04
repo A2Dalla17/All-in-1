@@ -11,14 +11,14 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { App } from './App';
-import { OfflineBanner } from '@/components/ui/EmptyState';
-import { AuthProvider } from '@/providers/AuthProvider';
-import { FlagsProvider } from '@/providers/FlagsProvider';
-import { ThemeProvider } from '@/providers/ThemeProvider';
-import { ApiError } from '@/lib/http';
-import { installReleaseErrorReporting } from '@/lib/releaseReporting';
+import { OfflineBanner } from '@shared/components/ui/EmptyState';
+import { AuthProvider } from '@shared/providers/AuthProvider';
+import { FlagsProvider } from '@shared/providers/FlagsProvider';
+import { ThemeProvider } from '@shared/providers/ThemeProvider';
+import { ApiError } from '@shared/lib/http';
+import { installReleaseErrorReporting } from '@shared/lib/releaseReporting';
 
-import './styles/index.css';
+import '@shared/styles/index.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {

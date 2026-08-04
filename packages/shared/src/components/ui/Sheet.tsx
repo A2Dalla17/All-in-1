@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Bottom sheet — the primary surface for the booking flow on mobile, and a

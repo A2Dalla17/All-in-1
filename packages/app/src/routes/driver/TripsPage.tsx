@@ -3,13 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, CheckCircle2, Clock, Star, TrendingUp } from 'lucide-react';
 
-import { earningsApi } from '@/api';
-import type { EarningsEntry } from '@/api/types';
-import { IconButton } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { cn, formatCurrency, formatDateTime } from '@/lib/utils';
+import { earningsApi } from '@shared/api';
+import type { EarningsEntry } from '@shared/api/types';
+import { IconButton } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { cn, formatCurrency, formatDateTime } from '@shared/lib/utils';
 
 const RANGES = [
   { id: 'today', label: 'Today' },

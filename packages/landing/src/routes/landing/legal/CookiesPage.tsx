@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 
 import { LegalPage, LegalSection } from '@/components/layout/LegalPage';
-import { Button } from '@/components/ui/Button';
-import { env } from '@/config/env';
-import { usePageMeta } from '@/lib/seo';
-import { usePreferences } from '@/lib/preferences';
+import { Button } from '@shared/components/ui/Button';
+import { env } from '@shared/config/env';
+import { usePageMeta } from '@shared/lib/seo';
+import { usePreferences } from '@shared/lib/preferences';
 
 export function CookiesPage() {
   usePageMeta('Cookie policy', 'What cookies AC7 GROUP uses and how to control them.');

@@ -5,11 +5,11 @@ import {
   MessageCircle, Phone, Send, ShieldAlert, User,
 } from 'lucide-react';
 
-import { Button, IconButton } from '@/components/ui/Button';
-import { Card, CardHeader } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { useToast } from '@/components/ui/Toast';
-import { cn } from '@/lib/utils';
+import { Button, IconButton } from '@shared/components/ui/Button';
+import { Card, CardHeader } from '@shared/components/ui/Card';
+import { Input } from '@shared/components/ui/Input';
+import { useToast } from '@shared/components/ui/Toast';
+import { cn } from '@shared/lib/utils';
 
 const TOPICS = [
   { id: 'trip', label: 'A trip', icon: MapPin },

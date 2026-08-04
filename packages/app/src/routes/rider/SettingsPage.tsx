@@ -38,11 +38,11 @@ import {
   Wallet,
 } from 'lucide-react';
 
-import { Card } from '@/components/ui/Card';
-import { ScreenHeader } from '@/components/ui/PageHeader';
-import { useTheme } from '@/providers/ThemeProvider';
-import { useAuth } from '@/providers/AuthProvider';
-import { cn } from '@/lib/utils';
+import { Card } from '@shared/components/ui/Card';
+import { ScreenHeader } from '@shared/components/ui/PageHeader';
+import { useTheme } from '@shared/providers/ThemeProvider';
+import { useAuth } from '@shared/providers/AuthProvider';
+import { cn } from '@shared/lib/utils';
 
 export function RiderSettingsPage() {
   const { logout, email, user } = useAuth();

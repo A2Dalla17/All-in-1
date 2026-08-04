@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@shared/lib/supabase';
 
 /**
  * Booking Shifts — jobs booked in advance that drivers claim.

@@ -1,4 +1,4 @@
-import { supabase, unwrap } from '@/lib/supabase';
+import { supabase, unwrap } from '@shared/lib/supabase';
 
 /**
  * Driver codes — the public "who is this driver?" lookup.

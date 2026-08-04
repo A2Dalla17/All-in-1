@@ -14,7 +14,7 @@
 import { Link } from 'react-router-dom';
 import { Download, Phone, ShieldCheck } from 'lucide-react';
 
-import { env } from '@/config/env';
+import { env } from '@shared/config/env';
 
 export function TaxiGatewayPage() {
   return (

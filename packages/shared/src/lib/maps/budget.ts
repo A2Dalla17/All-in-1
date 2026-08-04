@@ -33,7 +33,7 @@
  * allowance twice.
  */
 
-import { env } from '@/config/env';
+import { env } from '@shared/config/env';
 
 /**
  * The Google SKUs this app can spend against.

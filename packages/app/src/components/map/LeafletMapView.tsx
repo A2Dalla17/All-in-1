@@ -2,10 +2,10 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-import { env } from '@/config/env';
-import { decodePolyline } from '@/lib/googleMaps';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/providers/ThemeProvider';
+import { env } from '@shared/config/env';
+import { decodePolyline } from '@shared/lib/googleMaps';
+import { cn } from '@shared/lib/utils';
+import { useTheme } from '@shared/providers/ThemeProvider';
 
 import type { MapViewProps } from './types';
 

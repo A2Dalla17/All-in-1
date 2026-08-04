@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { LatLng } from '@/api/types';
-import { env } from '@/config/env';
+import type { LatLng } from '@shared/api/types';
+import { env } from '@shared/config/env';
 
 type PermissionState = 'prompt' | 'granted' | 'denied' | 'unsupported';
 

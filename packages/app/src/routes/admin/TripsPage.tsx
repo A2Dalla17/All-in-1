@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2, Clock, Download, Route as RouteIcon } from 'lucide-react';
 
-import { adminApi } from '@/api/admin';
-import type { Ride } from '@/api/types';
-import { Badge, RideStatusBadge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { DataTable, type Column } from '@/components/ui/DataTable';
-import { Modal } from '@/components/ui/Modal';
-import { PageHeader } from '@/components/ui/PageHeader';
-import { StatCard } from '@/components/ui/StatCard';
-import { cn, formatCurrency, formatDateTime, formatDistance, formatDuration } from '@/lib/utils';
+import { adminApi } from '@shared/api/admin';
+import type { Ride } from '@shared/api/types';
+import { Badge, RideStatusBadge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { DataTable, type Column } from '@shared/components/ui/DataTable';
+import { Modal } from '@shared/components/ui/Modal';
+import { PageHeader } from '@shared/components/ui/PageHeader';
+import { StatCard } from '@shared/components/ui/StatCard';
+import { cn, formatCurrency, formatDateTime, formatDistance, formatDuration } from '@shared/lib/utils';
 
 const FILTERS = [
   { id: 'all', label: 'All' },

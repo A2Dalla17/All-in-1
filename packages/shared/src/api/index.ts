@@ -16,8 +16,8 @@
  *   internal/maps/handler.go        /maps  (note: NOT under /api/v1)
  */
 
-import { http } from '@/lib/http';
-import { ApiError } from '@/lib/http';
+import { http } from '@shared/lib/http';
+import { ApiError } from '@shared/lib/http';
 import type {
   Driver,
   EarningsEntry,

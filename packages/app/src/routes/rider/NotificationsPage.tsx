@@ -4,14 +4,14 @@ import {
   ArrowLeft, Bell, Car, CheckCheck, CreditCard, Gift, ShieldAlert, Star,
 } from 'lucide-react';
 
-import { notificationsApi } from '@/api';
-import { env } from '@/config/env';
-import type { Notification } from '@/api/types';
-import { Button, IconButton } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { cn, formatRelative } from '@/lib/utils';
+import { notificationsApi } from '@shared/api';
+import { env } from '@shared/config/env';
+import type { Notification } from '@shared/api/types';
+import { Button, IconButton } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { cn, formatRelative } from '@shared/lib/utils';
 
 /** Icon and tint per notification type, so the list is scannable. */
 function iconFor(type: string) {

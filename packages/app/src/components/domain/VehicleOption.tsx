@@ -1,6 +1,6 @@
 import { Check, Users, Zap } from 'lucide-react';
 
-import { cn, formatCurrency, formatDuration } from '@/lib/utils';
+import { cn, formatCurrency, formatDuration } from '@shared/lib/utils';
 
 /**
  * A selectable vehicle tier on the booking sheet.

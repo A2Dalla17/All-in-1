@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Cookie } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
-import { usePreferences } from '@/lib/preferences';
+import { Button } from '@shared/components/ui/Button';
+import { usePreferences } from '@shared/lib/preferences';
 
 /**
  * Cookie consent.

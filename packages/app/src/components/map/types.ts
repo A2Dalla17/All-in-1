@@ -9,7 +9,7 @@
  * being a fallback and becomes a different screen.
  */
 
-import type { LatLng, NearbyDriver } from '@/api/types';
+import type { LatLng, NearbyDriver } from '@shared/api/types';
 
 export interface MapViewProps {
   center?: LatLng;

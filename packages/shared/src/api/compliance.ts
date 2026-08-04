@@ -16,7 +16,7 @@
  * Auth, which stores a bcrypt hash nobody at AC7 can read.
  */
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@shared/lib/supabase';
 
 export type VehicleCategory = 'car' | 'motorbike' | 'bicycle';
 

@@ -6,12 +6,12 @@
 import { Link } from 'react-router-dom';
 import { Accessibility, ChevronRight, Cookie, Mail, Phone, ShieldCheck } from 'lucide-react';
 
-import { Card, CardHeader } from '@/components/ui/Card';
-import { Container } from '@/components/ui/Container';
-import { env } from '@/config/env';
-import { LEGAL_NAV } from '@/config/navigation';
-import { usePageMeta } from '@/lib/seo';
-import { usePreferences } from '@/lib/preferences';
+import { Card, CardHeader } from '@shared/components/ui/Card';
+import { Container } from '@shared/components/ui/Container';
+import { env } from '@shared/config/env';
+import { LEGAL_NAV } from '@shared/config/navigation';
+import { usePageMeta } from '@shared/lib/seo';
+import { usePreferences } from '@shared/lib/preferences';
 
 /**
  * Settings.

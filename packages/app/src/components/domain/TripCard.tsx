@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 
-import type { Ride } from '@/api/types';
-import { RideStatusBadge } from '@/components/ui/Badge';
-import { RouteRail } from '@/components/ui/RouteRail';
-import { cn, formatCurrency, formatDateTime, formatDistance } from '@/lib/utils';
+import type { Ride } from '@shared/api/types';
+import { RideStatusBadge } from '@shared/components/ui/Badge';
+import { RouteRail } from '@shared/components/ui/RouteRail';
+import { cn, formatCurrency, formatDateTime, formatDistance } from '@shared/lib/utils';
 
 /**
  * A trip in a list.

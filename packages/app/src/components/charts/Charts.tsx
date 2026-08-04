@@ -11,7 +11,7 @@
 
 import { useId } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 
 const RAMP = ['#A11324', '#7A0C18', '#D9505F', '#EA8B96', '#B0B0B0', '#7A7A7A'];
 

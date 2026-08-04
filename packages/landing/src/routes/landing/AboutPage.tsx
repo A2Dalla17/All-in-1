@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Building2, HeartHandshake, Phone, Target } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Container } from '@/components/ui/Container';
-import { Section } from '@/components/ui/Section';
-import { env } from '@/config/env';
-import { SERVICES } from '@/config/navigation';
-import { usePageMeta } from '@/lib/seo';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { Container } from '@shared/components/ui/Container';
+import { Section } from '@shared/components/ui/Section';
+import { env } from '@shared/config/env';
+import { SERVICES } from '@shared/config/navigation';
+import { usePageMeta } from '@shared/lib/seo';
 
 /**
  * About Us.

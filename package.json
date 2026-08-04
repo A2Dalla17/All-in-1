@@ -1,0 +1,16 @@
+{
+  "name": "ac7-platform",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AC7 Transport — landing website and mobile application, sharing one backend.",
+  "workspaces": ["packages/shared", "packages/landing", "packages/app"],
+  "scripts": {
+    "dev:landing": "npm run dev -w @ac7/landing",
+    "dev:app": "npm run dev -w @ac7/app",
+    "build:landing": "npm run build -w @ac7/landing",
+    "build:app": "npm run build -w @ac7/app",
+    "build": "npm run build:landing && npm run build:app",
+    "typecheck": "tsc -b packages/shared packages/landing packages/app --noEmit"
+  }
+}

@@ -23,7 +23,7 @@
  * missing feature is an inconvenience, a half-initialised one is a bug report.
  */
 
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@shared/lib/supabase';
 
 /* -------------------------------------------------------------------------- */
 /* The flag set                                                               */

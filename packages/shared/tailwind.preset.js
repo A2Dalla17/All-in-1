@@ -29,7 +29,9 @@
  */
 export default {
   darkMode: 'class',
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  /* `content` is deliberately absent: it is per-package and lives in each
+     packages/*/tailwind.config.js. A preset that declared it would make both
+     the website and the app scan whatever paths happened to be written here. */
   theme: {
     extend: {
       colors: {

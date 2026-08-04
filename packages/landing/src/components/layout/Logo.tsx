@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
-import { env } from '@/config/env';
-import { cn } from '@/lib/utils';
+import { env } from '@shared/config/env';
+import { cn } from '@shared/lib/utils';
 
 /**
  * The AC7 GROUP lockup.

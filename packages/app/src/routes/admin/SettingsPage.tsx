@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Gift, Globe, Percent, Save, ShieldCheck, Sun, Moon, Monitor } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { PageHeader, SectionHeader } from '@/components/ui/PageHeader';
-import { useToast } from '@/components/ui/Toast';
-import { cn } from '@/lib/utils';
-import { useTheme, type ThemePreference } from '@/providers/ThemeProvider';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { Input } from '@shared/components/ui/Input';
+import { PageHeader, SectionHeader } from '@shared/components/ui/PageHeader';
+import { useToast } from '@shared/components/ui/Toast';
+import { cn } from '@shared/lib/utils';
+import { useTheme, type ThemePreference } from '@shared/providers/ThemeProvider';
 
 const THEMES: Array<{ id: ThemePreference; label: string; icon: typeof Sun }> = [
   { id: 'light', label: 'Light', icon: Sun },

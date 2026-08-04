@@ -14,9 +14,9 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarPlus, Clock, MapPin, Receipt } from 'lucide-react';
 
-import { Card } from '@/components/ui/Card';
-import { ScreenHeader } from '@/components/ui/PageHeader';
-import { cn } from '@/lib/utils';
+import { Card } from '@shared/components/ui/Card';
+import { ScreenHeader } from '@shared/components/ui/PageHeader';
+import { cn } from '@shared/lib/utils';
 
 type Tab = 'upcoming' | 'past';
 

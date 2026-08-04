@@ -49,14 +49,14 @@ import {
   type AdvertKind,
   type MediaType,
   type Placement,
-} from '@/api/adverts';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { PageHeader } from '@/components/ui/PageHeader';
-import { useAuth } from '@/providers/AuthProvider';
-import { cn } from '@/lib/utils';
+} from '@shared/api/adverts';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { Input } from '@shared/components/ui/Input';
+import { PageHeader } from '@shared/components/ui/PageHeader';
+import { useAuth } from '@shared/providers/AuthProvider';
+import { cn } from '@shared/lib/utils';
 
 /* -------------------------------------------------------------------------- */
 

@@ -27,7 +27,7 @@
  * taking a single real booking.
  */
 
-import type { FareEstimate, RideType } from '@/api/types';
+import type { FareEstimate, RideType } from '@shared/api/types';
 
 /** Multiply metres by this for miles. UK riders think in miles. */
 const METRES_PER_MILE = 1609.344;

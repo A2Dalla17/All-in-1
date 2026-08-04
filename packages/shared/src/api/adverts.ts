@@ -18,8 +18,8 @@
  * internally, plus the progress events it discards.
  */
 
-import { supabase } from '@/lib/supabase';
-import { KIND_LABEL, type BannerKind } from '@/api/banners';
+import { supabase } from '@shared/lib/supabase';
+import { KIND_LABEL, type BannerKind } from '@shared/api/banners';
 
 /* -------------------------------------------------------------------------- */
 /* Types                                                                      */

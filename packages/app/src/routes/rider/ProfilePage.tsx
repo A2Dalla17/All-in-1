@@ -3,24 +3,24 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Bell, ChevronRight, Gift, Heart, LifeBuoy, LogOut, Settings, Shield, ShieldAlert, UserPlus } from 'lucide-react';
 
-import { authApi, ratingsApi, safetyApi } from '@/api';
-import { AvatarUpload } from '@/components/ui/AvatarUpload';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card, CardHeader } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { NoTripsArt } from '@/components/ui/Illustration';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { ScreenHeader } from '@/components/ui/PageHeader';
-import { RatingStars } from '@/components/ui/Rating';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useToast } from '@/components/ui/Toast';
+import { authApi, ratingsApi, safetyApi } from '@shared/api';
+import { AvatarUpload } from '@shared/components/ui/AvatarUpload';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Card, CardHeader } from '@shared/components/ui/Card';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { NoTripsArt } from '@shared/components/ui/Illustration';
+import { Input } from '@shared/components/ui/Input';
+import { Modal } from '@shared/components/ui/Modal';
+import { ScreenHeader } from '@shared/components/ui/PageHeader';
+import { RatingStars } from '@shared/components/ui/Rating';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { useToast } from '@shared/components/ui/Toast';
 import { TripCard } from '@/components/domain/TripCard';
-import { useEmergencyContacts, useMyRides } from '@/hooks/queries';
-import { ApiError } from '@/lib/http';
-import { formatCurrency, fullName, initials } from '@/lib/utils';
-import { useAuth } from '@/providers/AuthProvider';
+import { useEmergencyContacts, useMyRides } from '@shared/hooks/queries';
+import { ApiError } from '@shared/lib/http';
+import { formatCurrency, fullName, initials } from '@shared/lib/utils';
+import { useAuth } from '@shared/providers/AuthProvider';
 
 /**
  * Rider profile.

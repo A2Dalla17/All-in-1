@@ -37,12 +37,12 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
-import type { UserRole } from '@/api/types';
+import type { UserRole } from '@shared/api/types';
 import { CookieBanner } from '@/components/layout/CookieBanner';
 import { SiteLayout } from '@/components/layout/SiteLayout';
-import { FullPageSpinner } from '@/components/ui/Spinner';
-import { applyPreferences, usePreferences } from '@/lib/preferences';
-import { useAuth } from '@/providers/AuthProvider';
+import { FullPageSpinner } from '@shared/components/ui/Spinner';
+import { applyPreferences, usePreferences } from '@shared/lib/preferences';
+import { useAuth } from '@shared/providers/AuthProvider';
 import { HomePage } from '@/routes/landing/HomePage';
 
 /* -------------------------------------------------------------------------- */

@@ -1,8 +1,8 @@
 import { ShieldCheck } from 'lucide-react';
 
 import { CommunityShowcase } from '@/components/marketing/CommunityShowcase';
-import { Container } from '@/components/ui/Container';
-import { env } from '@/config/env';
+import { Container } from '@shared/components/ui/Container';
+import { env } from '@shared/config/env';
 
 /**
  * Hero.

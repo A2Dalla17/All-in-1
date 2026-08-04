@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 
 import { Skeleton } from './Skeleton';
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 
 interface StatCardProps {
   label: string;

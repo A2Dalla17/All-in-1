@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Star } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Star rating — read-only display and interactive input.

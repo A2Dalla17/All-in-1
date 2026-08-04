@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CreditCard, Route as RouteIcon, TrendingUp, Users } from 'lucide-react';
 
-import { adminApi } from '@/api/admin';
+import { adminApi } from '@shared/api/admin';
 import { AreaChart, BarChart, DonutChart } from '@/components/charts/Charts';
-import { Card } from '@/components/ui/Card';
-import { PageHeader, SectionHeader } from '@/components/ui/PageHeader';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { StatCard } from '@/components/ui/StatCard';
-import { cn, formatCurrency } from '@/lib/utils';
+import { Card } from '@shared/components/ui/Card';
+import { PageHeader, SectionHeader } from '@shared/components/ui/PageHeader';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { StatCard } from '@shared/components/ui/StatCard';
+import { cn, formatCurrency } from '@shared/lib/utils';
 
 type Period = 'week' | 'month' | 'year';
 

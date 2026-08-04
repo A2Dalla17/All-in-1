@@ -1,8 +1,8 @@
 import { Clock, Headphones, Mail, MapPin, Phone } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
-import { Container } from '@/components/ui/Container';
-import { env } from '@/config/env';
+import { Button } from '@shared/components/ui/Button';
+import { Container } from '@shared/components/ui/Container';
+import { env } from '@shared/config/env';
 
 /**
  * The control centre block.

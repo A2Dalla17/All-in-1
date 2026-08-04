@@ -2,18 +2,18 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarClock, Luggage, Plane, Users } from 'lucide-react';
 
-import { ShiftTakenError, shiftsApi, type Shift } from '@/api/shifts';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { EmptyState, ErrorState } from '@/components/ui/EmptyState';
-import { NoTripsArt } from '@/components/ui/Illustration';
-import { ScreenHeader } from '@/components/ui/PageHeader';
-import { RouteRail } from '@/components/ui/RouteRail';
-import { SegmentedControl } from '@/components/ui/SegmentedControl';
-import { SkeletonList } from '@/components/ui/Skeleton';
-import { useToast } from '@/components/ui/Toast';
-import { cn, formatCurrency, formatDistance, formatDuration } from '@/lib/utils';
+import { ShiftTakenError, shiftsApi, type Shift } from '@shared/api/shifts';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { EmptyState, ErrorState } from '@shared/components/ui/EmptyState';
+import { NoTripsArt } from '@shared/components/ui/Illustration';
+import { ScreenHeader } from '@shared/components/ui/PageHeader';
+import { RouteRail } from '@shared/components/ui/RouteRail';
+import { SegmentedControl } from '@shared/components/ui/SegmentedControl';
+import { SkeletonList } from '@shared/components/ui/Skeleton';
+import { useToast } from '@shared/components/ui/Toast';
+import { cn, formatCurrency, formatDistance, formatDuration } from '@shared/lib/utils';
 
 /**
  * Booking Shifts — the driver's side.

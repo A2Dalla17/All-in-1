@@ -1,8 +1,8 @@
 import { Car, Users } from 'lucide-react';
 
-import type { FareEstimate, RideType } from '@/api/types';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { cn, formatCurrency, formatDuration } from '@/lib/utils';
+import type { FareEstimate, RideType } from '@shared/api/types';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { cn, formatCurrency, formatDuration } from '@shared/lib/utils';
 
 /**
  * Vehicle tier picker.

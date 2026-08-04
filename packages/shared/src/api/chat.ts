@@ -1,6 +1,6 @@
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@shared/lib/supabase';
 
 /**
  * Rider ↔ driver chat.

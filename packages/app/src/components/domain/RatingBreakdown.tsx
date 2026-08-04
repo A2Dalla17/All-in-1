@@ -1,8 +1,8 @@
 import { TrendingDown, TrendingUp } from 'lucide-react';
 
-import type { UserRatingProfile } from '@/api/types';
-import { RatingStars } from '@/components/ui/Rating';
-import { cn } from '@/lib/utils';
+import type { UserRatingProfile } from '@shared/api/types';
+import { RatingStars } from '@shared/components/ui/Rating';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Rating summary with the 5→1 star histogram.

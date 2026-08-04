@@ -10,7 +10,7 @@
  * only one script tag is ever injected.
  */
 
-import { env, hasGoogleMapsKey } from '@/config/env';
+import { env, hasGoogleMapsKey } from '@shared/config/env';
 
 export class MapsKeyMissingError extends Error {
   constructor() {

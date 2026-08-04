@@ -20,7 +20,7 @@
  * is actually load-bearing — this is only politeness toward the user's battery.
  */
 
-import { reportReleaseEvent, type FlagKey, type ReleaseEventKind } from '@/lib/flags';
+import { reportReleaseEvent, type FlagKey, type ReleaseEventKind } from '@shared/lib/flags';
 
 const RECENT = new Map<string, number>();
 const THROTTLE_MS = 60_000;

@@ -8,8 +8,8 @@
  * not the only thing that can issue an UPDATE.
  */
 
-import { supabase } from '@/lib/supabase';
-import type { FlagKey } from '@/lib/flags';
+import { supabase } from '@shared/lib/supabase';
+import type { FlagKey } from '@shared/lib/flags';
 
 export type FlagStage = 'off' | 'internal' | 'canary' | 'rollout' | 'ga' | 'killed';
 

@@ -13,10 +13,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FlaskConical, X } from 'lucide-react';
 
-import type { UserRole } from '@/api/types';
-import { PREVIEW_BUILD } from '@/preview/flag';
-import { clearSession } from '@/lib/session';
-import { cn } from '@/lib/utils';
+import type { UserRole } from '@shared/api/types';
+import { PREVIEW_BUILD } from '@shared/preview/flag';
+import { clearSession } from '@shared/lib/session';
+import { cn } from '@shared/lib/utils';
 
 import { DEMO_ENABLED, isDemoSession, startDemoSession } from './demoSession';
 

@@ -1,6 +1,6 @@
 import type { ElementType, ReactNode } from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Horizontal rhythm for the whole site.

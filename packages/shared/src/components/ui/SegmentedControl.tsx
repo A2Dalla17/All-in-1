@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Segmented control — the pill of tabs used for Daily/Weekly/Monthly,

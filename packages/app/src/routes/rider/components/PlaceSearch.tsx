@@ -1,10 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { MapPin, Search, X } from 'lucide-react';
 
-import { searchPlaces, SEARCH_DEBOUNCE_MS, type PlaceSuggestion } from '@/lib/geocode';
-import type { LatLng } from '@/api/types';
-import { Spinner } from '@/components/ui/Spinner';
-import { cn } from '@/lib/utils';
+import { searchPlaces, SEARCH_DEBOUNCE_MS, type PlaceSuggestion } from '@shared/lib/geocode';
+import type { LatLng } from '@shared/api/types';
+import { Spinner } from '@shared/components/ui/Spinner';
+import { cn } from '@shared/lib/utils';
 
 export interface SelectedPlace {
   address: string;

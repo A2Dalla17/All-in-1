@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { Container } from '@/components/ui/Container';
-import { cn } from '@/lib/utils';
+import { Container } from '@shared/components/ui/Container';
+import { cn } from '@shared/lib/utils';
 
 /**
  * A titled page section.

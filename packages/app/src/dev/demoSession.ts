@@ -25,9 +25,9 @@
  *   Then run `npx tsc --noEmit`; it will point at anything missed.
  */
 
-import type { User, UserRole } from '@/api/types';
-import { setSession } from '@/lib/session';
-import { PREVIEW_BUILD, getPreviewRole, setPreviewRole } from '@/preview/flag';
+import type { User, UserRole } from '@shared/api/types';
+import { setSession } from '@shared/lib/session';
+import { PREVIEW_BUILD, getPreviewRole, setPreviewRole } from '@shared/preview/flag';
 
 /** Marks a fabricated token so the real auth paths can recognise and skip it. */
 const DEMO_ISSUER = 'ac7-demo-skip-login';

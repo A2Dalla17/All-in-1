@@ -28,7 +28,7 @@
  * below rather than passed around as a loose string.
  */
 
-import { env } from '@/config/env';
+import { env } from '@shared/config/env';
 
 import { canSpend, record } from './budget';
 import * as cache from './cache';

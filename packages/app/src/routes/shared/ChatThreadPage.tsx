@@ -3,14 +3,14 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, SendHorizonal, WifiOff } from 'lucide-react';
 
-import { chatApi, type ChatMessage } from '@/api/chat';
-import { driversApi } from '@/api/drivers';
-import { Button } from '@/components/ui/Button';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { NoNotificationsArt } from '@/components/ui/Illustration';
-import { Spinner } from '@/components/ui/Spinner';
-import { useAuth } from '@/providers/AuthProvider';
-import { cn } from '@/lib/utils';
+import { chatApi, type ChatMessage } from '@shared/api/chat';
+import { driversApi } from '@shared/api/drivers';
+import { Button } from '@shared/components/ui/Button';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { NoNotificationsArt } from '@shared/components/ui/Illustration';
+import { Spinner } from '@shared/components/ui/Spinner';
+import { useAuth } from '@shared/providers/AuthProvider';
+import { cn } from '@shared/lib/utils';
 
 /**
  * One conversation.
@@ -59,7 +59,7 @@ export function ChatThreadPage() {
       // lookup_driver_by_code deliberately does not return the driver's row id,
       // so the thread is opened by code through a dedicated call rather than by
       // widening the public lookup's return type.
-      const { data, error } = await import('@/lib/supabase').then(({ supabase }) =>
+      const { data, error } = await import('@shared/lib/supabase').then(({ supabase }) =>
         supabase.rpc('open_thread_with_driver_code', { p_code: driverCode }),
       );
       if (error) throw new Error(error.message);

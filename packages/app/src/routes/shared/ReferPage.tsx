@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Check, Copy, Gift, Share2, Users } from 'lucide-react';
 
-import { referralsApi } from '@/api';
-import { Button } from '@/components/ui/Button';
-import { Card, CardHeader } from '@/components/ui/Card';
-import { ScreenHeader } from '@/components/ui/PageHeader';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useToast } from '@/components/ui/Toast';
-import { cn, formatCurrency } from '@/lib/utils';
+import { referralsApi } from '@shared/api';
+import { Button } from '@shared/components/ui/Button';
+import { Card, CardHeader } from '@shared/components/ui/Card';
+import { ScreenHeader } from '@shared/components/ui/PageHeader';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { useToast } from '@shared/components/ui/Toast';
+import { cn, formatCurrency } from '@shared/lib/utils';
 
 /**
  * Refer a driver.

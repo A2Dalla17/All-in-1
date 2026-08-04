@@ -43,13 +43,13 @@ import {
   type FlagAuditEntry,
   type FlagHealth,
   type FlagStage,
-} from '@/api/releases';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { PageHeader, SectionHeader } from '@/components/ui/PageHeader';
-import { useFlags } from '@/providers/FlagsProvider';
-import { cn } from '@/lib/utils';
+} from '@shared/api/releases';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { PageHeader, SectionHeader } from '@shared/components/ui/PageHeader';
+import { useFlags } from '@shared/providers/FlagsProvider';
+import { cn } from '@shared/lib/utils';
 
 /* -------------------------------------------------------------------------- */
 

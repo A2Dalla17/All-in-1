@@ -171,6 +171,10 @@ export default defineConfig(({ command, mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
+        /* Pointed at SOURCE, not a build output. A workspace whose shared
+           package must be compiled before the app sees a change is a
+           workspace nobody uses — you edit a button and nothing happens. */
+        '@shared': path.resolve(__dirname, '../shared/src'),
       },
     },
 

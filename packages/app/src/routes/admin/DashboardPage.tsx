@@ -5,18 +5,18 @@ import {
   ShieldAlert, TrendingUp, Users, XCircle,
 } from 'lucide-react';
 
-import { adminApi } from '@/api/admin';
+import { adminApi } from '@shared/api/admin';
 import { AreaChart, BarChart, DonutChart } from '@/components/charts/Charts';
-import { RideStatusBadge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { DataTable, type Column } from '@/components/ui/DataTable';
-import { PageHeader, SectionHeader } from '@/components/ui/PageHeader';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { StatCard } from '@/components/ui/StatCard';
-import type { Ride } from '@/api/types';
-import { formatCurrency, formatDateTime, formatDistance } from '@/lib/utils';
-import { useAuth } from '@/providers/AuthProvider';
+import { RideStatusBadge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { DataTable, type Column } from '@shared/components/ui/DataTable';
+import { PageHeader, SectionHeader } from '@shared/components/ui/PageHeader';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { StatCard } from '@shared/components/ui/StatCard';
+import type { Ride } from '@shared/api/types';
+import { formatCurrency, formatDateTime, formatDistance } from '@shared/lib/utils';
+import { useAuth } from '@shared/providers/AuthProvider';
 
 /**
  * Admin dashboard.

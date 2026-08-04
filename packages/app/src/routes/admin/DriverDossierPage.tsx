@@ -41,12 +41,12 @@ import {
   type ApplicationStatus,
   type DocumentRow,
   type DriverCompliance,
-} from '@/api/compliance';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { PageHeader, SectionHeader } from '@/components/ui/PageHeader';
-import { cn } from '@/lib/utils';
+} from '@shared/api/compliance';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { PageHeader, SectionHeader } from '@shared/components/ui/PageHeader';
+import { cn } from '@shared/lib/utils';
 
 const APP_TONE: Record<ApplicationStatus, 'muted' | 'warning' | 'success' | 'danger' | 'brand'> = {
   draft: 'muted',

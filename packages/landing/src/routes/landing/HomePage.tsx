@@ -2,7 +2,7 @@ import { ControlCentre } from '@/components/marketing/ControlCentre';
 import { Hero } from '@/components/marketing/Hero';
 import { ServiceCards } from '@/components/marketing/ServiceCards';
 import { WhyACT } from '@/components/marketing/WhyACT';
-import { usePageMeta } from '@/lib/seo';
+import { usePageMeta } from '@shared/lib/seo';
 
 /**
  * The hub.

@@ -6,26 +6,26 @@ import {
   Monitor, Moon, ShieldCheck, Star, Sun,
 } from 'lucide-react';
 
-import { authApi, earningsApi, geoApi, ratingsApi } from '@/api';
-import type { EarningsEntry } from '@/api/types';
-import { AvatarUpload } from '@/components/ui/AvatarUpload';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card, CardHeader } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { NoTripsArt } from '@/components/ui/Illustration';
-import { Input } from '@/components/ui/Input';
-import { ScreenHeader } from '@/components/ui/PageHeader';
-import { RatingStars } from '@/components/ui/Rating';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useToast } from '@/components/ui/Toast';
+import { authApi, earningsApi, geoApi, ratingsApi } from '@shared/api';
+import type { EarningsEntry } from '@shared/api/types';
+import { AvatarUpload } from '@shared/components/ui/AvatarUpload';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Card, CardHeader } from '@shared/components/ui/Card';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { NoTripsArt } from '@shared/components/ui/Illustration';
+import { Input } from '@shared/components/ui/Input';
+import { ScreenHeader } from '@shared/components/ui/PageHeader';
+import { RatingStars } from '@shared/components/ui/Rating';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { useToast } from '@shared/components/ui/Toast';
 import { DriverCodeCard } from '@/components/domain/DriverCodeCard';
 import { RatingBreakdown, RatingTags } from '@/components/domain/RatingBreakdown';
-import { ApiError } from '@/lib/http';
-import { cn, formatCurrency, formatDateTime, fullName, initials } from '@/lib/utils';
-import { useDriverPresence } from '@/hooks/useDriverPresence';
-import { useAuth } from '@/providers/AuthProvider';
-import { useTheme, type ThemePreference } from '@/providers/ThemeProvider';
+import { ApiError } from '@shared/lib/http';
+import { cn, formatCurrency, formatDateTime, fullName, initials } from '@shared/lib/utils';
+import { useDriverPresence } from '@shared/hooks/useDriverPresence';
+import { useAuth } from '@shared/providers/AuthProvider';
+import { useTheme, type ThemePreference } from '@shared/providers/ThemeProvider';
 
 const THEMES: Array<{ id: ThemePreference; label: string; icon: typeof Sun }> = [
   { id: 'light', label: 'Light', icon: Sun },

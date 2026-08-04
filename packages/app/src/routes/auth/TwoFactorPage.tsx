@@ -1,11 +1,11 @@
 import { useRef, useState, type ClipboardEvent, type KeyboardEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { otpApi, type OtpDelivery, type OtpType } from '@/api';
-import { Button } from '@/components/ui/Button';
-import { ApiError } from '@/lib/http';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/providers/AuthProvider';
+import { otpApi, type OtpDelivery, type OtpType } from '@shared/api';
+import { Button } from '@shared/components/ui/Button';
+import { ApiError } from '@shared/lib/http';
+import { cn } from '@shared/lib/utils';
+import { useAuth } from '@shared/providers/AuthProvider';
 import { AuthShell } from './AuthShell';
 
 const CODE_LENGTH = 6;

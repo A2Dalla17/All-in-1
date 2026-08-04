@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 import { useFocusTrap } from './Sheet';
 
 /**

@@ -2,12 +2,12 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Car, Lock, Mail, Phone, User as UserIcon } from 'lucide-react';
 
-import type { UserRole } from '@/api/types';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { ApiError } from '@/lib/http';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/providers/AuthProvider';
+import type { UserRole } from '@shared/api/types';
+import { Button } from '@shared/components/ui/Button';
+import { Input } from '@shared/components/ui/Input';
+import { ApiError } from '@shared/lib/http';
+import { cn } from '@shared/lib/utils';
+import { useAuth } from '@shared/providers/AuthProvider';
 import { AuthShell } from './AuthShell';
 
 type SignupRole = Exclude<UserRole, 'admin'>;

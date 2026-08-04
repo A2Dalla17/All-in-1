@@ -8,7 +8,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { realtime, type WsEventType, type WsMessage, type WsStatus } from '@/lib/ws';
+import { realtime, type WsEventType, type WsMessage, type WsStatus } from '@shared/lib/ws';
 
 /** Current connection status, re-rendering on change. */
 export function useRealtimeStatus(): WsStatus {

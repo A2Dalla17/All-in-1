@@ -23,8 +23,8 @@
 
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
-import type { FlagKey } from '@/lib/flags';
-import { report } from '@/lib/releaseReporting';
+import type { FlagKey } from '@shared/lib/flags';
+import { report } from '@shared/lib/releaseReporting';
 
 interface Props {
   /** The feature this subtree belongs to. Drives circuit breaker attribution. */

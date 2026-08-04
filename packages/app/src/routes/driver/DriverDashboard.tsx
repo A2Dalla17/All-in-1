@@ -4,24 +4,24 @@ import {
   Bell, ChevronRight, Clock, Crosshair, Menu, Moon, Star, Sun, TrendingUp, Wallet,
 } from 'lucide-react';
 
-import { driverRidesApi, geoApi } from '@/api';
-import type { NearbyDriver } from '@/api/types';
+import { driverRidesApi, geoApi } from '@shared/api';
+import type { NearbyDriver } from '@shared/api/types';
 import { MapView } from '@/components/map/MapView';
-import { IconButton } from '@/components/ui/Button';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useToast } from '@/components/ui/Toast';
+import { IconButton } from '@shared/components/ui/Button';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { useToast } from '@shared/components/ui/Toast';
 import {
   useAvailableRides,
   useDriverEarnings,
   useDriverStatus,
   useSetDriverStatus,
-} from '@/hooks/queries';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { env } from '@/config/env';
-import { ApiError } from '@/lib/http';
-import { cn, formatCurrency } from '@/lib/utils';
-import { useTheme } from '@/providers/ThemeProvider';
+} from '@shared/hooks/queries';
+import { useGeolocation } from '@shared/hooks/useGeolocation';
+import { env } from '@shared/config/env';
+import { ApiError } from '@shared/lib/http';
+import { cn, formatCurrency } from '@shared/lib/utils';
+import { useTheme } from '@shared/providers/ThemeProvider';
 
 import { RideRequestCard } from './components/RideRequestCard';
 import { SlideToToggle } from './components/SlideToToggle';

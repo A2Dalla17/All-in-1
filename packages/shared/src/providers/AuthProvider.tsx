@@ -40,9 +40,9 @@ import {
 } from 'react';
 import type { Session } from '@supabase/supabase-js';
 
-import type { User, UserRole } from '@/api/types';
-import { supabase } from '@/lib/supabase';
-import { clearSession, setSession as persistSession, updateUser as persistUser } from '@/lib/session';
+import type { User, UserRole } from '@shared/api/types';
+import { supabase } from '@shared/lib/supabase';
+import { clearSession, setSession as persistSession, updateUser as persistUser } from '@shared/lib/session';
 
 export interface LoginPayload {
   email: string;

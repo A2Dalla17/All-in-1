@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Lock } from 'lucide-react';
 
-import { Container } from '@/components/ui/Container';
-import { SERVICES, type ServiceLink } from '@/config/navigation';
-import { cn } from '@/lib/utils';
+import { Container } from '@shared/components/ui/Container';
+import { SERVICES, type ServiceLink } from '@shared/config/navigation';
+import { cn } from '@shared/lib/utils';
 
 /**
  * The four service cards.

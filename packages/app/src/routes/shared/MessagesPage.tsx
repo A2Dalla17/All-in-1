@@ -3,15 +3,15 @@ import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, MessageSquare, ScanLine } from 'lucide-react';
 
-import { chatApi } from '@/api/chat';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { EmptyState, ErrorState } from '@/components/ui/EmptyState';
-import { NoNotificationsArt } from '@/components/ui/Illustration';
-import { ScreenHeader } from '@/components/ui/PageHeader';
-import { SkeletonList } from '@/components/ui/Skeleton';
-import { useAuth } from '@/providers/AuthProvider';
+import { chatApi } from '@shared/api/chat';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { EmptyState, ErrorState } from '@shared/components/ui/EmptyState';
+import { NoNotificationsArt } from '@shared/components/ui/Illustration';
+import { ScreenHeader } from '@shared/components/ui/PageHeader';
+import { SkeletonList } from '@shared/components/ui/Skeleton';
+import { useAuth } from '@shared/providers/AuthProvider';
 
 /**
  * Conversation list, shared by riders and drivers.

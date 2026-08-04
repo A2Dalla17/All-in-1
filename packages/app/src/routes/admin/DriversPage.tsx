@@ -2,18 +2,18 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Car, CheckCircle2, Clock, Star, XCircle } from 'lucide-react';
 
-import { adminApi } from '@/api/admin';
-import type { Driver } from '@/api/types';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { DataTable, type Column } from '@/components/ui/DataTable';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { PageHeader } from '@/components/ui/PageHeader';
-import { StatCard } from '@/components/ui/StatCard';
-import { useToast } from '@/components/ui/Toast';
-import { ApiError } from '@/lib/http';
-import { cn } from '@/lib/utils';
+import { adminApi } from '@shared/api/admin';
+import type { Driver } from '@shared/api/types';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { DataTable, type Column } from '@shared/components/ui/DataTable';
+import { Input } from '@shared/components/ui/Input';
+import { Modal } from '@shared/components/ui/Modal';
+import { PageHeader } from '@shared/components/ui/PageHeader';
+import { StatCard } from '@shared/components/ui/StatCard';
+import { useToast } from '@shared/components/ui/Toast';
+import { ApiError } from '@shared/lib/http';
+import { cn } from '@shared/lib/utils';
 
 const FILTERS = [
   { id: 'all', label: 'All' },

@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react';
 import { Check, Copy, Download, ShieldCheck } from 'lucide-react';
 
-import { driverCodeUrl } from '@/api/drivers';
-import { Button } from '@/components/ui/Button';
-import { QrCode } from '@/components/ui/QrCode';
-import { cn } from '@/lib/utils';
+import { driverCodeUrl } from '@shared/api/drivers';
+import { Button } from '@shared/components/ui/Button';
+import { QrCode } from '@shared/components/ui/QrCode';
+import { cn } from '@shared/lib/utils';
 
 /**
  * A driver's own code and QR, shown on their profile.

@@ -2,13 +2,13 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, ListOrdered, TrendingUp } from 'lucide-react';
 
-import { earningsApi } from '@/api';
+import { earningsApi } from '@shared/api';
 import { useQuery } from '@tanstack/react-query';
-import { IconButton } from '@/components/ui/Button';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useDriverEarnings } from '@/hooks/queries';
-import { cn, formatCurrency } from '@/lib/utils';
+import { IconButton } from '@shared/components/ui/Button';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { useDriverEarnings } from '@shared/hooks/queries';
+import { cn, formatCurrency } from '@shared/lib/utils';
 
 type Period = 'day' | 'week' | 'month';
 

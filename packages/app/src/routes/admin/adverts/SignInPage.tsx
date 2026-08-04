@@ -3,10 +3,10 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { Lock, ShieldCheck } from 'lucide-react';
 
 import { Logo } from '@/components/layout/Logo';
-import { Button } from '@/components/ui/Button';
-import { Container } from '@/components/ui/Container';
-import { useAuth } from '@/providers/AuthProvider';
-import { usePageMeta } from '@/lib/seo';
+import { Button } from '@shared/components/ui/Button';
+import { Container } from '@shared/components/ui/Container';
+import { useAuth } from '@shared/providers/AuthProvider';
+import { usePageMeta } from '@shared/lib/seo';
 
 /**
  * Admin sign in — email and password, then the access PIN.

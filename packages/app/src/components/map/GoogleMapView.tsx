@@ -25,10 +25,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { env } from '@/config/env';
-import { decodePolyline } from '@/lib/googleMaps';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/providers/ThemeProvider';
+import { env } from '@shared/config/env';
+import { decodePolyline } from '@shared/lib/googleMaps';
+import { cn } from '@shared/lib/utils';
+import { useTheme } from '@shared/providers/ThemeProvider';
 
 import { acquireMap, attachMap, mapStyleFor, releaseMap } from './googleMapInstance';
 import type { MapViewProps } from './types';

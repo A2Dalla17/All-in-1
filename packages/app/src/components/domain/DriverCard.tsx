@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 import { MessageCircle, Phone, ShieldCheck } from 'lucide-react';
 
-import { Avatar } from '@/components/ui/Avatar';
-import { IconButton } from '@/components/ui/Button';
-import { RatingStars } from '@/components/ui/Rating';
-import { cn, initials } from '@/lib/utils';
+import { Avatar } from '@shared/components/ui/Avatar';
+import { IconButton } from '@shared/components/ui/Button';
+import { RatingStars } from '@shared/components/ui/Rating';
+import { cn, initials } from '@shared/lib/utils';
 
 /**
  * The assigned driver, shown while a trip is live.

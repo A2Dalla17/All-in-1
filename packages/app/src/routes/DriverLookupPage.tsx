@@ -18,17 +18,17 @@ import {
   isDriverCode,
   normaliseDriverCode,
   type DriverPublicProfile,
-} from '@/api/drivers';
-import { Avatar } from '@/components/ui/Avatar';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { QrScanner, isQrScanningSupported } from '@/components/ui/QrScanner';
-import { NoResultsArt } from '@/components/ui/Illustration';
-import { Spinner } from '@/components/ui/Spinner';
-import { useAuth } from '@/providers/AuthProvider';
-import { cn } from '@/lib/utils';
+} from '@shared/api/drivers';
+import { Avatar } from '@shared/components/ui/Avatar';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { Input } from '@shared/components/ui/Input';
+import { QrScanner, isQrScanningSupported } from '@shared/components/ui/QrScanner';
+import { NoResultsArt } from '@shared/components/ui/Illustration';
+import { Spinner } from '@shared/components/ui/Spinner';
+import { useAuth } from '@shared/providers/AuthProvider';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Find a driver by their code.

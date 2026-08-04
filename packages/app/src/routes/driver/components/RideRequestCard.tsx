@@ -1,10 +1,10 @@
 import { Clock } from 'lucide-react';
 
-import type { Ride } from '@/api/types';
+import type { Ride } from '@shared/api/types';
 import { NavigateButton } from '@/components/map/NavigateButton';
-import { Avatar } from '@/components/ui/Avatar';
-import { Button } from '@/components/ui/Button';
-import { cn, formatCurrency, formatDistance } from '@/lib/utils';
+import { Avatar } from '@shared/components/ui/Avatar';
+import { Button } from '@shared/components/ui/Button';
+import { cn, formatCurrency, formatDistance } from '@shared/lib/utils';
 
 /**
  * Incoming ride request.

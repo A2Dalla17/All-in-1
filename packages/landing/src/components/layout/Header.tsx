@@ -10,10 +10,10 @@ import {
 } from 'lucide-react';
 
 import { Logo } from '@/components/layout/Logo';
-import { Container } from '@/components/ui/Container';
-import { env } from '@/config/env';
-import { HEADER_NAV } from '@/config/navigation';
-import { cn } from '@/lib/utils';
+import { Container } from '@shared/components/ui/Container';
+import { env } from '@shared/config/env';
+import { HEADER_NAV } from '@shared/config/navigation';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Site header.

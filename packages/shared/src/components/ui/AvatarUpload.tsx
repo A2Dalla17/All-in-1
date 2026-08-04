@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Camera, Loader2, Trash2 } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 import { Avatar } from './Avatar';
 
 /**

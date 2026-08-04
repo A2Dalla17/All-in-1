@@ -3,17 +3,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Briefcase, Heart, Home, MapPin, Plus, Trash2 } from 'lucide-react';
 
-import { favoritesApi } from '@/api';
-import type { FavoritePlace } from '@/api/types';
-import { Button, IconButton } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useToast } from '@/components/ui/Toast';
-import { ApiError } from '@/lib/http';
-import { cn } from '@/lib/utils';
+import { favoritesApi } from '@shared/api';
+import type { FavoritePlace } from '@shared/api/types';
+import { Button, IconButton } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { Input } from '@shared/components/ui/Input';
+import { Modal } from '@shared/components/ui/Modal';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { useToast } from '@shared/components/ui/Toast';
+import { ApiError } from '@shared/lib/http';
+import { cn } from '@shared/lib/utils';
 
 import { PlaceSearch, type SelectedPlace } from './components/PlaceSearch';
 

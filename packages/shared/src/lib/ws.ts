@@ -21,8 +21,8 @@
  *   - queues outbound frames while reconnecting instead of throwing
  */
 
-import { env } from '@/config/env';
-import { getToken } from '@/lib/session';
+import { env } from '@shared/config/env';
+import { getToken } from '@shared/lib/session';
 
 /* -------------------------------------------------------------------------- */
 /* Message types                                                               */

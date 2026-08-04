@@ -2,9 +2,9 @@ import { lazy, Suspense } from 'react';
 import { NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Car, Home, LayoutGrid, User } from 'lucide-react';
 
-import { Spinner } from '@/components/ui/Spinner';
-import { ToastProvider } from '@/components/ui/Toast';
-import { cn } from '@/lib/utils';
+import { Spinner } from '@shared/components/ui/Spinner';
+import { ToastProvider } from '@shared/components/ui/Toast';
+import { cn } from '@shared/lib/utils';
 
 import { HomePage } from './HomePage';
 

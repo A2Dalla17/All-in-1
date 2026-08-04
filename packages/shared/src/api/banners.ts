@@ -1,4 +1,4 @@
-import { supabase, friendlyError, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, friendlyError, isSupabaseConfigured } from '@shared/lib/supabase';
 
 /**
  * Community advertising — the showcase carousel under the hero.

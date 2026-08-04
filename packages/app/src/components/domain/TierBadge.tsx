@@ -1,7 +1,7 @@
 import { Crown, Trophy } from 'lucide-react';
 
-import { TIER_BY_NAME, type Tier, type TierName } from '@/lib/ranking';
-import { cn } from '@/lib/utils';
+import { TIER_BY_NAME, type Tier, type TierName } from '@shared/lib/ranking';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Driver tier badge.

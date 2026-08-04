@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { ExternalLink, Navigation, X } from 'lucide-react';
 
-import type { LatLng } from '@/api/types';
-import { env } from '@/config/env';
-import { cn, googleMapsNavLink, wazeLink } from '@/lib/utils';
+import type { LatLng } from '@shared/api/types';
+import { env } from '@shared/config/env';
+import { cn, googleMapsNavLink, wazeLink } from '@shared/lib/utils';
 
 /**
  * Turn-by-turn handoff for drivers.

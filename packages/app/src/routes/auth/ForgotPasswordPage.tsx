@@ -2,10 +2,10 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail } from 'lucide-react';
 
-import { otpApi } from '@/api';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { ApiError } from '@/lib/http';
+import { otpApi } from '@shared/api';
+import { Button } from '@shared/components/ui/Button';
+import { Input } from '@shared/components/ui/Input';
+import { ApiError } from '@shared/lib/http';
 import { AuthShell } from './AuthShell';
 
 /**

@@ -22,11 +22,11 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageCircle, Phone, Smartphone } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { env } from '@/config/env';
-import { supabase } from '@/lib/supabase';
-import { cn } from '@/lib/utils';
+import { Button } from '@shared/components/ui/Button';
+import { Input } from '@shared/components/ui/Input';
+import { env } from '@shared/config/env';
+import { supabase } from '@shared/lib/supabase';
+import { cn } from '@shared/lib/utils';
 
 type Channel = 'none' | 'whatsapp' | 'sms' | 'both';
 

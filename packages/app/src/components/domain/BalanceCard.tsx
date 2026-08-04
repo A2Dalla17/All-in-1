@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { cn, formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@shared/lib/utils';
 
 /**
  * The brand hero panel used for a wallet balance or an earnings total.

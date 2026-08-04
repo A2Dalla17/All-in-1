@@ -36,8 +36,8 @@ import {
   initialFlags,
   type FlagKey,
   type FlagMap,
-} from '@/lib/flags';
-import { supabase } from '@/lib/supabase';
+} from '@shared/lib/flags';
+import { supabase } from '@shared/lib/supabase';
 
 /** How often an open, visible tab re-evaluates. */
 const POLL_MS = 60_000;

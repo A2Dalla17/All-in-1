@@ -2,10 +2,10 @@ import { lazy, Suspense } from 'react';
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom';
 import { CalendarClock, Car, Home, Power, Trophy, User } from 'lucide-react';
 
-import { Spinner } from '@/components/ui/Spinner';
-import { ToastProvider } from '@/components/ui/Toast';
-import { useDriverPresence } from '@/hooks/useDriverPresence';
-import { cn } from '@/lib/utils';
+import { Spinner } from '@shared/components/ui/Spinner';
+import { ToastProvider } from '@shared/components/ui/Toast';
+import { useDriverPresence } from '@shared/hooks/useDriverPresence';
+import { cn } from '@shared/lib/utils';
 
 import { DriverDashboard } from './DriverDashboard';
 

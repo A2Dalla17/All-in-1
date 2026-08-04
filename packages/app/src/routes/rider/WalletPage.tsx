@@ -5,21 +5,21 @@ import {
   Receipt, Wallet as WalletIcon,
 } from 'lucide-react';
 
-import { Button, IconButton } from '@/components/ui/Button';
-import { Card, CardHeader } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { Skeleton, SkeletonList } from '@/components/ui/Skeleton';
-import { useToast } from '@/components/ui/Toast';
+import { Button, IconButton } from '@shared/components/ui/Button';
+import { Card, CardHeader } from '@shared/components/ui/Card';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { Input } from '@shared/components/ui/Input';
+import { Modal } from '@shared/components/ui/Modal';
+import { Skeleton, SkeletonList } from '@shared/components/ui/Skeleton';
+import { useToast } from '@shared/components/ui/Toast';
 import {
   usePaymentMethods,
   useTopUpWallet,
   useWallet,
   useWalletTransactions,
-} from '@/hooks/queries';
-import { ApiError } from '@/lib/http';
-import { cn, formatCurrency, formatDateTime } from '@/lib/utils';
+} from '@shared/hooks/queries';
+import { ApiError } from '@shared/lib/http';
+import { cn, formatCurrency, formatDateTime } from '@shared/lib/utils';
 
 const QUICK_AMOUNTS = [50, 100, 200, 500];
 

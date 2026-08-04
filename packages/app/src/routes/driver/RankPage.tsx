@@ -5,10 +5,10 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { geoApi } from '@/api';
-import { Card, CardHeader } from '@/components/ui/Card';
-import { ScreenHeader } from '@/components/ui/PageHeader';
-import { Skeleton } from '@/components/ui/Skeleton';
+import { geoApi } from '@shared/api';
+import { Card, CardHeader } from '@shared/components/ui/Card';
+import { ScreenHeader } from '@shared/components/ui/PageHeader';
+import { Skeleton } from '@shared/components/ui/Skeleton';
 import { TierBadge, TierLadder } from '@/components/domain/TierBadge';
 import {
   daysLeftInSeason,
@@ -19,14 +19,14 @@ import {
   seasonScore,
   tierFor,
   type DriverStats,
-} from '@/lib/ranking';
-import { cn } from '@/lib/utils';
+} from '@shared/lib/ranking';
+import { cn } from '@shared/lib/utils';
 
 /**
  * The driver's standing: tier, progress to the next one, season score, and
  * their permanent AC7 code.
  *
- * Every number here is derived from real driver data via `@/lib/ranking` —
+ * Every number here is derived from real driver data via `@shared/lib/ranking` —
  * nothing is hard-coded. When `internal/gamification` grows a seasons table
  * the season block swaps to server values; the tier block already matches the
  * thresholds the Go `CheckTierUpgrade` uses.

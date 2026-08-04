@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 
 /**
  * Loading placeholder. Sized by the caller so the layout does not shift when

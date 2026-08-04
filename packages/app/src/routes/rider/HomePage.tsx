@@ -38,9 +38,9 @@ import {
 } from 'lucide-react';
 
 import { MapView } from '@/components/map/MapView';
-import { DragSheet } from '@/components/ui/DragSheet';
-import { env } from '@/config/env';
-import { useGeolocation } from '@/hooks/useGeolocation';
+import { DragSheet } from '@shared/components/ui/DragSheet';
+import { env } from '@shared/config/env';
+import { useGeolocation } from '@shared/hooks/useGeolocation';
 import {
   AutocompleteSession,
   resolve,
@@ -48,8 +48,8 @@ import {
   searchPlaces,
   SEARCH_DEBOUNCE_MS,
   type PlaceSuggestion,
-} from '@/lib/geocode';
-import { useAuth } from '@/providers/AuthProvider';
+} from '@shared/lib/geocode';
+import { useAuth } from '@shared/providers/AuthProvider';
 
 import { QUICK_DESTINATIONS } from './quickDestinations';
 

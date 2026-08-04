@@ -2,21 +2,21 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AlertTriangle, Phone, Share2, ShieldAlert, Star } from 'lucide-react';
 
-import { safetyApi } from '@/api';
-import type { LatLng, NearbyDriver } from '@/api/types';
+import { safetyApi } from '@shared/api';
+import type { LatLng, NearbyDriver } from '@shared/api/types';
 import { MapView } from '@/components/map/MapView';
-import { Avatar } from '@/components/ui/Avatar';
-import { Button } from '@/components/ui/Button';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Modal } from '@/components/ui/Modal';
-import { RideStatusBadge } from '@/components/ui/Badge';
-import { Sheet } from '@/components/ui/Sheet';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useToast } from '@/components/ui/Toast';
-import { useCancelRide, useRateRide, useRide, useRoute, useTriggerSos } from '@/hooks/queries';
-import { useRideEvents } from '@/hooks/useRealtime';
-import { ApiError } from '@/lib/http';
-import { cn, formatCurrency, formatDuration, initials, secondsToMinutes } from '@/lib/utils';
+import { Avatar } from '@shared/components/ui/Avatar';
+import { Button } from '@shared/components/ui/Button';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { Modal } from '@shared/components/ui/Modal';
+import { RideStatusBadge } from '@shared/components/ui/Badge';
+import { Sheet } from '@shared/components/ui/Sheet';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { useToast } from '@shared/components/ui/Toast';
+import { useCancelRide, useRateRide, useRide, useRoute, useTriggerSos } from '@shared/hooks/queries';
+import { useRideEvents } from '@shared/hooks/useRealtime';
+import { ApiError } from '@shared/lib/http';
+import { cn, formatCurrency, formatDuration, initials, secondsToMinutes } from '@shared/lib/utils';
 
 /**
  * Live ride tracking.

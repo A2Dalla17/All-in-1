@@ -1,7 +1,7 @@
 import { Clock, Headphones, ShieldCheck, Sparkles, Star, Users } from 'lucide-react';
 
-import { Card } from '@/components/ui/Card';
-import { Section } from '@/components/ui/Section';
+import { Card } from '@shared/components/ui/Card';
+import { Section } from '@shared/components/ui/Section';
 
 /**
  * Why choose ACT.

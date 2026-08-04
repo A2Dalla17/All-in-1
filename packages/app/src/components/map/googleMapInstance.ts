@@ -31,8 +31,8 @@
  * megabytes of memory and saves most of the bill.
  */
 
-import { env } from '@/config/env';
-import { canSpend, record } from '@/lib/maps/budget';
+import { env } from '@shared/config/env';
+import { canSpend, record } from '@shared/lib/maps/budget';
 
 /** Container holding the live map. Created once, moved between screens. */
 let container: HTMLDivElement | null = null;

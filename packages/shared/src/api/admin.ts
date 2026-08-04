@@ -10,7 +10,7 @@
  * than pretending to have data.
  */
 
-import { http } from '@/lib/http';
+import { http } from '@shared/lib/http';
 import type { Driver, Payment, Ride, User } from './types';
 
 /* -------------------------------------------------------------------------- */

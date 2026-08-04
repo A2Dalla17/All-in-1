@@ -2,24 +2,24 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Crosshair, Loader2, TrendingUp } from 'lucide-react';
 
-import { geoApi } from '@/api';
-import type { LatLng } from '@/api/types';
-import type { EstimateRequest } from '@/api';
+import { geoApi } from '@shared/api';
+import type { LatLng } from '@shared/api/types';
+import type { EstimateRequest } from '@shared/api';
 import { MapView } from '@/components/map/MapView';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Sheet } from '@/components/ui/Sheet';
-import { useToast } from '@/components/ui/Toast';
-import { useGeolocation } from '@/hooks/useGeolocation';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button } from '@shared/components/ui/Button';
+import { Sheet } from '@shared/components/ui/Sheet';
+import { useToast } from '@shared/components/ui/Toast';
+import { useGeolocation } from '@shared/hooks/useGeolocation';
 import {
   useFareEstimates,
   useNearbyDrivers,
   useRequestRide,
   useRideTypes,
   useRoute,
-} from '@/hooks/queries';
-import { ApiError } from '@/lib/http';
-import { formatDistance, formatDuration } from '@/lib/utils';
+} from '@shared/hooks/queries';
+import { ApiError } from '@shared/lib/http';
+import { formatDistance, formatDuration } from '@shared/lib/utils';
 
 import { PlaceSearch, type SelectedPlace } from './components/PlaceSearch';
 import { VehicleSelector } from './components/VehicleSelector';

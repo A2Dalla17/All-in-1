@@ -1,6 +1,6 @@
 import { Bus, CalendarCheck, Car, Info, ShoppingBag, type LucideIcon } from 'lucide-react';
 
-import { env } from '@/config/env';
+import { env } from '@shared/config/env';
 
 /**
  * The navigation model.

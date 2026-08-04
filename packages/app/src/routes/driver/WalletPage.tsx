@@ -3,17 +3,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Banknote, Building2, Clock, Download, Wallet } from 'lucide-react';
 
-import { earningsApi } from '@/api';
-import { Badge } from '@/components/ui/Badge';
-import { Button, IconButton } from '@/components/ui/Button';
-import { Card, CardHeader } from '@/components/ui/Card';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { useToast } from '@/components/ui/Toast';
-import { ApiError } from '@/lib/http';
-import { cn, formatCurrency, formatDateTime } from '@/lib/utils';
+import { earningsApi } from '@shared/api';
+import { Badge } from '@shared/components/ui/Badge';
+import { Button, IconButton } from '@shared/components/ui/Button';
+import { Card, CardHeader } from '@shared/components/ui/Card';
+import { EmptyState } from '@shared/components/ui/EmptyState';
+import { Input } from '@shared/components/ui/Input';
+import { Modal } from '@shared/components/ui/Modal';
+import { Skeleton } from '@shared/components/ui/Skeleton';
+import { useToast } from '@shared/components/ui/Toast';
+import { ApiError } from '@shared/lib/http';
+import { cn, formatCurrency, formatDateTime } from '@shared/lib/utils';
 
 const QUICK = [25, 50, 100];
 

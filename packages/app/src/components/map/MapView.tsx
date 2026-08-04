@@ -29,8 +29,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { hasGoogleMapsKey } from '@/config/env';
-import { loadGoogleMaps } from '@/lib/googleMaps';
+import { hasGoogleMapsKey } from '@shared/config/env';
+import { loadGoogleMaps } from '@shared/lib/googleMaps';
 
 import { GoogleMapView } from './GoogleMapView';
 import { canCreateMap } from './googleMapInstance';

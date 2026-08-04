@@ -1,6 +1,6 @@
 import { LegalPage, LegalSection } from '@/components/layout/LegalPage';
-import { env } from '@/config/env';
-import { usePageMeta } from '@/lib/seo';
+import { env } from '@shared/config/env';
+import { usePageMeta } from '@shared/lib/seo';
 
 export function TermsPage() {
   usePageMeta('Terms of service', 'The terms on which AC7 GROUP provides its services.');

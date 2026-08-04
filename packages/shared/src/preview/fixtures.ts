@@ -4,7 +4,7 @@
  * Realistic London fixtures used when the app runs without a backend.
  *
  * These exist so the design can be reviewed on a real phone before the Go
- * services are deployed. Every shape here mirrors `@/api/types` exactly, so
+ * services are deployed. Every shape here mirrors `@shared/api/types` exactly, so
  * if the wire format changes, TypeScript breaks this file rather than the
  * screens silently rendering wrong.
  *
@@ -23,8 +23,8 @@ import type {
   UserRatingProfile,
   Wallet,
   WalletTransaction,
-} from '@/api/types';
-import type { Shift } from '@/api/shifts';
+} from '@shared/api/types';
+import type { Shift } from '@shared/api/shifts';
 
 const now = Date.now();
 const iso = (minutesAgo: number) => new Date(now - minutesAgo * 60_000).toISOString();

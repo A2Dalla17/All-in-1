@@ -1,6 +1,6 @@
 import { Banknote, Check, CreditCard, Smartphone, Wallet } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@shared/lib/utils';
 
 /**
  * A payment method in a list or a picker.

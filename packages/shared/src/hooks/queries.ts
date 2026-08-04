@@ -18,11 +18,11 @@ import {
   driverRidesApi,
   safetyApi,
   walletApi,
-} from '@/api';
-import type { LatLng, RideRequestPayload } from '@/api/types';
-import type { EstimateRequest } from '@/api';
-import { computeRoute } from '@/lib/geocode';
-import { quoteAll, tariffsAsRideTypes } from '@/lib/pricing';
+} from '@shared/api';
+import type { LatLng, RideRequestPayload } from '@shared/api/types';
+import type { EstimateRequest } from '@shared/api';
+import { computeRoute } from '@shared/lib/geocode';
+import { quoteAll, tariffsAsRideTypes } from '@shared/lib/pricing';
 
 /* -------------------------------------------------------------------------- */
 /* Cache keys                                                                  */

@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { fullName, initials } from '@/lib/utils';
-import { useAuth } from '@/providers/AuthProvider';
-import { useRealtimeStatus } from '@/hooks/useRealtime';
+import { Button } from '@shared/components/ui/Button';
+import { Card } from '@shared/components/ui/Card';
+import { fullName, initials } from '@shared/lib/utils';
+import { useAuth } from '@shared/providers/AuthProvider';
+import { useRealtimeStatus } from '@shared/hooks/useRealtime';
 
 /**
  * Temporary shell for the rider / driver / admin areas.

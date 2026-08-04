@@ -15,9 +15,9 @@
  *   - expose rate-limit headers so the UI can back off instead of hammering
  */
 
-import { env } from '@/config/env';
-import { PREVIEW_BUILD } from '@/preview/flag';
-import { clearSession, getToken } from '@/lib/session';
+import { env } from '@shared/config/env';
+import { PREVIEW_BUILD } from '@shared/preview/flag';
+import { clearSession, getToken } from '@shared/lib/session';
 
 /* -------------------------------------------------------------------------- */
 /* Envelope                                                                    */
@@ -208,7 +208,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   // is false everywhere except the Vercel preview project, so this branch is
   // dead code in a real build and the bundler drops it. See src/preview/.
   if (PREVIEW_BUILD) {
-    const { mockRequest } = await import('@/preview/mockApi');
+    const { mockRequest } = await import('@shared/preview/mockApi');
     const mocked = await mockRequest(path, method, body);
     if (mocked !== undefined) return mocked as T;
   }
@@ -319,7 +319,7 @@ export async function requestPaged<T>(
 ): Promise<Paged<T>> {
   // PREVIEW_MODE — see the note in `request`.
   if (PREVIEW_BUILD) {
-    const { mockRequest } = await import('@/preview/mockApi');
+    const { mockRequest } = await import('@shared/preview/mockApi');
     const mocked = await mockRequest(path, options.method ?? 'GET', options.body);
     if (mocked !== undefined) {
       const items = mocked as T;

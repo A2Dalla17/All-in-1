@@ -5,14 +5,14 @@ import {
   Megaphone, Menu, Moon, Rocket, Route as RouteIcon, Settings, ShieldCheck, Sun, Tag, Users, Wallet, X,
 } from 'lucide-react';
 
-import { Avatar } from '@/components/ui/Avatar';
-import { IconButton } from '@/components/ui/Button';
-import { Spinner } from '@/components/ui/Spinner';
-import { ToastProvider } from '@/components/ui/Toast';
-import { cn, fullName, initials } from '@/lib/utils';
-import { useAuth } from '@/providers/AuthProvider';
-import { useTheme } from '@/providers/ThemeProvider';
-import { useRealtimeStatus } from '@/hooks/useRealtime';
+import { Avatar } from '@shared/components/ui/Avatar';
+import { IconButton } from '@shared/components/ui/Button';
+import { Spinner } from '@shared/components/ui/Spinner';
+import { ToastProvider } from '@shared/components/ui/Toast';
+import { cn, fullName, initials } from '@shared/lib/utils';
+import { useAuth } from '@shared/providers/AuthProvider';
+import { useTheme } from '@shared/providers/ThemeProvider';
+import { useRealtimeStatus } from '@shared/hooks/useRealtime';
 
 import { DashboardPage } from './DashboardPage';
 
