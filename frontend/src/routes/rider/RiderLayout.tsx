@@ -106,24 +106,52 @@ export function RiderLayout() {
   );
 }
 
+/**
+ * The rider tab bar.
+ *
+ * ── Solid, full width, brand red ───────────────────────────────────────────
+ * This was a translucent pill floating with a margin on every side. Over a
+ * map that meant tiles showing through the bar AND around it, so the
+ * navigation never looked like part of the app — it looked like something
+ * resting on top of a map, and the map's own attribution ("Leaflet ©
+ * OpenStreetMap © CARTO") read through the gap underneath it.
+ *
+ * A navigation bar is chrome, not content. It is now opaque, brand red, and
+ * anchored to the bottom edge with nothing behind or beside it. That also
+ * makes it identical in light and dark themes, which is correct: the brand
+ * does not change colour because the rider's phone did.
+ *
+ * ── Why the centre action inverts ──────────────────────────────────────────
+ * Book ride used to be a red circle. On a red bar it would vanish. It is now
+ * white with a red car, which is both the highest contrast available here and
+ * the standard treatment for a primary action sitting on a brand-filled
+ * surface.
+ */
 function RiderTabBar() {
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 pb-[var(--safe-bottom)]">
-      <div className="glass mx-3 mb-2 flex items-end justify-around rounded-card border border-line px-2 pb-1.5 pt-2 shadow-lifted">
+    <nav
+      aria-label="Main"
+      /* No margin, no rounding at the sides: the bar meets the screen edges so
+         nothing of the map can appear beside it. The safe-area padding is
+         INSIDE the coloured element, so the red runs all the way down through
+         the home indicator rather than stopping short and leaving a stripe. */
+      className="brand-gradient fixed inset-x-0 bottom-0 z-40 pb-[var(--safe-bottom)] shadow-lifted"
+    >
+      <div className="flex items-end justify-around px-2 pb-2 pt-2.5">
         {LEFT_TABS.map((tab) => (
           <Tab key={tab.to} {...tab} />
         ))}
 
-        {/* Centre action — raised, matching the mockup */}
+        {/* Centre action — raised, and inverted so it reads on the red. */}
         <NavLink
           to="/taxi/app/book"
           className="pressable -mt-6 flex flex-col items-center gap-1"
           aria-label="Book a ride"
         >
-          <span className="grid h-12 w-12 place-items-center rounded-full brand-gradient text-white shadow-brand-lg ring-4 ring-bg">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-brand-700 shadow-lifted ring-4 ring-white/25">
             <Car size={21} aria-hidden />
           </span>
-          <span className="text-[0.625rem] font-semibold text-ink">Book ride</span>
+          <span className="text-[0.625rem] font-semibold text-white">Book ride</span>
         </NavLink>
 
         {RIGHT_TABS.map((tab) => (
@@ -153,7 +181,11 @@ function Tab({
         cn(
           'flex min-w-[3.75rem] flex-col items-center gap-1 rounded-tile px-2 py-1.5',
           'transition-colors duration-200',
-          isActive ? 'text-brand-ink' : 'text-ink-muted hover:text-ink',
+          /* Everything on this bar is white now, because the bar is brand red.
+             The unselected state is dimmed white rather than a grey token —
+             a theme grey chosen to sit on the page background has nothing to
+             do with legibility on a saturated red, and read as muddy. */
+          isActive ? 'text-white' : 'text-white/65 hover:text-white',
         )
       }
     >
@@ -164,7 +196,9 @@ function Tab({
             <span
               aria-hidden
               className={cn(
-                'absolute -bottom-[0.3125rem] left-1/2 h-[3px] -translate-x-1/2 rounded-full bg-brand transition-all duration-300 ease-smooth',
+                /* The active underline was brand red, which is now the colour
+                   of the bar it sits on — invisible. White. */
+                'absolute -bottom-[0.3125rem] left-1/2 h-[3px] -translate-x-1/2 rounded-full bg-white transition-all duration-300 ease-smooth',
                 isActive ? 'w-3.5 opacity-100' : 'w-0 opacity-0',
               )}
             />

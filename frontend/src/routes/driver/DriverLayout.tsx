@@ -103,8 +103,14 @@ function DriverTabBar() {
   const online = isOnline;
 
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 pb-[var(--safe-bottom)]">
-      <div className="glass mx-3 mb-3 flex items-end justify-around rounded-card border border-line px-2 pb-2 pt-2.5 shadow-lifted">
+    /* Solid brand red, full width — see the note on the rider bar. Kept
+       identical here on purpose: a driver who also rides should not meet two
+       different navigation bars in what is one application. */
+    <nav
+      aria-label="Main"
+      className="brand-gradient fixed inset-x-0 bottom-0 z-40 pb-[var(--safe-bottom)] shadow-lifted"
+    >
+      <div className="flex items-end justify-around px-2 pb-2 pt-2.5">
         {LEFT_TABS.map((tab) => (
           <Tab key={tab.to} {...tab} />
         ))}
@@ -116,15 +122,28 @@ function DriverTabBar() {
           aria-pressed={online}
           className="pressable -mt-7 flex flex-col items-center gap-1"
         >
+          {/*
+            Online and offline must be distinguishable at a glance, from a
+            windscreen mount, in daylight — this is the control a driver's
+            earnings depend on.
+
+            Both states used to sit on the page background, so red-versus-grey
+            carried the meaning. On a red bar that is gone, so the states now
+            differ in FILL as well as colour: solid white when online, hollow
+            when not. That reads correctly even to a driver who cannot
+            distinguish the two colours.
+          */}
           <span
             className={cn(
-              'grid h-14 w-14 place-items-center rounded-full text-white ring-4 ring-bg',
-              online ? 'brand-gradient shadow-brand-lg' : 'bg-ink-subtle',
+              'grid h-14 w-14 place-items-center rounded-full ring-4 transition-colors',
+              online
+                ? 'bg-white text-brand-700 ring-white/30'
+                : 'border-2 border-white/50 bg-brand-900/40 text-white/80 ring-transparent',
             )}
           >
             <Power size={22} aria-hidden />
           </span>
-          <span className="text-[0.625rem] font-semibold text-ink">
+          <span className="text-[0.625rem] font-semibold text-white">
             {online ? 'Go offline' : 'Go online'}
           </span>
         </button>
@@ -156,7 +175,9 @@ function Tab({
         cn(
           'flex min-w-[3.75rem] flex-col items-center gap-1 rounded-tile px-2 py-1.5',
           'transition-colors duration-200',
-          isActive ? 'text-brand-ink' : 'text-ink-muted hover:text-ink',
+          /* White on the red bar — a theme grey picked for the page
+             background is not legible on saturated red. */
+          isActive ? 'text-white' : 'text-white/65 hover:text-white',
         )
       }
     >
@@ -167,7 +188,9 @@ function Tab({
             <span
               aria-hidden
               className={cn(
-                'absolute -bottom-[0.3125rem] left-1/2 h-[3px] -translate-x-1/2 rounded-full bg-brand transition-all duration-300 ease-smooth',
+                /* White, not bg-brand — brand red is now the colour of the bar
+                   this sits on, so it was drawing red on red. */
+                'absolute -bottom-[0.3125rem] left-1/2 h-[3px] -translate-x-1/2 rounded-full bg-white transition-all duration-300 ease-smooth',
                 isActive ? 'w-3.5 opacity-100' : 'w-0 opacity-0',
               )}
             />
