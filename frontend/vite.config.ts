@@ -115,6 +115,49 @@ export default defineConfig(({ command, mode }) => {
     }
   }
 
+  /**
+   * Warn — loudly, in the build log — when a production build has no Google key.
+   *
+   * ── Why this is a warning and not an error ────────────────────────------
+   * The app works without it. Address search falls back to OpenStreetMap and
+   * nothing crashes, so failing the build would be wrong.
+   *
+   * ── Why it is here at all ─────────────────────────────────────────────---
+   * Because "works" and "works well" are different things, and the gap between
+   * them is invisible. A deploy without this key builds green, loads, renders
+   * every screen, and then quietly gives riders a worse address search — one
+   * that struggles with exactly the UK postcodes a London minicab firm depends
+   * on. That is precisely what happened: the key was set locally, never added
+   * to Vercel, and the only symptom was a rider typing a postcode and getting
+   * nothing back.
+   *
+   * Vite inlines environment variables at BUILD time, so adding the variable in
+   * a hosting dashboard changes nothing until the next deploy. That catches
+   * people out constantly, which is why the message says so.
+   */
+  if (command === 'build' && !previewMode) {
+    const googleKey =
+      env['VITE_GOOGLE_PLACES_KEY']?.trim() || env['VITE_GOOGLE_MAPS_BROWSER_KEY']?.trim();
+
+    if (!googleKey) {
+      console.warn(
+        [
+          '',
+          '  ⚠  No Google Maps key in this build.',
+          '',
+          '     Address search will fall back to OpenStreetMap, which is weak at',
+          '     UK postcodes, and the map will render with Leaflet rather than',
+          '     Google. Nothing breaks — it is simply the degraded path.',
+          '',
+          '     To fix: add VITE_GOOGLE_PLACES_KEY in your host\'s environment',
+          '     variables, then REDEPLOY. Vite inlines these at build time, so',
+          '     saving the variable alone changes nothing.',
+          '',
+        ].join('\n'),
+      );
+    }
+  }
+
   return {
     plugins: [react()],
 
