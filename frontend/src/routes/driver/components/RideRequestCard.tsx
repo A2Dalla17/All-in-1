@@ -1,6 +1,7 @@
 import { Clock } from 'lucide-react';
 
 import type { Ride } from '@/api/types';
+import { NavigateButton } from '@/components/map/NavigateButton';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { cn, formatCurrency, formatDistance } from '@/lib/utils';
@@ -92,6 +93,27 @@ export function RideRequestCard({
           <p className="truncate text-body text-ink">{ride.pickup_address}</p>
           <p className="truncate text-body text-ink">{ride.dropoff_address}</p>
         </div>
+
+        {/*
+          Navigation before accepting, not only after.
+
+          An address means little on its own — a driver needs to know whether
+          the pickup is two streets away or the wrong side of a river, and
+          they have seconds to decide. Being able to see the route first is
+          the difference between an informed accept and a guess, and a guess
+          is what produces a cancellation five minutes later.
+
+          Compact and outlined so it never competes with Accept, which is
+          still the action this card is asking for.
+        */}
+        {ride.pickup_latitude != null && ride.pickup_longitude != null && (
+          <NavigateButton
+            destination={{ lat: ride.pickup_latitude, lng: ride.pickup_longitude }}
+            label="Navigate to pickup"
+            compact
+            className="self-start"
+          />
+        )}
       </div>
 
       {/* Trip facts */}

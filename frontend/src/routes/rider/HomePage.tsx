@@ -24,7 +24,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Crosshair, Loader2, Lock, MapPin, Navigation, Search, ShoppingBag } from 'lucide-react';
+import {
+  Crosshair,
+  ExternalLink,
+  Loader2,
+  Lock,
+  MapPin,
+  Navigation,
+  Search,
+  ShoppingBag,
+} from 'lucide-react';
 
 import { MapView } from '@/components/map/MapView';
 import { DragSheet } from '@/components/ui/DragSheet';
@@ -308,25 +317,66 @@ export function HomePage() {
           )}
 
           {results.length === 0 && (
-            <div className="flex items-center gap-3 rounded-card border border-line bg-surface p-3.5 opacity-80">
-              <span
-                aria-hidden
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-tile bg-card text-ink-subtle"
-              >
-                <ShoppingBag size={18} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-2 text-body-sm font-semibold text-ink">
-                  AC7 Deliveries
-                  <span className="inline-flex items-center gap-1 rounded-pill bg-card px-2 py-0.5 text-micro font-medium text-ink-subtle">
-                    <Lock size={10} aria-hidden />
-                    Coming soon
-                  </span>
-                </p>
-                <p className="mt-0.5 text-body-sm text-ink-muted">
-                  Food, shops and parcels across London.
-                </p>
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-3 rounded-card border border-line bg-surface p-3.5 opacity-80">
+                <span
+                  aria-hidden
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-tile bg-card text-ink-subtle"
+                >
+                  <ShoppingBag size={18} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="flex items-center gap-2 text-body-sm font-semibold text-ink">
+                    AC7 Deliveries
+                    <span className="inline-flex items-center gap-1 rounded-pill bg-card px-2 py-0.5 text-micro font-medium text-ink-subtle">
+                      <Lock size={10} aria-hidden />
+                      Coming soon
+                    </span>
+                  </p>
+                  <p className="mt-0.5 text-body-sm text-ink-muted">
+                    Food, shops and parcels across London.
+                  </p>
+                </div>
               </div>
+
+              {/*
+                Waze, one tap, no chooser.
+
+                Sitting directly under Deliveries because that is where the
+                eye already is once the search box has been passed over. It
+                opens Waze at the rider's current position when we have one,
+                so a driver using this app — and many of AC7's riders are
+                drivers — is one tap from navigating rather than switching
+                apps by hand.
+
+                A plain link, not an API call: deep links to Waze cost
+                nothing, need no key, and count against no quota.
+              */}
+              <a
+                href={
+                  position
+                    ? `https://waze.com/ul?ll=${position.lat},${position.lng}&navigate=yes`
+                    : 'https://waze.com/ul'
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pressable flex items-center gap-3 rounded-card border border-line bg-surface p-3.5 transition-colors hover:border-line-strong"
+              >
+                <span
+                  aria-hidden
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-tile text-white"
+                  style={{ background: '#33CCFF' }}
+                >
+                  <Navigation size={18} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-body-sm font-semibold text-ink">Open Waze</p>
+                  <p className="mt-0.5 text-body-sm text-ink-muted">
+                    Live traffic, police and hazards.
+                  </p>
+                </div>
+                <ExternalLink size={16} className="shrink-0 text-ink-subtle" aria-hidden />
+              </a>
             </div>
           )}
         </div>

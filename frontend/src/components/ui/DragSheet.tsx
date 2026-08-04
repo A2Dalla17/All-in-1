@@ -36,7 +36,7 @@ interface DragSheetProps {
   expandedFraction?: number;
   initial?: SnapPoint;
   /**
-   * Raise the sheet when this becomes true.
+   * Raise the sheet to its tall stop when this becomes true.
    *
    * `initial` is read once, by useState, and never again — so a sheet told to
    * start collapsed stayed collapsed even when it filled with search results,
@@ -50,10 +50,20 @@ interface DragSheetProps {
 }
 
 export function DragSheet({
+  /*
+   * Measured against Bolt, which is the behaviour asked for.
+   *
+   * The first attempt had this the wrong way round: the sheet rested small and
+   * the map filled the screen. That is backwards for a booking app. At rest a
+   * rider is choosing a destination, not reading a map, so the sheet owns the
+   * screen (~76%) and the map is a strip at the top confirming roughly where
+   * they are. The map is something you pull DOWN to see, when you want it —
+   * not the default state you have to work around.
+   */
   children,
-  collapsedFraction = 0.42,
-  expandedFraction = 0.88,
-  initial = 'collapsed',
+  collapsedFraction = 0.34,
+  expandedFraction = 0.76,
+  initial = 'expanded',
   expandWhen = false,
   className,
 }: DragSheetProps) {
