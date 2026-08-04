@@ -25,14 +25,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  ChevronRight,
   Crosshair,
-  ExternalLink,
   Loader2,
   Lock,
   MapPin,
   Navigation,
+  Plane,
   Search,
   ShoppingBag,
+  TrainFront,
 } from 'lucide-react';
 
 import { MapView } from '@/components/map/MapView';
@@ -48,6 +50,8 @@ import {
   type PlaceSuggestion,
 } from '@/lib/geocode';
 import { useAuth } from '@/providers/AuthProvider';
+
+import { QUICK_DESTINATIONS } from './quickDestinations';
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -185,6 +189,22 @@ export function HomePage() {
    * billing session. A Nominatim suggestion already has its coordinates, so
    * resolve returns it untouched and nothing is spent.
    */
+  /**
+   * Send the rider to booking with a destination already known.
+   *
+   * Shared by the search results and the popular-destination list, which is
+   * the point: a hard-coded airport and a searched address arrive at booking
+   * through exactly the same door, so there is only one place for that
+   * handover to be wrong.
+   */
+  const goTo = useCallback(
+    (label: string, lat: number, lng: number) => {
+      const params = new URLSearchParams({ to: label, lat: String(lat), lng: String(lng) });
+      navigate(`/taxi/app/book?${params.toString()}`);
+    },
+    [navigate],
+  );
+
   const choose = useCallback(
     async (place: PlaceSuggestion) => {
       setResolving(place.id);
@@ -202,17 +222,12 @@ export function HomePage() {
           return;
         }
 
-        const params = new URLSearchParams({
-          to: resolved.label,
-          lat: String(resolved.lat),
-          lng: String(resolved.lng),
-        });
-        navigate(`/taxi/app/book?${params.toString()}`);
+        goTo(resolved.label, resolved.lat, resolved.lng);
       } finally {
         setResolving(null);
       }
     },
-    [navigate],
+    [goTo],
   );
 
   return (
@@ -253,24 +268,44 @@ export function HomePage() {
       </div>
 
       <DragSheet expandWhen={searchFocused || results.length > 0}>
-        <div className="space-y-4">
-          {/* Where to — the reason the sheet exists, so it leads. */}
-          <div>
-            {hasLocation && (
-              <p className="mb-2 flex items-center gap-2 text-body-sm text-ink-muted">
-                <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-accent" />
-                <span className="truncate">{pickupLabel ?? 'Your current location'}</span>
-              </p>
-            )}
+        {/*
+          Bolt's home screen, and why this is arranged the way it is.
 
-            <label className="flex h-12 items-center gap-2.5 rounded-control border border-line bg-surface px-3.5">
-              <Search size={18} className="shrink-0 text-ink-subtle" aria-hidden />
+          The previous version was a search box and two loose cards above a
+          large empty white area. Empty space on the main screen of a booking
+          app is the most valuable space there is — it is exactly where the
+          rider's likely next action belongs — and leaving it blank is what
+          made the screen feel unfinished rather than calm.
+
+          Order is by how often it is used:
+            1. where you are      — one line, confirmation, not a card
+            2. where are you going — the reason the screen exists
+            3. the six places Londoners actually book
+            4. everything else
+        */}
+        <div className="space-y-5">
+          {/* ---- Pickup ---------------------------------------------------- */}
+          {hasLocation && (
+            <p className="flex items-center gap-2 text-body-sm text-ink-muted">
+              <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-accent" />
+              <span className="truncate">{pickupLabel ?? 'Your current location'}</span>
+            </p>
+          )}
+
+          {/* ---- Where to -------------------------------------------------- */}
+          <div>
+            <h1 className="mb-3 text-h3 font-bold tracking-[-0.02em] text-ink">
+              Where are you going?
+            </h1>
+
+            <label className="flex h-13 items-center gap-2.5 rounded-control border border-line bg-surface px-4 transition-colors focus-within:border-brand-ink/40">
+              <Search size={19} className="shrink-0 text-ink-subtle" aria-hidden />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                placeholder="Where to?"
+                placeholder="Enter a postcode or address"
                 aria-label="Where to?"
                 className="h-full w-full bg-transparent text-body text-ink outline-none placeholder:text-ink-subtle"
               />
@@ -286,25 +321,27 @@ export function HomePage() {
             )}
           </div>
 
+          {/* ---- Results --------------------------------------------------- */}
           {results.length > 0 && (
-            <ul className="-mx-2">
+            <ul className="-mx-2 divide-y divide-line">
               {results.map((place) => (
                 <li key={place.id}>
                   <button
                     type="button"
                     onClick={() => void choose(place)}
                     disabled={resolving !== null}
-                    className="flex min-h-14 w-full items-center gap-3 rounded-tile px-2 py-2 text-left hover:bg-surface disabled:opacity-60"
+                    className="flex min-h-14 w-full items-center gap-3.5 rounded-tile px-2 py-3 text-left transition-colors hover:bg-surface disabled:opacity-60"
                   >
-                    {resolving === place.id ? (
-                      <Loader2
-                        size={17}
-                        className="shrink-0 animate-spin text-ink-subtle"
-                        aria-hidden
-                      />
-                    ) : (
-                      <MapPin size={17} className="shrink-0 text-ink-subtle" aria-hidden />
-                    )}
+                    <span
+                      aria-hidden
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded-tile bg-surface text-ink-subtle"
+                    >
+                      {resolving === place.id ? (
+                        <Loader2 size={17} className="animate-spin" />
+                      ) : (
+                        <MapPin size={17} />
+                      )}
+                    </span>
                     <span className="min-w-0">
                       <span className="block truncate text-body font-medium text-ink">
                         {place.label}
@@ -319,59 +356,106 @@ export function HomePage() {
             </ul>
           )}
 
-          {/* Location. Below the search box, because typing an address works
-              whether or not location is granted — it is a help, not a gate. */}
-          {!hasLocation && results.length === 0 && (
-            <div className="rounded-card border border-line bg-surface p-4">
-              <div className="flex items-start gap-3">
-                <span
-                  aria-hidden
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-tile bg-brand-soft text-brand-ink"
-                >
-                  <Navigation size={18} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-body-sm font-semibold text-ink">
-                    {permission === 'denied' ? 'Location is switched off' : 'Use my location'}
-                  </p>
-                  <p className="mt-0.5 text-body-sm text-ink-muted">
-                    {permission === 'denied'
-                      ? 'Turn it on in your browser settings, or just type your pickup address.'
-                      : 'Sets your pickup automatically and finds the nearest car.'}
-                  </p>
-                </div>
-              </div>
-
-              {permission !== 'denied' && (
-                <button
-                  type="button"
-                  disabled={askedForLocation && isLocating}
-                  onClick={() => setAskedForLocation(true)}
-                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-control border border-brand-ink/35 text-body-sm font-semibold text-brand-ink transition-colors hover:bg-brand-soft disabled:opacity-60"
-                >
-                  {askedForLocation && isLocating ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" aria-hidden />
-                      Finding you
-                    </>
-                  ) : (
-                    <>
-                      <Crosshair size={16} aria-hidden />
-                      Allow location
-                    </>
-                  )}
-                </button>
-              )}
-
-              {geoError && askedForLocation && (
-                <p className="mt-2 text-body-sm text-danger-ink">{geoError}</p>
-              )}
-            </div>
-          )}
-
+          {/* ---- Everything below is hidden while searching ----------------
+              A rider mid-search wants the list and nothing else competing
+              with it for the screen. */}
           {results.length === 0 && (
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-3 rounded-card border border-line bg-surface p-3.5 opacity-80">
+            <>
+              {/* Popular destinations.
+                  Hard-coded coordinates, so tapping one is instant and costs
+                  no Google call at all — see quickDestinations.ts. */}
+              <section>
+                <h2 className="mb-2 text-caption font-semibold uppercase tracking-wide text-ink-subtle">
+                  Popular destinations
+                </h2>
+
+                <ul className="divide-y divide-line overflow-hidden rounded-card border border-line">
+                  {QUICK_DESTINATIONS.map((place) => (
+                    <li key={place.id}>
+                      <button
+                        type="button"
+                        onClick={() => goTo(place.label, place.lat, place.lng)}
+                        className="flex min-h-14 w-full items-center gap-3.5 bg-surface px-4 py-3 text-left transition-colors hover:bg-card"
+                      >
+                        <span
+                          aria-hidden
+                          className="grid h-10 w-10 shrink-0 place-items-center rounded-tile bg-card text-ink-muted"
+                        >
+                          {place.kind === 'airport' ? <Plane size={17} /> : <TrainFront size={17} />}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-body font-medium text-ink">
+                            {place.label}
+                          </span>
+                          <span className="block truncate text-body-sm text-ink-muted">
+                            {place.hint}
+                          </span>
+                        </span>
+                        <ChevronRight size={17} className="shrink-0 text-ink-subtle" aria-hidden />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              {/* Location.
+                  A single row, not the large card it used to be. Typing an
+                  address works with or without it, so it is a convenience and
+                  should not look like a barrier standing between the rider
+                  and a taxi. */}
+              {!hasLocation && (
+                <div className="rounded-card border border-line bg-surface p-4">
+                  <div className="flex items-start gap-3">
+                    <span
+                      aria-hidden
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded-tile bg-brand-soft text-brand-ink"
+                    >
+                      <Navigation size={18} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-body-sm font-semibold text-ink">
+                        {permission === 'denied' ? 'Location is switched off' : 'Use my location'}
+                      </p>
+                      <p className="mt-0.5 text-body-sm text-ink-muted">
+                        {permission === 'denied'
+                          ? 'Turn it on in your browser settings, or just type your pickup address.'
+                          : 'Sets your pickup automatically and finds the nearest car.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {permission !== 'denied' && (
+                    <button
+                      type="button"
+                      disabled={askedForLocation && isLocating}
+                      onClick={() => setAskedForLocation(true)}
+                      className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-control border border-brand-ink/35 text-body-sm font-semibold text-brand-ink transition-colors hover:bg-brand-soft disabled:opacity-60"
+                    >
+                      {askedForLocation && isLocating ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" aria-hidden />
+                          Finding you
+                        </>
+                      ) : (
+                        <>
+                          <Crosshair size={16} aria-hidden />
+                          Allow location
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  {geoError && askedForLocation && (
+                    <p className="mt-2 text-body-sm text-danger-ink">{geoError}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Deliveries.
+                  Last, and visibly inactive. A locked row placed above live
+                  features reads as the app being unfinished; placed below
+                  them it reads as something on the way. */}
+              <div className="flex items-center gap-3 rounded-card border border-line border-dashed bg-surface/60 p-3.5">
                 <span
                   aria-hidden
                   className="grid h-10 w-10 shrink-0 place-items-center rounded-tile bg-card text-ink-subtle"
@@ -379,58 +463,19 @@ export function HomePage() {
                   <ShoppingBag size={18} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="flex items-center gap-2 text-body-sm font-semibold text-ink">
+                  <p className="flex items-center gap-2 text-body-sm font-semibold text-ink-muted">
                     AC7 Deliveries
                     <span className="inline-flex items-center gap-1 rounded-pill bg-card px-2 py-0.5 text-micro font-medium text-ink-subtle">
                       <Lock size={10} aria-hidden />
                       Coming soon
                     </span>
                   </p>
-                  <p className="mt-0.5 text-body-sm text-ink-muted">
+                  <p className="mt-0.5 text-body-sm text-ink-subtle">
                     Food, shops and parcels across London.
                   </p>
                 </div>
               </div>
-
-              {/*
-                Waze, one tap, no chooser.
-
-                Sitting directly under Deliveries because that is where the
-                eye already is once the search box has been passed over. It
-                opens Waze at the rider's current position when we have one,
-                so a driver using this app — and many of AC7's riders are
-                drivers — is one tap from navigating rather than switching
-                apps by hand.
-
-                A plain link, not an API call: deep links to Waze cost
-                nothing, need no key, and count against no quota.
-              */}
-              <a
-                href={
-                  position
-                    ? `https://waze.com/ul?ll=${position.lat},${position.lng}&navigate=yes`
-                    : 'https://waze.com/ul'
-                }
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pressable flex items-center gap-3 rounded-card border border-line bg-surface p-3.5 transition-colors hover:border-line-strong"
-              >
-                <span
-                  aria-hidden
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-tile text-white"
-                  style={{ background: '#33CCFF' }}
-                >
-                  <Navigation size={18} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-body-sm font-semibold text-ink">Open Waze</p>
-                  <p className="mt-0.5 text-body-sm text-ink-muted">
-                    Live traffic, police and hazards.
-                  </p>
-                </div>
-                <ExternalLink size={16} className="shrink-0 text-ink-subtle" aria-hidden />
-              </a>
-            </div>
+            </>
           )}
         </div>
       </DragSheet>

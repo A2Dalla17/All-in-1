@@ -190,6 +190,15 @@ export default {
 
       /* ---- Layout ------------------------------------------------------ */
       spacing: {
+        /* Tailwind's default scale jumps 12 → 14, so `h-13` silently emitted
+           nothing. Two search inputs were already asking for it and getting
+           their height from padding instead, which is why nobody noticed: the
+           class did nothing and the box looked roughly right anyway.
+
+           52px is the size those inputs actually want — comfortably above the
+           44px minimum touch target, and a step below the 56px primary button
+           so a text field never outweighs the action next to it. */
+        13: '3.25rem',
         gutter: '1.25rem' /* the standard screen inset — px-gutter */,
         'safe-top': 'var(--safe-top)',
         'safe-bottom': 'var(--safe-bottom)',

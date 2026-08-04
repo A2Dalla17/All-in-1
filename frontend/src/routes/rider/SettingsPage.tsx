@@ -19,6 +19,7 @@ import {
   Bell,
   CalendarDays,
   ChevronRight,
+  ExternalLink,
   FileText,
   Gift,
   Globe,
@@ -29,6 +30,7 @@ import {
   LogOut,
   MapPin,
   Moon,
+  Navigation,
   ShieldCheck,
   ShoppingBag,
   Sun,
@@ -118,6 +120,30 @@ export function RiderSettingsPage() {
           <Row icon={<MapPin size={19} />} label="Saved places" to="/taxi/app/favourites" />
           <Row icon={<ShieldCheck size={19} />} label="Safety" to="/taxi/app/safety" />
           <Row icon={<LifeBuoy size={19} />} label="Support" to="/taxi/app/support" />
+        </Group>
+
+        {/*
+          Navigation.
+
+          This lived on the rider home screen and did not belong there. A
+          rider's home screen is for booking a car; a link that launches a
+          driving app is noise between them and that. It matters to drivers,
+          so that is where it is prominent — but riders who drive too can
+          still reach it here, which is where anybody would think to look for
+          a setting they only occasionally want.
+
+          An external link rather than a route: it leaves the app, and a row
+          that looks identical to Saved places but navigates somewhere else
+          entirely would be a small lie.
+        */}
+        <Group heading="Navigation">
+          <ExternalRow
+            icon={<Navigation size={19} />}
+            label="Open Waze"
+            hint="Live traffic, police and hazards"
+            href="https://waze.com/ul"
+            tint="#33CCFF"
+          />
         </Group>
 
         <Group>
@@ -240,6 +266,53 @@ function Group({ heading, children }: { heading?: string; children: React.ReactN
         {children}
       </Card>
     </div>
+  );
+}
+
+/**
+ * A row that leaves the application.
+ *
+ * Visually a sibling of Row, but with the outbound arrow rather than the
+ * chevron. The chevron promises "another screen in this app"; using it for a
+ * link that opens Waze would teach the rider that the chevron cannot be
+ * trusted, and every row after it becomes a guess.
+ */
+function ExternalRow({
+  icon,
+  label,
+  hint,
+  href,
+  tint,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  hint?: string;
+  href: string;
+  tint?: string;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex min-h-14 w-full items-center gap-3.5 px-4 py-3 text-left transition-colors hover:bg-surface"
+    >
+      <span
+        aria-hidden
+        className={cn(
+          'grid h-9 w-9 shrink-0 place-items-center rounded-tile',
+          tint ? 'text-white' : 'text-ink-muted',
+        )}
+        {...(tint ? { style: { background: tint } } : {})}
+      >
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-body font-medium text-ink">{label}</span>
+        {hint && <span className="mt-0.5 block text-body-sm text-ink-muted">{hint}</span>}
+      </span>
+      <ExternalLink size={16} className="shrink-0 text-ink-subtle" aria-hidden />
+    </a>
   );
 }
 
