@@ -14,6 +14,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import '@shared/styles/index.css';
 
+import { AuthProvider } from '@shared/providers/AuthProvider';
+
+import { IntroGate } from '@/components/brand/IntroGate';
+
 import { App } from './App';
 
 const queryClient = new QueryClient({
@@ -34,9 +38,22 @@ if (!container) throw new Error('#root is missing from index.html');
 createRoot(container).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      {/* Wraps everything, but costs a visitor almost nothing: with no stored
+          session it resolves to "signed out" on the first check and never
+          calls the network again. Only the restaurant portal and the control
+          room read from it. */}
+      <AuthProvider>
+        {/* Outside BrowserRouter on purpose. The gate reads window.location
+            directly and needs to decide before any route renders — putting it
+            inside the router would mean the homepage mounts, then unmounts
+            behind the overlay, which is the flicker the whole thing exists to
+            avoid. */}
+        <IntroGate>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </IntroGate>
+      </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,
 );

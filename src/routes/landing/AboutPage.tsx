@@ -1,26 +1,31 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Building2, HeartHandshake, Phone, Target } from 'lucide-react';
+import { ArrowRight, Bike, HeartHandshake, Phone, Store, Target } from 'lucide-react';
 
 import { Button } from '@shared/components/ui/Button';
 import { Card } from '@shared/components/ui/Card';
 import { Container } from '@shared/components/ui/Container';
 import { Section } from '@shared/components/ui/Section';
 import { env } from '@shared/config/env';
-import { SERVICES } from '@shared/config/navigation';
 import { usePageMeta } from '@shared/lib/seo';
 
 /**
- * About Us.
+ * About AC7 GALEYR.
  *
- * Written without invented history. The company is new, so there are no
- * founding dates, no headcount and no "since 2009" — every claim here is
- * either structurally true (what the group does, how it is organised) or a
- * stated intention clearly framed as one.
+ * ── No invented history ────────────────────────────────────────────────────
+ * The business is new. There is no founding date, no headcount, no "trusted by
+ * thousands", and no restaurant logos — because there are no restaurant
+ * partners yet, and a wall of logos nobody agreed to is the single fastest way
+ * to lose the trust of the next owner who sees their competitor on it.
+ *
+ * Every claim here is either structurally true or an intention stated as one.
+ * The page says outright that the service is being built. That reads as more
+ * credible than the alternative, and it is the only version that survives being
+ * checked.
  */
 export function AboutPage() {
   usePageMeta(
     'About us',
-    'AC7 GROUP — Aragti Cad. A London transport group operating taxi, school runs and local booking services under one control centre.',
+    'AC7 GALEYR — food delivery in Mogadishu. Part of AC7 GROUP.',
   );
 
   return (
@@ -38,80 +43,85 @@ export function AboutPage() {
           <p className="text-caption font-semibold uppercase tracking-[0.14em] text-brand-ink">
             About us
           </p>
-          <h1 className="mt-4 text-h1 text-ink">
-            One group, one number, every journey
-          </h1>
+          <h1 className="mt-4 text-h1 text-ink">Cunto la keeno, si fudud</h1>
           <p className="mt-5 text-body-lg leading-relaxed text-ink-muted">
-            {env.company.name} — <span className="text-brand-ink">{env.company.meaning}</span> —
-            brings taxi, school transport and local bookings together under a single control
-            centre, so there is always one place to call and one team accountable.
+            AC7 GALEYR delivers food across {env.market.city}. You order from a restaurant
+            near you, a courier collects it, and you pay cash when it reaches your door.
+          </p>
+          <p className="mt-4 text-body leading-relaxed text-ink-muted">
+            We are part of {env.company.name} —{' '}
+            <span className="text-brand-ink">{env.company.meaning}</span>.
           </p>
         </Container>
       </section>
 
-      {/* What we do */}
+      {/* ── Said plainly, near the top ──
+          Anyone can see the site has three restaurants called "Demo". Naming
+          that before they work it out is the difference between a company that
+          is early and a company that is pretending. */}
+      <Container size="narrow" className="pt-12">
+        <div className="rounded-card border border-warning/35 bg-warning-soft p-5 text-body-sm text-warning-ink">
+          <p className="font-semibold">We are still being built</p>
+          <p className="mt-1">
+            AC7 GALEYR has not signed its first restaurant yet. Everything you can see on
+            the site today is clearly labelled demo data, used to test that ordering,
+            cooking, dispatch and delivery all work before a single real order is taken. We
+            will not list a restaurant until they have agreed to work with us.
+          </p>
+        </div>
+      </Container>
+
       <Section
-        id="what-we-do"
-        title="What we run"
-        description="Each service is a separate operation with its own drivers, rules and dashboards. They share a control centre, not a codebase compromise."
+        id="how-it-works"
+        title="How it works"
+        description="Four steps, and a person watching all of them."
       >
-        <ul className="stagger grid gap-4 sm:grid-cols-2">
-          {SERVICES.map((service) => {
-            const { icon: Icon } = service;
-            return (
-              <li key={service.id} className="flex">
-                <Card className="w-full">
-                  <div className="flex items-start gap-4">
-                    <span
-                      aria-hidden
-                      className="grid h-11 w-11 shrink-0 place-items-center rounded-tile bg-brand-soft text-brand-ink"
-                    >
-                      <Icon size={20} />
-                    </span>
-                    <div className="min-w-0">
-                      <h3 className="text-h4 text-ink">
-                        {service.label}
-                        {service.comingSoon && (
-                          <span className="ml-2 align-middle text-micro font-semibold text-ink-subtle">
-                            Coming soon
-                          </span>
-                        )}
-                      </h3>
-                      <p className="mt-2 text-body-sm leading-relaxed text-ink-muted">
-                        {service.description}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              </li>
-            );
-          })}
-        </ul>
+        <ol className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { n: '1', title: 'Dalbo', en: 'Order', body: 'Choose a restaurant and pick your food. No account needed.' },
+            { n: '2', title: 'Karis', en: 'Cooked', body: 'The restaurant accepts and starts cooking straight away.' },
+            { n: '3', title: 'Keenid', en: 'Delivered', body: 'A courier collects it and calls you when they are close.' },
+            { n: '4', title: 'Bixi', en: 'Pay', body: 'Cash to the courier, once the food is in your hands.' },
+          ].map((step) => (
+            <li key={step.n} className="flex">
+              <Card className="w-full">
+                <span
+                  aria-hidden
+                  className="grid h-11 w-11 place-items-center rounded-tile bg-brand-soft text-h5 font-bold text-brand-ink"
+                >
+                  {step.n}
+                </span>
+                <h3 className="mt-4 text-h4 text-ink">{step.title}</h3>
+                <p className="text-body-sm text-ink-subtle">{step.en}</p>
+                <p className="mt-2 text-body-sm leading-relaxed text-ink-muted">{step.body}</p>
+              </Card>
+            </li>
+          ))}
+        </ol>
       </Section>
 
-      {/* Principles */}
       <Section
         id="principles"
         tone="raised"
         title="How we work"
-        description="Three commitments that decide how the business is run when something goes wrong."
+        description="Three commitments that decide what happens when something goes wrong — which is when a delivery company is actually judged."
       >
         <ul className="stagger grid gap-4 lg:grid-cols-3">
           {[
             {
               icon: Phone,
               title: 'Somebody always answers',
-              body: 'The control centre is staffed around the clock. If the app cannot do it, a person will — including taking the whole booking over the phone.',
+              body: 'The control room is staffed and the number is on every page. If the website cannot fix it, a person will — including taking the whole order over the phone.',
             },
             {
               icon: HeartHandshake,
-              title: 'Drivers are accountable, not anonymous',
-              body: 'Every driver carries a permanent code. Anyone can check it before getting in and see exactly who is driving them.',
+              title: 'You pay when the food arrives',
+              body: 'Cash on delivery, always. Nothing leaves your pocket before the food is in your hands, so a late or missing order costs you nothing but time.',
             },
             {
               icon: Target,
               title: 'We would rather say no',
-              body: 'If we cannot cover a route properly we say so, rather than accepting the work and letting somebody down on the morning it matters.',
+              body: 'If a restaurant cannot cook it or we cannot deliver it, we say so instead of accepting the order and letting somebody down at dinner time.',
             },
           ].map(({ icon: Icon, title, body }) => (
             <li key={title} className="flex">
@@ -130,33 +140,53 @@ export function AboutPage() {
         </ul>
       </Section>
 
-      {/* Work with us */}
       <Container className="py-20">
-        <div className="rounded-panel border border-line bg-card p-8 text-center shadow-card sm:p-12">
-          <span
-            aria-hidden
-            className="mx-auto grid h-12 w-12 place-items-center rounded-tile bg-brand-soft text-brand-ink"
-          >
-            <Building2 size={22} />
-          </span>
-          <h2 className="mt-4 text-h1 text-ink">Councils, schools and businesses</h2>
-          <p className="mx-auto mt-4 max-w-xl text-body leading-relaxed text-ink-muted">
-            We take on contracted school routes and corporate accounts. Talk to the control
-            centre and we will put you through to the right person.
-          </p>
-
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a href={`tel:${env.controlCentre.tel}`}>
-              <Button variant="primary" size="lg" leadingIcon={<Phone size={17} />}>
-                <span className="tabular">{env.controlCentre.display}</span>
-              </Button>
-            </a>
-            <Link to="/school-runs">
-              <Button variant="secondary" size="lg" trailingIcon={<ArrowRight size={16} />}>
-                School Runs portal
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-panel border border-line bg-card p-8 shadow-card">
+            <span
+              aria-hidden
+              className="grid h-12 w-12 place-items-center rounded-tile bg-brand-soft text-brand-ink"
+            >
+              <Store size={22} />
+            </span>
+            <h2 className="mt-4 text-h3 text-ink">Run a restaurant?</h2>
+            <p className="mt-3 text-body leading-relaxed text-ink-muted">
+              Reach more of {env.market.city} without hiring a delivery team. Applying is a
+              conversation, not a contract.
+            </p>
+            <Link to="/partners" className="mt-6 inline-block">
+              <Button variant="primary" trailingIcon={<ArrowRight size={16} />}>
+                Partner with us
               </Button>
             </Link>
           </div>
+
+          <div className="rounded-panel border border-line bg-card p-8 shadow-card">
+            <span
+              aria-hidden
+              className="grid h-12 w-12 place-items-center rounded-tile bg-brand-soft text-brand-ink"
+            >
+              <Bike size={22} />
+            </span>
+            <h2 className="mt-4 text-h3 text-ink">Have a motorbike?</h2>
+            <p className="mt-3 text-body leading-relaxed text-ink-muted">
+              Work your own hours, get paid per delivery, and have a control room behind you
+              when an address turns out to be wrong.
+            </p>
+            <Link to="/couriers" className="mt-6 inline-block">
+              <Button variant="secondary" trailingIcon={<ArrowRight size={16} />}>
+                Deliver with us
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-8 text-center">
+          <a href={`tel:${env.controlCentre.tel}`}>
+            <Button variant="outline" size="lg" leadingIcon={<Phone size={17} />}>
+              <span className="tabular">{env.controlCentre.display}</span>
+            </Button>
+          </a>
         </div>
       </Container>
     </>

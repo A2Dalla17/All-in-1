@@ -589,3 +589,109 @@
 .leaflet-popup-tip {
   background: rgb(var(--bg)) !important;
 }
+
+/* ==========================================================================
+   GALEYR — opening sequence
+   ==========================================================================
+   Timings are expressed as percentages, so the whole sequence stretches or
+   compresses with whatever animation-duration the component sets from
+   INTRO_DURATION_MS. Change the number in brand.ts and every movement re-times
+   together; nothing here needs editing.
+
+   Everything animates `transform` and `opacity` only. Those are the two
+   properties a browser can composite on the GPU without re-laying-out the page,
+   which is what keeps an eighteen-second full-screen animation from pinning the
+   CPU of a cheap Android phone — the exact device most of these customers are
+   holding.
+   ========================================================================== */
+
+/* The monogram: rises out of the dark, settles, breathes, then leaves. */
+@keyframes galeyr-intro-mark {
+  0%   { opacity: 0; transform: scale(0.86) translateY(14px); filter: blur(12px); }
+  14%  { opacity: 1; transform: scale(1.008) translateY(0);   filter: blur(0); }
+  18%  { transform: scale(1); }
+  /* The hold is not perfectly still — a fraction of a percent of scale keeps it
+     alive without anyone consciously noticing movement. */
+  50%  { transform: scale(1.012); }
+  82%  { transform: scale(1.004); opacity: 1; }
+  92%  { opacity: 0; transform: scale(1.05); filter: blur(6px); }
+  100% { opacity: 0; transform: scale(1.05); filter: blur(6px); }
+}
+
+.galeyr-intro-mark {
+  animation-name: galeyr-intro-mark;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+/* The light sweep — one pass, early, then gone. Held at opacity 0 for the rest
+   of the sequence so it cannot repeat and become a tic. */
+@keyframes galeyr-intro-sweep {
+  0%, 20%  { opacity: 0; transform: translateX(-120%); }
+  26%      { opacity: 1; }
+  44%      { opacity: 0; transform: translateX(120%); }
+  100%     { opacity: 0; transform: translateX(120%); }
+}
+
+.galeyr-intro-sweep {
+  animation-name: galeyr-intro-sweep;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+/* The hairline drawing out beneath the mark, in place of adding any text to
+   the supplied artwork. */
+@keyframes galeyr-intro-rule {
+  0%, 34%  { opacity: 0; width: 0; }
+  56%      { opacity: 1; width: 13rem; }
+  84%      { opacity: 1; width: 13rem; }
+  94%, 100%{ opacity: 0; width: 13rem; }
+}
+
+.galeyr-intro-rule {
+  animation-name: galeyr-intro-rule;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+  width: 0;
+}
+
+/* Background washes. Deliberately not synced to the main timeline — two drifts
+   at unrelated speeds never quite repeat, which is what stops a long hold from
+   reading as a loop. */
+@keyframes galeyr-intro-aura {
+  0%   { opacity: 0;    transform: translate3d(-6%, 4%, 0) scale(0.94); }
+  30%  { opacity: 0.95; }
+  50%  { transform: translate3d(5%, -4%, 0) scale(1.06); }
+  80%  { opacity: 0.8; }
+  100% { opacity: 0.5;  transform: translate3d(-4%, 3%, 0) scale(0.98); }
+}
+
+.galeyr-intro-aura,
+.galeyr-intro-aura-slow {
+  animation-name: galeyr-intro-aura;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+.galeyr-intro-aura-slow {
+  animation-direction: alternate-reverse;
+}
+
+/* Belt and braces alongside the JavaScript check in BrandIntro: if the media
+   query is honoured by the browser but the component ever renders the animated
+   branch, nothing moves. */
+@media (prefers-reduced-motion: reduce) {
+  .galeyr-intro-mark,
+  .galeyr-intro-sweep,
+  .galeyr-intro-rule,
+  .galeyr-intro-aura,
+  .galeyr-intro-aura-slow {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}

@@ -225,12 +225,31 @@ export const env = {
    * becomes an absolute URL again, the platform has quietly been split back
    * into two.
    */
+  /**
+   * AC7 GALEYR runs one business: food delivery in Mogadishu.
+   *
+   * Taxi, School Runs, Bookings and Marketplace have been removed rather than
+   * hidden. A "coming soon" card is still a card — it takes space on the one
+   * screen that has to sell the thing that works, and it invites a customer to
+   * click away from ordering. The taxi code remains in the repository, paused.
+   */
   services: {
-    taxi: '/taxi',
-    schoolRuns: '/school-runs',
-    bookings: '/bookings',
-    /** Phase 2. Empty means the card renders as Coming Soon. */
-    marketplace: '',
+    restaurants: '/restaurants',
+    couriers: '/couriers',
+    partners: '/partners',
+    track: '/track',
+  },
+
+  /** Where AC7 GALEYR operates today. Used in copy and in the address form. */
+  market: {
+    city: 'Mogadishu',
+    cityLocal: 'Muqdisho',
+    country: 'Somalia',
+    countryLocal: 'Soomaaliya',
+    /** Somali mobile numbers. Drives the phone field's prefix and validation. */
+    phonePrefix: '+252',
+    currency: 'USD',
+    currencySymbol: '$',
   },
 
   /**

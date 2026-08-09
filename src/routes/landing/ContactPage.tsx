@@ -63,7 +63,7 @@ export function ContactPage() {
                 <p className="text-body font-semibold text-ink">Opening hours</p>
                 <p className="mt-0.5 text-body-sm text-ink">{env.controlCentre.hours}</p>
                 <p className="mt-1 text-body-sm text-ink-muted">
-                  Including bank holidays and Christmas Day.
+                  Including Fridays and public holidays.
                 </p>
               </div>
             </div>
@@ -77,8 +77,9 @@ export function ContactPage() {
               <div className="min-w-0">
                 <p className="text-body font-semibold text-ink">Where we operate</p>
                 <p className="mt-0.5 text-body-sm text-ink-muted">
-                  Greater London and the surrounding counties, with airport runs
-                  to Heathrow, Gatwick, Stansted, Luton and London City.
+                  {env.market.city} · {env.market.cityLocal}. Which districts we can reach
+                  depends on the restaurant — you will only see restaurants that deliver to
+                  your district when you order.
                 </p>
               </div>
             </div>

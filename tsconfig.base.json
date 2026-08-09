@@ -21,7 +21,11 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": false,
 
-    "types": ["vite/client", "google.maps"]
+    /* google.maps was here for the taxi map, which this site no longer has.
+       AC7 GALEYR delivers to a district and a landmark, not to a pin — so the
+       website needs no map at all, which also keeps it light on a weak
+       connection and off the Maps bill entirely. */
+    "types": ["vite/client"]
   },
   "exclude": ["node_modules", "dist"]
 }

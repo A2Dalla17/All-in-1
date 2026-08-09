@@ -1,15 +1,97 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AC7 Taxi — Licensed minicabs across London</title>
+
+    <!-- The consumer brand leads. "AC7 GALEYR" is an internal name and does not
+         appear on customer-facing surfaces; AC7 GROUP is credited, not sold. -->
+    <title>GALEYR — Galeyrka Duulo | Food delivery in Mogadishu</title>
     <meta
       name="description"
-      content="Book a licensed AC7 minicab across London. Fixed fares, vetted drivers, 24 hour control room. Download the app for iPhone and Android."
+      content="GALEYR delivers food across Mogadishu. Order from restaurants near you, pay the courier in cash on delivery, and track your order. Powered by AC7 Group."
     />
-    <link rel="canonical" href="https://ac7taxi.com/" />
-    <meta name="theme-color" content="#8B0000" />
+
+    <!-- lang is "en" rather than "en-GB": the audience is Somali, the copy is
+         bilingual, and en-GB would tell a screen reader to use a British voice
+         for Somali words. -->
+    <link rel="canonical" href="https://galeyr.com/" />
+    <meta name="theme-color" content="#8B1A1A" />
+
+    <link rel="icon" href="/favicon-512.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- ── Preloading the intro ──
+         The opening sequence is the first thing a new visitor sees, so its
+         artwork cannot arrive late — a fade-in that begins with an empty box
+         reads as a broken page, not a brand moment. Preloaded here rather than
+         from the component, because by the time React has mounted the request
+         would already be several hundred milliseconds behind.
+
+         `imagesrcset` lets the browser take the WebP and skip the PNG entirely
+         where it is supported, which is most places. -->
+    <link
+      rel="preload"
+      as="image"
+      href="/brand/gr-intro.png"
+      imagesrcset="/brand/gr-intro.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+
+    <!-- The header wordmark, needed the moment the intro finishes. -->
+    <link
+      rel="prefetch"
+      as="image"
+      href="/brand/galeyr-logo-sm.webp"
+      type="image/webp"
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GALEYR" />
+    <meta property="og:title" content="GALEYR — Galeyrka Duulo" />
+    <meta
+      property="og:description"
+      content="Food delivery across Mogadishu. Cash on delivery, no account needed."
+    />
+    <meta property="og:image" content="/brand/galeyr-logo.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- ── The pre-React backdrop ──
+         Between the HTML arriving and React mounting there is a gap, and on a
+         slow connection it is not short. Painting the intro's own background
+         colour across that gap means it reads as the sequence beginning rather
+         than as a white flash — the jolt a cinematic opening cannot survive.
+
+         It must be conditional. A returning visitor goes straight to the
+         landing page, and painting them a near-black screen first would be the
+         very flash this is meant to prevent, just in the other direction. So
+         the check runs inline, before the first paint, and only then does the
+         dark backdrop apply.
+
+         This duplicates the decision in IntroGate. That is deliberate and the
+         duplication is deliberately tiny: it cannot import from the bundle,
+         because the whole point is to run before the bundle exists. The storage
+         key is the one constant shared with brand.ts — if that changes, change
+         it here too. Getting it wrong is not harmful, only a flash. -->
+    <script>
+      (function () {
+        try {
+          var firstVisit = localStorage.getItem('galeyr.intro.seen.v1') !== '1';
+          if (firstVisit && location.pathname === '/') {
+            document.documentElement.classList.add('galeyr-intro-pending');
+          }
+        } catch (e) {
+          /* Storage blocked — no intro will play, so no backdrop. */
+        }
+      })();
+    </script>
+    <style>
+      html.galeyr-intro-pending,
+      html.galeyr-intro-pending body {
+        background: #120404;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

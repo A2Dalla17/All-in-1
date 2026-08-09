@@ -1,109 +1,99 @@
-import type { ReactNode } from 'react';
+/**
+ * The three ways to be part of AC7 GALEYR: order, deliver, or list a restaurant.
+ *
+ * ── Not a services menu ────────────────────────────────────────────────────
+ * These are not four products with one greyed out. They are the three sides of
+ * one marketplace, and every card leads somewhere that works today.
+ *
+ * Ordering comes first and is visually heavier, because customers outnumber
+ * couriers and restaurants by a very long way and the page has one job.
+ */
+
 import { Link } from 'react-router-dom';
-import { ArrowRight, Lock } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 import { Container } from '@shared/components/ui/Container';
-import { SERVICES, type ServiceLink } from '@shared/config/navigation';
+import { SERVICES } from '@shared/config/navigation';
 import { cn } from '@shared/lib/utils';
 
-/**
- * The four service cards.
- *
- * ── Why the inactive card is a <div> and not a disabled link ───────────────
- * Marketplace is Phase 2. An <a> with no href is not focusable and is
- * announced as plain text, which is confusing next to three cards that are
- * links; an <a> pointing at "#" or a dead route is worse, because it looks
- * like it works until someone clicks it. A div marked aria-disabled says
- * exactly what is true: this is a thing, and it is not available yet.
- *
- * The card also stops being `interactive` in that state — no lift on hover.
- * A card that responds to the cursor but does nothing when clicked is a small
- * lie, and it is the kind that makes people distrust the rest of the page.
- */
 export function ServiceCards() {
   return (
-    <section aria-labelledby="services-heading">
-      <Container className="pb-20">
-        <h2 id="services-heading" className="sr-only">
-          Our services
-        </h2>
+    <section id="services" className="py-16 sm:py-20">
+      <Container>
+        <div className="grid gap-4 md:grid-cols-3">
+          {SERVICES.map((service, i) => {
+            /* The first card — ordering — is the primary action, and is filled
+               rather than outlined so it wins the glance. */
+            const primary = i === 0;
 
-        <ul className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {SERVICES.map((service) => (
-            <li key={service.id} className="flex">
-              <ServiceCard service={service} />
-            </li>
-          ))}
-        </ul>
+            return (
+              <Link
+                key={service.id}
+                to={service.to}
+                className={cn(
+                  'pressable group flex flex-col rounded-card p-6 transition-colors',
+                  primary
+                    ? 'brand-gradient text-white shadow-brand md:row-span-2'
+                    : 'border border-line bg-card hover:border-line-strong',
+                )}
+              >
+                <span
+                  aria-hidden
+                  className={cn(
+                    'grid h-12 w-12 place-items-center rounded-tile',
+                    primary ? 'bg-white/15 text-white' : 'bg-brand-soft text-brand-ink',
+                  )}
+                >
+                  <service.icon size={22} />
+                </span>
+
+                <h2
+                  className={cn(
+                    'mt-5 text-h4',
+                    primary ? 'text-white' : 'text-ink',
+                  )}
+                >
+                  {service.label}
+                </h2>
+
+                {service.labelSo && (
+                  <p
+                    className={cn(
+                      'mt-0.5 text-body-sm',
+                      primary ? 'text-white/70' : 'text-ink-subtle',
+                    )}
+                  >
+                    {service.labelSo}
+                  </p>
+                )}
+
+                <p
+                  className={cn(
+                    'mt-3 flex-1 text-body',
+                    primary ? 'text-white/85' : 'text-ink-muted',
+                  )}
+                >
+                  {service.description}
+                </p>
+
+                <span
+                  className={cn(
+                    'mt-5 inline-flex items-center gap-1.5 text-body-sm font-semibold',
+                    primary ? 'text-white' : 'text-brand-ink',
+                  )}
+                >
+                  {service.cta}
+                  <ArrowRight
+                    size={16}
+                    aria-hidden
+                    className="transition-transform group-hover:translate-x-0.5"
+                  />
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </Container>
     </section>
-  );
-}
-
-function ServiceCard({ service }: { service: ServiceLink }) {
-  const { icon: Icon, label, tagline, description, cta, comingSoon, to, href } = service;
-
-  const body: ReactNode = (
-    <>
-      <span
-        aria-hidden
-        className={cn(
-          'grid h-12 w-12 place-items-center rounded-tile transition-colors duration-300',
-          comingSoon ? 'bg-elevated text-ink-subtle' : 'bg-brand-soft text-brand-ink',
-        )}
-      >
-        <Icon size={22} />
-      </span>
-
-      <h3 className="mt-5 text-h4 text-ink">{label}</h3>
-      <p className="mt-1 text-caption font-medium text-brand-ink">{tagline}</p>
-      <p className="mt-3 flex-1 text-body-sm leading-relaxed text-ink-muted">{description}</p>
-
-      <span
-        className={cn(
-          'mt-6 inline-flex items-center gap-1.5 text-body-sm font-semibold',
-          comingSoon ? 'text-ink-subtle' : 'text-brand-ink',
-        )}
-      >
-        {cta}
-        {comingSoon ? (
-          <Lock size={13} aria-hidden />
-        ) : (
-          <ArrowRight
-            size={15}
-            aria-hidden
-            className="transition-transform duration-300 ease-smooth group-hover:translate-x-1"
-          />
-        )}
-      </span>
-    </>
-  );
-
-  const shell =
-    'group relative flex w-full flex-col rounded-card border border-line p-6 shadow-card';
-
-  if (comingSoon) {
-    return (
-      <div aria-disabled="true" className={cn(shell, 'bg-card/60')}>
-        <span className="absolute right-5 top-5 rounded-pill bg-elevated px-2.5 py-1 text-micro font-semibold text-ink-subtle">
-          Coming soon
-        </span>
-        {body}
-      </div>
-    );
-  }
-
-  const interactive = cn(shell, 'liftable bg-card hover:border-brand/40');
-
-  /* Taxi is a separate deployment, so it needs a real page navigation rather
-     than a router push that would 404 inside this app. */
-  return href ? (
-    <a href={href} className={interactive}>
-      {body}
-    </a>
-  ) : (
-    <Link to={to as string} className={interactive}>
-      {body}
-    </Link>
   );
 }

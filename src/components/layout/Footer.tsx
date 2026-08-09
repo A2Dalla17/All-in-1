@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Mail, MapPin, Phone } from 'lucide-react';
 
-import { Logo } from '@shared/components/ui/Logo';
+import { Logo, PoweredByAc7 } from '@shared/components/ui/Logo';
 import { Container } from '@shared/components/ui/Container';
+import { brand } from '@shared/config/brand';
 import { env } from '@shared/config/env';
 import { LEGAL_NAV, SERVICES } from '@shared/config/navigation';
 
@@ -23,10 +24,10 @@ export function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Identity */}
           <div className="lg:col-span-1">
-            <Logo showMeaning />
-            <p className="mt-4 max-w-xs text-body-sm leading-relaxed text-ink-muted">
-              {env.company.product} — {env.company.productLong}. Transport, school runs and local
-              bookings across {env.company.city}.
+            <Logo showTagline />
+            <p className="mt-5 max-w-xs text-body-sm leading-relaxed text-ink-muted">
+              Food delivery across {env.market.city}. Order from restaurants near you and
+              pay the courier in cash when it arrives.
             </p>
           </div>
 
@@ -99,7 +100,7 @@ export function Footer() {
           {/* Contact */}
           <div>
             <h2 className="text-caption font-semibold uppercase tracking-[0.12em] text-ink-subtle">
-              Control Centre
+              Control Room
             </h2>
             <ul className="mt-4 space-y-3">
               <li>
@@ -122,7 +123,7 @@ export function Footer() {
               </li>
               <li className="inline-flex items-center gap-2 text-body-sm text-ink-muted">
                 <MapPin size={15} aria-hidden className="shrink-0 text-brand-ink" />
-                {env.company.city}, United Kingdom
+                {env.market.city}, {env.market.country}
               </li>
             </ul>
             <p className="mt-3 text-micro text-ink-subtle">{env.controlCentre.hours}</p>
@@ -130,13 +131,15 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-line pt-7 text-caption text-ink-subtle sm:flex-row">
-          <p>
-            © {year} {env.company.name} ·{' '}
-            <span className="text-brand-ink">{env.company.meaning}</span>
-          </p>
+          {/* ── The official footer branding ──
+              "Galeyr Powered by AC7 Group", in that form, rendered by the one
+              component that owns the wording. Not "AC7 GALEYR" — that is an
+              internal name and appears on no customer-facing surface. */}
+          <PoweredByAc7 />
 
-          {/* The staff entrance lives in Settings, not here. */}
-          <p>All rights reserved.</p>
+          <p>
+            © {year} {brand.parent} · All rights reserved.
+          </p>
         </div>
       </Container>
     </footer>

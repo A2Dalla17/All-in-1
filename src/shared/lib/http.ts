@@ -16,7 +16,12 @@
  */
 
 import { env } from '@shared/config/env';
-import { PREVIEW_BUILD } from '@shared/preview/flag';
+/* The preview fixture layer has been removed.
+ *
+ * It let the taxi app be demonstrated with no backend deployed. AC7 GALEYR has
+ * a real Supabase behind it from the first order, so there is nothing to mock —
+ * and a mock layer left inside a live product is a way to serve invented data
+ * to a real customer. */
 import { clearSession, getToken } from '@shared/lib/session';
 
 /* -------------------------------------------------------------------------- */
@@ -204,15 +209,6 @@ function idempotencyKey(): string {
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { method = 'GET', body, anonymous = false, signal, timeoutMs = 20_000 } = options;
 
-  // PREVIEW_MODE — design-preview builds answer from fixtures. `env.previewMode`
-  // is false everywhere except the Vercel preview project, so this branch is
-  // dead code in a real build and the bundler drops it. See src/preview/.
-  if (PREVIEW_BUILD) {
-    const { mockRequest } = await import('@shared/preview/mockApi');
-    const mocked = await mockRequest(path, method, body);
-    if (mocked !== undefined) return mocked as T;
-  }
-
   const headers: Record<string, string> = {
     Accept: 'application/json',
   };
@@ -317,17 +313,6 @@ export async function requestPaged<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<Paged<T>> {
-  // PREVIEW_MODE — see the note in `request`.
-  if (PREVIEW_BUILD) {
-    const { mockRequest } = await import('@shared/preview/mockApi');
-    const mocked = await mockRequest(path, options.method ?? 'GET', options.body);
-    if (mocked !== undefined) {
-      const items = mocked as T;
-      const total = Array.isArray(items) ? items.length : 0;
-      return { items, meta: { page: 1, per_page: total, total, total_pages: 1 } };
-    }
-  }
-
   // Re-implemented rather than wrapping `request` because we need the envelope.
   const method = options.method ?? 'GET';
   const headers: Record<string, string> = { Accept: 'application/json' };

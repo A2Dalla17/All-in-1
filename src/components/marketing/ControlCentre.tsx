@@ -1,92 +1,66 @@
-import { Clock, Headphones, Mail, MapPin, Phone } from 'lucide-react';
+/**
+ * The phone number.
+ *
+ * ── Why this is a whole section on a delivery site ─────────────────────────
+ * Ordering online is unfamiliar to a lot of people here, and a business whose
+ * only contact route is a form feels like one that cannot be held to account.
+ * A number that a person answers is what makes a first order feel safe — and
+ * for the first months of this business, plenty of orders will come by phone
+ * rather than through the site. That is fine. The website exists to make the
+ * business operable, not to force a channel.
+ */
 
-import { Button } from '@shared/components/ui/Button';
+import { Phone, MessageCircle } from 'lucide-react';
+
 import { Container } from '@shared/components/ui/Container';
 import { env } from '@shared/config/env';
 
-/**
- * The control centre block.
- *
- * The PRD calls the control centre the heart of the ecosystem, and this is the
- * section that has to earn that on the page: a single very large call button,
- * with the supporting details beneath it rather than competing with it.
- *
- * The email is a mailto and the address is plain text — deliberately not a
- * map link, which would open a third-party app and lose the person mid-task.
- */
 export function ControlCentre() {
+  const digits = env.controlCentre.tel.replace(/\D/g, '');
+
   return (
-    <section aria-labelledby="control-centre-heading">
-      <Container className="py-20">
-        <div className="edge-light relative overflow-hidden rounded-panel border border-line bg-card p-8 text-center shadow-card sm:p-14">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              backgroundImage:
-                'radial-gradient(ellipse at 50% 0%, rgb(165 12 12 / 0.07), transparent 60%)',
-            }}
-          />
+    <section id="control-room" className="py-16 sm:py-20">
+      <Container>
+        <div className="overflow-hidden rounded-card border border-line bg-card">
+          <div className="grid gap-8 p-8 sm:p-10 md:grid-cols-2 md:items-center">
+            <div>
+              <p className="text-caption font-semibold uppercase tracking-wide text-brand-ink">
+                Wac Galeyr
+              </p>
+              <h2 className="mt-2 text-h2 text-ink">Would rather just ring us?</h2>
+              <p className="mt-3 text-body-lg text-ink-muted">
+                The control room takes orders by phone and on WhatsApp, every
+                day. Tell us what you want and where you are — we will do the
+                rest.
+              </p>
+            </div>
 
-          <div className="relative">
-            <span
-              aria-hidden
-              className="mx-auto grid h-14 w-14 place-items-center rounded-tile bg-brand-soft text-brand-ink"
-            >
-              <Headphones size={26} />
-            </span>
+            <div className="flex flex-col gap-3">
+              <a
+                href={`tel:${env.controlCentre.tel}`}
+                className="pressable inline-flex h-14 items-center justify-center gap-2.5 rounded-pill brand-gradient px-7 text-body font-semibold text-white shadow-brand"
+              >
+                <Phone size={18} aria-hidden />
+                {env.controlCentre.display}
+              </a>
 
-            <h2 id="control-centre-heading" className="mt-5 text-h1 text-ink">
-              Control Centre
-            </h2>
+              {/* WhatsApp is how most of Mogadishu actually communicates.
+                  Leaving it out because a website "should" have a contact form
+                  would be building for the wrong country. */}
+              <a
+                href={`https://wa.me/${digits}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-14 items-center justify-center gap-2.5 rounded-pill border border-line-strong px-7 text-body font-semibold text-ink transition-colors hover:bg-surface"
+              >
+                <MessageCircle size={18} aria-hidden />
+                WhatsApp
+              </a>
 
-            <p className="mx-auto mt-4 max-w-xl text-body-lg leading-relaxed text-ink-muted">
-              Our operators book taxis, arrange school runs and sort out bookings on your behalf.
-              No app, no account — just call and speak to somebody.
-            </p>
-
-            <a href={`tel:${env.controlCentre.tel}`} className="mt-9 inline-block">
-              <Button variant="primary" size="xl" leadingIcon={<Phone size={20} />}>
-                <span className="tabular">{env.controlCentre.display}</span>
-              </Button>
-            </a>
-
-            <dl className="mx-auto mt-10 grid max-w-2xl gap-6 border-t border-line pt-8 sm:grid-cols-3">
-              <div>
-                <dt className="flex items-center justify-center gap-1.5 text-caption text-ink-subtle">
-                  <Mail size={13} aria-hidden />
-                  Email
-                </dt>
-                <dd className="mt-1.5">
-                  <a
-                    href={`mailto:${env.controlCentre.email}`}
-                    className="break-all text-body-sm font-medium text-brand-ink hover:underline"
-                  >
-                    {env.controlCentre.email}
-                  </a>
-                </dd>
-              </div>
-
-              <div>
-                <dt className="flex items-center justify-center gap-1.5 text-caption text-ink-subtle">
-                  <Clock size={13} aria-hidden />
-                  Opening hours
-                </dt>
-                <dd className="mt-1.5 text-body-sm font-medium text-ink">
-                  {env.controlCentre.hours}
-                </dd>
-              </div>
-
-              <div>
-                <dt className="flex items-center justify-center gap-1.5 text-caption text-ink-subtle">
-                  <MapPin size={13} aria-hidden />
-                  Serving
-                </dt>
-                <dd className="mt-1.5 text-body-sm font-medium text-ink">
-                  {env.company.city} and surrounding areas
-                </dd>
-              </div>
-            </dl>
+              <p className="mt-1 text-center text-body-sm text-ink-subtle">
+                {env.controlCentre.hours}
+              </p>
+            </div>
           </div>
         </div>
       </Container>

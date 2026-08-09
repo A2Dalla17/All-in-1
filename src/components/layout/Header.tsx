@@ -6,6 +6,7 @@ import {
   Menu,
   Phone,
   Settings,
+  ShoppingBag,
   X,
 } from 'lucide-react';
 
@@ -13,6 +14,7 @@ import { Logo } from '@shared/components/ui/Logo';
 import { Container } from '@shared/components/ui/Container';
 import { env } from '@shared/config/env';
 import { HEADER_NAV } from '@shared/config/navigation';
+import { cartCount, useCart } from '@shared/lib/cart';
 import { cn } from '@shared/lib/utils';
 
 /**
@@ -34,6 +36,11 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const location = useLocation();
+
+  /* The cart persists across pages and reloads, so without a permanent
+     indicator a customer can wander off the menu page and forget an order is
+     half-built — then start again from scratch, or leave. */
+  const itemsInCart = cartCount(useCart());
 
   /* Close on navigation. */
   useEffect(() => {
@@ -104,6 +111,24 @@ export function Header() {
               <Phone size={15} aria-hidden />
               <span className="tabular">{env.controlCentre.display}</span>
             </a>
+
+            {/* Shown only when there is something in it. An always-visible
+                empty cart is a permanent invitation to a dead end. */}
+            {itemsInCart > 0 && (
+              <Link
+                to="/checkout"
+                aria-label={`Your order — ${itemsInCart} item${itemsInCart === 1 ? '' : 's'}`}
+                className="relative grid h-11 w-11 place-items-center rounded-control text-ink transition-colors hover:bg-surface"
+              >
+                <ShoppingBag size={19} aria-hidden />
+                <span
+                  aria-hidden
+                  className="absolute right-1 top-1 grid h-5 min-w-5 place-items-center rounded-pill bg-brand px-1 text-[11px] font-bold leading-none text-white"
+                >
+                  {itemsInCart}
+                </span>
+              </Link>
+            )}
 
             <Link
               to="/settings"

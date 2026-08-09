@@ -1,63 +1,91 @@
-import { ShieldCheck } from 'lucide-react';
+/**
+ * AC7 GALEYR — hero.
+ *
+ * ── One message ────────────────────────────────────────────────────────────
+ * Food delivery in Mogadishu. Not a transport group, not four services, not
+ * "coming soon" to anything. A company that lists everything it might do reads
+ * as a company that does none of it yet.
+ *
+ * ── Somali first, English beneath ──────────────────────────────────────────
+ * The headline is the Somali line, because the customer is Somali. English sits
+ * underneath as support rather than as the primary — the reverse of how a
+ * London-built product would do it, and the reason this will feel local rather
+ * than imported.
+ *
+ * ── Why the restaurant search is the hero action ───────────────────────────
+ * The single thing a visitor wants is to see whether anywhere near them
+ * delivers. Putting that decision in the hero rather than behind a "learn more"
+ * is the difference between a brochure and a shop.
+ */
 
-import { CommunityShowcase } from '@/components/marketing/CommunityShowcase';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Clock, Wallet } from 'lucide-react';
+
 import { Container } from '@shared/components/ui/Container';
 import { env } from '@shared/config/env';
 
-/**
- * Hero.
- *
- * Identity, then inventory: name, meaning, tagline, advertising billboard.
- * Nothing else.
- *
- * ── Why there are no call-to-action buttons here ───────────────────────────
- * There were two — Book Taxi and Call Control Centre — and both were the third
- * copy of something already on the page. Taxi is in the header navigation and
- * is the first of the four service cards directly below. The control centre
- * number is in the header, in its own section further down, and in the footer.
- *
- * Removing them costs nothing in reach and buys the billboard the whole of the
- * first screen. Every route those buttons offered is still one click away, and
- * the advertising space — which is the thing being sold — is no longer
- * competing with a duplicate of the navigation.
- */
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* Ambient glow. Inline rather than a Tailwind arbitrary value: a
-          radial-gradient contains commas and slashes that have to be escaped
-          into an unreadable class for no benefit. */}
+      {/* Brand wash. Kept as a CSS gradient rather than an image: this page has
+          to open on a weak connection in Mogadishu, and a hero photograph is
+          the single heaviest thing most marketing sites ship. */}
+      <div aria-hidden className="absolute inset-0 brand-gradient" />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 -top-48 h-[34rem]"
-        style={{
-          backgroundImage:
-            'radial-gradient(ellipse at 50% 0%, rgb(165 12 12 / 0.10), transparent 62%)',
-        }}
+        className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-white/[0.06]"
       />
 
-      <Container className="relative pb-12 pt-20 text-center sm:pt-28">
-        <p className="mb-5 inline-flex items-center gap-2 rounded-pill border border-line bg-surface px-3.5 py-1.5 text-caption font-medium text-ink-muted">
-          <ShieldCheck size={13} aria-hidden className="text-brand-ink" />
-          Licensed private hire across {env.company.city}
-        </p>
+      <Container className="relative py-16 sm:py-24">
+        <div className="max-w-2xl">
+          <p className="text-caption font-semibold uppercase tracking-[0.14em] text-white/75">
+            {env.market.cityLocal} · {env.market.countryLocal}
+          </p>
 
-        <h1 className="text-display text-ink">{env.company.name}</h1>
+          <h1 className="mt-4 text-h1 font-extrabold leading-[1.05] tracking-[-0.03em] text-white">
+            Cuntada aad jeceshahay,
+            <br />
+            albaabkaaga.
+          </h1>
 
-        <p className="mt-3 text-h2 font-semibold text-brand-ink">{env.company.meaning}</p>
+          <p className="mt-5 max-w-prose text-body-lg text-white/85">
+            Food delivery made simple. Order from restaurants across Mogadishu
+            and pay the courier in cash when it arrives.
+          </p>
 
-        <p className="mx-auto mt-6 max-w-2xl text-body-lg leading-relaxed text-ink-muted">
-          Transport, school runs and local bookings — run properly, answered by a person, and
-          built to be relied on every single day.
-        </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Link
+              to={env.services.restaurants}
+              className="pressable inline-flex h-14 items-center justify-center gap-2.5 rounded-pill bg-white px-8 text-body font-semibold text-brand-700 shadow-lifted"
+            >
+              Dalbo hadda · Order now
+              <ArrowRight size={18} aria-hidden />
+            </Link>
 
-        {/* The advertising billboard closes the hero.
-            No buttons follow it: Taxi is in the header, the control centre
-            number is in the header, its own section and the footer, and the
-            four service cards sit immediately below this. Repeating either
-            here added a third copy of both without adding a route to anything
-            new. */}
-        <CommunityShowcase className="mt-10" />
+            <Link
+              to={env.services.track}
+              className="inline-flex h-14 items-center justify-center rounded-pill border border-white/35 px-8 text-body font-semibold text-white transition-colors hover:bg-white/10"
+            >
+              Track your order
+            </Link>
+          </div>
+
+          {/* The three objections a first-time customer actually has, answered
+              before they are asked: what does it cost me, when does it come,
+              and do I have to pay before I see the food. */}
+          <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3">
+            {[
+              { icon: Wallet, text: 'Cash on delivery' },
+              { icon: Clock, text: '30–45 minutes' },
+              { icon: ArrowRight, text: 'No account needed' },
+            ].map((item) => (
+              <li key={item.text} className="flex items-center gap-2 text-body-sm text-white/85">
+                <item.icon size={16} aria-hidden className="shrink-0" />
+                {item.text}
+              </li>
+            ))}
+          </ul>
+        </div>
       </Container>
     </section>
   );

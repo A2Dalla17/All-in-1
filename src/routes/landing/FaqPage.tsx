@@ -1,86 +1,135 @@
 /**
- * Frequently asked questions.
+ * Questions people actually ask.
  *
- * ── Why <details> and not a JavaScript accordion ──────────────────────────
- * The native element is keyboard operable, announced correctly by screen
- * readers, works before JavaScript loads, and — the part people forget — its
- * contents are found by the browser's own Ctrl+F. A custom accordion hides
- * text from search until the right panel happens to be open.
+ * ── Written to answer, not to reassure ─────────────────────────────────────
+ * Every entry here is a real objection to ordering food from a company nobody
+ * has heard of yet: can I trust you with my money, what if it does not come,
+ * who do I shout at. Answering those honestly — including "we are new, and here
+ * is our phone number" — is worth more than a page of promises.
+ *
+ * The awkward ones are included on purpose. A FAQ that only asks itself easy
+ * questions is marketing, and readers can tell.
  */
 
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
+
 import { Container } from '@shared/components/ui/Container';
-import { Section } from '@shared/components/ui/Section';
 import { env } from '@shared/config/env';
+import { cn } from '@shared/lib/utils';
 
 interface Faq {
-  q: string;
-  a: string;
+  question: string;
+  questionSo?: string;
+  answer: string;
 }
 
-const GROUPS: { heading: string; items: Faq[] }[] = [
+const SECTIONS: { title: string; faqs: Faq[] }[] = [
   {
-    heading: 'Booking',
-    items: [
+    title: 'Ordering',
+    faqs: [
       {
-        q: 'How do I book a car?',
-        a: 'Through the app, or by ringing the control room on ' +
-          env.controlCentre.display +
-          '. The line is open 24 hours a day, every day of the year.',
+        question: 'Do I need an account?',
+        questionSo: 'Ma u baahanahay akoon?',
+        answer:
+          'No. You choose your food, give a name, a phone number and where you are, and that is it. Keep your order number — it and your phone number are how you find the order again.',
       },
       {
-        q: 'Can I book in advance?',
-        a: 'Yes. Journeys can be booked days or weeks ahead, which is what most people do for early airport runs. You will be reminded before the driver sets off.',
+        question: 'How do I pay?',
+        questionSo: 'Sidee baan u bixiyaa?',
+        answer:
+          'Cash, to the courier, when the food arrives. You pay nothing before it reaches you. Card and mobile money are not connected yet, and we would rather leave them off than offer a payment method that fails.',
       },
       {
-        q: 'How far ahead should I book an airport run?',
-        a: 'The evening before is usually enough. For flights before 6am, book the day before so a driver is allocated rather than found at short notice.',
+        question: 'How long does delivery take?',
+        answer:
+          'Usually 30 to 45 minutes. Each restaurant shows its own preparation time before you order, and how long the courier takes depends on how far you are.',
+      },
+      {
+        question: 'Why can I only order from one restaurant at a time?',
+        answer:
+          'One order is one courier making one journey to one kitchen. Two restaurants would mean two pickups, two waits and two delivery fees — a different service, not a longer list.',
+      },
+      {
+        question: 'Is there a minimum order?',
+        answer:
+          'Each restaurant sets its own, and it is shown on their page and in your basket before you check out.',
       },
     ],
   },
   {
-    heading: 'Fares',
-    items: [
+    title: 'Delivery and address',
+    faqs: [
       {
-        q: 'How is the fare worked out?',
-        a: 'From the distance and the expected journey time, plus a fixed starting charge. You see the price before you confirm — there is no meter running and no surprise at the end.',
+        question: 'Why do you ask for a landmark instead of an address?',
+        questionSo: 'Maxaad ii weydiineysaa calaamad?',
+        answer:
+          'Because that is how Mogadishu works. There are no postcodes and most streets are not signed, so a courier finds you by district, then by something they recognise, then by calling you. A street address would be a worse answer, not a better one.',
       },
       {
-        q: 'Is the quoted price what I pay?',
-        a: 'Yes, unless the journey itself changes — a new destination, an extra stop, or a long wait. Traffic on the agreed route does not change the price.',
+        question: 'What if the courier cannot find me?',
+        answer:
+          'They will call the number you gave. Keep your phone nearby. If they still cannot reach you, our control room will ring you.',
       },
       {
-        q: 'How do I pay?',
-        a: 'Card in the app, or cash directly to the driver. Account customers are invoiced monthly.',
-      },
-    ],
-  },
-  {
-    heading: 'Drivers and safety',
-    items: [
-      {
-        q: 'Are your drivers licensed?',
-        a: 'Every driver holds a private hire licence, and every vehicle is licensed and insured for hire and reward. We check licences, insurance, MOT and right to work before a driver takes a single job, and we re-check them as they expire.',
-      },
-      {
-        q: 'How do I know I am getting into the right car?',
-        a: 'Every driver has an AC7 code. You are given the code, the registration and the driver name before the car arrives, and you can look up any code on this website without signing in.',
-      },
-      {
-        q: 'What if I leave something in the car?',
-        a: 'Ring the control room as soon as you notice. We know which driver did your journey and can usually reunite you with it the same day.',
+        question: 'Which parts of Mogadishu do you deliver to?',
+        answer:
+          'The districts each restaurant covers. When you choose your district at checkout you will only see restaurants that can reach you.',
       },
     ],
   },
   {
-    heading: 'Accounts',
-    items: [
+    title: 'When something goes wrong',
+    faqs: [
       {
-        q: 'Do you do business accounts?',
-        a: 'Yes. Monthly invoicing, named passengers, cost centres and a statement you can hand to your accountant. Ring the control room to set one up.',
+        question: 'My order is late. What do I do?',
+        answer: `Track it first — it will show you exactly which stage it is at. If it looks stuck, call the control room on ${env.controlCentre.display}. A person answers.`,
       },
       {
-        q: 'Can I get a receipt?',
-        a: 'A receipt is issued for every journey and kept in your ride history in the app. Email the control room if you need one re-sent.',
+        question: 'The food is wrong or missing.',
+        answer: `Call us on ${env.controlCentre.display} while the courier is still with you if you can. We will sort it out with the restaurant.`,
+      },
+      {
+        question: 'Can I cancel?',
+        answer:
+          'Call the control room. If the restaurant has not started cooking, cancelling is straightforward. Once the food is being made it is harder, because someone has already paid for the ingredients.',
+      },
+      {
+        question: 'A restaurant cancelled my order. Am I charged?',
+        answer:
+          'No. You pay on delivery, so if nothing arrives you pay nothing. The reason the restaurant gave will be shown when you track the order.',
+      },
+    ],
+  },
+  {
+    title: 'About AC7 GALEYR',
+    faqs: [
+      {
+        // The question a careful person asks, so it is answered rather than avoided.
+        question: 'You are new. Why should I trust you?',
+        answer:
+          'You should not have to, and the way we are set up means you do not: you pay nothing until food is in your hands, and there is a phone number on every page with a person behind it. Judge us on the first order.',
+      },
+      {
+        question: 'Are these real restaurants?',
+        answer:
+          'Not yet. Everything on the site today is clearly labelled demo data while we build and test. We will not put a restaurant on here until they have agreed to work with us — listing a business that never said yes would be dishonest.',
+      },
+      {
+        question: 'I run a restaurant. How do I join?',
+        questionSo: 'Makhaayad ma leeyahay. Sidee baan idiinku biiraa?',
+        answer:
+          'Send us an application from the Partner page. It is not a contract — we call you, talk it through, and nothing of yours goes on the site until you have agreed.',
+      },
+      {
+        question: 'I want to deliver for you.',
+        answer: `Call the control room on ${env.controlCentre.display}. We check identification in person rather than through a form.`,
+      },
+      {
+        question: 'What happened to the taxi service?',
+        answer:
+          'AC7 GROUP still runs it. AC7 GALEYR is focused on food delivery in Mogadishu, and doing one thing properly comes before doing two things halfway.',
       },
     ],
   },
@@ -88,35 +137,82 @@ const GROUPS: { heading: string; items: Faq[] }[] = [
 
 export function FaqPage() {
   return (
-    <>
-      <Container size="narrow" className="pt-16 text-center sm:pt-24">
-        <h1 className="text-h1 text-ink">Questions, answered</h1>
-        <p className="mx-auto mt-4 max-w-prose text-body-lg text-ink-muted">
-          If yours is not here, the control room will answer it on the phone in
-          less time than it takes to read this page.
-        </p>
-      </Container>
+    <Container className="py-8 sm:py-12" size="narrow">
+      <h1 className="text-h2 font-extrabold tracking-tight text-ink">
+        Su'aalaha badanaa la weydiiyo
+      </h1>
+      <p className="mt-2 text-body-lg text-ink-muted">
+        Common questions about ordering with AC7 GALEYR.
+      </p>
 
-      {GROUPS.map((group) => (
-        <Section key={group.heading} id={`faq-${group.heading.toLowerCase()}`} title={group.heading}>
-          <div className="divide-y divide-line overflow-hidden rounded-card border border-line">
-            {group.items.map((item) => (
-              <details key={item.q} className="group bg-card">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-body font-medium text-ink transition-colors hover:bg-surface">
-                  {item.q}
-                  <span
-                    aria-hidden
-                    className="shrink-0 text-ink-subtle transition-transform duration-200 group-open:rotate-45"
-                  >
-                    +
-                  </span>
-                </summary>
-                <p className="px-5 pb-5 text-body text-ink-muted">{item.a}</p>
-              </details>
-            ))}
-          </div>
-        </Section>
-      ))}
-    </>
+      <div className="mt-10 space-y-10">
+        {SECTIONS.map((section) => (
+          <section key={section.title}>
+            <h2 className="text-h4 font-bold text-ink">{section.title}</h2>
+
+            <div className="mt-4 divide-y divide-line rounded-card border border-line bg-card">
+              {section.faqs.map((faq) => (
+                <FaqRow key={faq.question} faq={faq} />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <div className="mt-12 rounded-card border border-line bg-surface p-6 text-center">
+        <p className="font-semibold text-ink">Still stuck?</p>
+        <p className="mt-1 text-body-sm text-ink-muted">
+          The control room is open {env.controlCentre.hours.toLowerCase()}.
+        </p>
+        <a
+          href={`tel:${env.controlCentre.tel}`}
+          className="mt-3 inline-block text-h5 font-bold text-brand-ink"
+        >
+          {env.controlCentre.display}
+        </a>
+        <p className="mt-4 text-body-sm text-ink-muted">
+          Or{' '}
+          <Link to="/contact" className="font-semibold text-brand-ink">
+            send us a message
+          </Link>
+          .
+        </p>
+      </div>
+    </Container>
+  );
+}
+
+function FaqRow({ faq }: { faq: Faq }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        className="flex w-full items-start justify-between gap-4 p-5 text-left"
+      >
+        <span>
+          <span className="font-semibold text-ink">{faq.question}</span>
+          {faq.questionSo && (
+            <span className="mt-0.5 block text-body-sm text-ink-subtle">
+              {faq.questionSo}
+            </span>
+          )}
+        </span>
+
+        <ChevronDown
+          size={18}
+          aria-hidden
+          className={cn(
+            'mt-0.5 shrink-0 text-ink-muted transition-transform',
+            open && 'rotate-180',
+          )}
+        />
+      </button>
+
+      {open && <p className="px-5 pb-5 text-body text-ink-muted">{faq.answer}</p>}
+    </div>
   );
 }

@@ -29,9 +29,16 @@
  */
 export default {
   darkMode: 'class',
-  /* `content` is deliberately absent: it is per-package and lives in each
-     packages/*/tailwind.config.js. A preset that declared it would make both
-     the website and the app scan whatever paths happened to be written here. */
+  // `content` is deliberately absent from this preset: it belongs to whatever
+  // consumes the preset, and lives in that project's own tailwind.config.js.
+  // A preset that declared it would make every consumer scan whatever paths
+  // happened to be written here.
+  //
+  // Line comments rather than a block, because a path glob written inside a
+  // block comment closes it early — the sequence that ends a comment is the
+  // same one that appears in a wildcard directory path. That is exactly what
+  // broke this file, and the resulting error blamed PostCSS and a stylesheet
+  // thirty lines away.
   theme: {
     extend: {
       colors: {

@@ -1,26 +1,28 @@
 /**
- * AC7 — the landing website's route table
+ * AC7 GALEYR — the route table.
  *
- * This is ac7taxi.com. Every route here is a public marketing or legal page.
+ * ── This is the product, not a brochure ───────────────────────────────────
+ * It used to be a marketing site for the London taxi business, whose only job
+ * was to explain the service and hand over an app-store link.
  *
- * ── What is deliberately NOT here ─────────────────────────────────────────
- * There is no /taxi, no /login, no rider or driver or admin route. Those live
- * in packages/app, which this package does not depend on and cannot import.
- * That is enforced by the dependency graph rather than by discipline: adding a
- * rider screen to this file would require adding @ac7/app as a dependency of
- * the website, which is a change nobody makes by accident.
+ * It is now the delivery business itself. A customer browses, orders and tracks
+ * here; a restaurant runs its kitchen here; the control room dispatches here.
+ * There is no mobile app to download yet, so if it cannot be done on this site
+ * it cannot be done at all.
  *
- * The old unified router had all of it in one table and shipped the driver
- * dashboard to anyone reading the privacy policy.
+ * ── Three audiences, one router ───────────────────────────────────────────
+ *   · Public       — home, restaurants, checkout, tracking, legal
+ *   · Restaurants  — /portal
+ *   · Control room — /control
  *
- * ── How someone gets to the actual product ────────────────────────────────
- * Through the app stores. The website's job is to explain the service and hand
- * the visitor a download link — which is why the store buttons appear in the
- * hero, in the navigation and in the footer, rather than once at the bottom.
+ * The staff routes are behind `StaffGate`, which decides what to render. It is
+ * NOT what keeps anybody out: every restriction that matters is row level
+ * security in Postgres, so pasting /control into the address bar renders a page
+ * that returns nothing and can write nothing. See StaffGate for the full note.
  */
 
 import { lazy, Suspense, useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { CookieBanner } from '@/components/layout/CookieBanner';
 import { SiteLayout } from '@/components/layout/SiteLayout';
@@ -34,15 +36,6 @@ import { HomePage } from './routes/landing/HomePage';
    is lazy. */
 const AboutPage = lazy(() =>
   import('./routes/landing/AboutPage').then((m) => ({ default: m.AboutPage })),
-);
-const ServicesPage = lazy(() =>
-  import('./routes/landing/ServicesPage').then((m) => ({ default: m.ServicesPage })),
-);
-const DriversPage = lazy(() =>
-  import('./routes/landing/DriversPage').then((m) => ({ default: m.DriversPage })),
-);
-const PricingPage = lazy(() =>
-  import('./routes/landing/PricingPage').then((m) => ({ default: m.PricingPage })),
 );
 const FaqPage = lazy(() =>
   import('./routes/landing/FaqPage').then((m) => ({ default: m.FaqPage })),
@@ -66,6 +59,52 @@ const NotFoundPage = lazy(() =>
   import('./routes/landing/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 );
 
+/* ── The delivery product ──────────────────────────────────────────────────
+   Ordering is what this site is for, but it is not what most visitors load
+   first — they arrive on the home page. Splitting these keeps the menu, the
+   cart and the checkout out of the bundle someone downloads to read the
+   privacy policy, which matters on a connection where every kilobyte is
+   noticeable. */
+const RestaurantsPage = lazy(() =>
+  import('./routes/delivery/RestaurantsPage').then((m) => ({ default: m.RestaurantsPage })),
+);
+const RestaurantMenuPage = lazy(() =>
+  import('./routes/delivery/RestaurantMenuPage').then((m) => ({
+    default: m.RestaurantMenuPage,
+  })),
+);
+const CheckoutPage = lazy(() =>
+  import('./routes/delivery/CheckoutPage').then((m) => ({ default: m.CheckoutPage })),
+);
+const OrderPlacedPage = lazy(() =>
+  import('./routes/delivery/OrderPlacedPage').then((m) => ({ default: m.OrderPlacedPage })),
+);
+const TrackOrderPage = lazy(() =>
+  import('./routes/delivery/TrackOrderPage').then((m) => ({ default: m.TrackOrderPage })),
+);
+const PartnersPage = lazy(() =>
+  import('./routes/delivery/PartnersPage').then((m) => ({ default: m.PartnersPage })),
+);
+const CouriersPage = lazy(() =>
+  import('./routes/delivery/CouriersPage').then((m) => ({ default: m.CouriersPage })),
+);
+
+/* ── Staff ────────────────────────────────────────────────────────────────
+   The restaurant portal and the control room. Lazy for the usual reason and
+   one more: a customer ordering lunch should never download the admin
+   interface. That is a bundle-size point, not a security one — the security
+   is row level security in Postgres, which does not care what code a browser
+   is holding. See StaffGate. */
+const StaffGate = lazy(() =>
+  import('./routes/staff/StaffGate').then((m) => ({ default: m.StaffGate })),
+);
+const PortalPage = lazy(() =>
+  import('./routes/staff/PortalPage').then((m) => ({ default: m.PortalPage })),
+);
+const ControlRoomPage = lazy(() =>
+  import('./routes/staff/ControlRoomPage').then((m) => ({ default: m.ControlRoomPage })),
+);
+
 export function App() {
   const { preferences } = usePreferences();
 
@@ -79,11 +118,54 @@ export function App() {
         <Routes>
           <Route element={<SiteLayout />}>
             <Route index element={<HomePage />} />
+
+            {/* ── Ordering ──
+                /track has two forms on purpose. The bare one is for a customer
+                typing their number in from the header; the one with the number
+                in the path is what the confirmation screen links to, so they do
+                not retype what they just saw. Both render the same page. */}
+            <Route path="restaurants" element={<RestaurantsPage />} />
+            <Route path="restaurants/:restaurantId" element={<RestaurantMenuPage />} />
+            <Route path="checkout" element={<CheckoutPage />} />
+            <Route path="order/:orderNumber" element={<OrderPlacedPage />} />
+            <Route path="track" element={<TrackOrderPage />} />
+            <Route path="track/:orderNumber" element={<TrackOrderPage />} />
+            <Route path="partners" element={<PartnersPage />} />
+            <Route path="couriers" element={<CouriersPage />} />
+
+            {/* ── Staff ──
+                Not linked from anywhere on the public site. That is not a
+                security measure — an unlinked URL is still a public URL — it
+                simply keeps a customer from wandering into a sign-in form. */}
+            <Route
+              path="portal"
+              element={
+                <StaffGate area="portal">
+                  <PortalPage />
+                </StaffGate>
+              }
+            />
+            <Route
+              path="control"
+              element={
+                <StaffGate area="control">
+                  <ControlRoomPage />
+                </StaffGate>
+              }
+            />
+
             <Route path="about" element={<AboutPage />} />
-            <Route path="services" element={<ServicesPage />} />
-            <Route path="drivers" element={<DriversPage />} />
-            <Route path="pricing" element={<PricingPage />} />
             <Route path="faq" element={<FaqPage />} />
+
+            {/* ── Old taxi URLs ──
+                /services, /drivers and /pricing described the London minicab
+                business. They are redirected rather than deleted because they
+                are in search results and in messages people have already sent
+                — a 404 loses a visitor who was trying to reach us. Each points
+                at the delivery page that answers the same question. */}
+            <Route path="services" element={<Navigate to="/restaurants" replace />} />
+            <Route path="drivers" element={<Navigate to="/couriers" replace />} />
+            <Route path="pricing" element={<Navigate to="/faq" replace />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="settings" element={<SiteSettingsPage />} />
             <Route path="privacy" element={<PrivacyPage />} />

@@ -15,7 +15,10 @@ import { useEffect } from 'react';
 export function usePageMeta(title: string, description?: string) {
   useEffect(() => {
     const previousTitle = document.title;
-    document.title = `${title} — AC7 GROUP`;
+    /* The consumer brand, not the parent. A browser tab reading
+       "Checkout — AC7 GROUP" tells the customer nothing about who is
+       delivering their food. */
+    document.title = `${title} — GALEYR`;
 
     let meta = document.querySelector<HTMLMetaElement>('meta[name="description"]');
     const previousDescription = meta?.content;
