@@ -11,6 +11,7 @@
 import { ClipboardList, CookingPot, Bike, HandCoins } from 'lucide-react';
 
 import { Container } from '@shared/components/ui/Container';
+import { BlurFade } from '@shared/components/motion';
 
 const STEPS = [
   {
@@ -53,7 +54,11 @@ export function WhyACT() {
 
         <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((step, i) => (
-            <li key={step.title} className="relative">
+            /* Dalbo → Karis → Keenid → Bixi. These describe a sequence, so
+               revealing them in sequence is the animation carrying meaning
+               rather than decorating it. */
+            <BlurFade key={step.title} delay={i * 0.1}>
+            <li className="relative">
               <div className="flex items-center gap-3">
                 <span
                   aria-hidden
@@ -73,6 +78,7 @@ export function WhyACT() {
               <p className="text-body-sm font-medium text-ink-subtle">{step.en}</p>
               <p className="mt-2 text-body text-ink-muted">{step.body}</p>
             </li>
+            </BlurFade>
           ))}
         </ol>
       </Container>

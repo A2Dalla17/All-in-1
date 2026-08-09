@@ -14,7 +14,7 @@
  * Two steps because the mistake they prevent is not recoverable in the way that
  * matters. Un-listing a restaurant takes a click; a restaurant owner who finds
  * their name advertised on a delivery service they never agreed to has already
- * formed an opinion of AC7 GALEYR, and that does not get undone.
+ * formed an opinion of GALEYR, and that does not get undone.
  */
 
 import { useState } from 'react';
@@ -26,15 +26,17 @@ import { EmptyState } from '@shared/components/ui/EmptyState';
 import { Spinner } from '@shared/components/ui/Spinner';
 import { Textarea } from '@shared/components/ui/Input';
 import {
-  approveApplication,
   districtLabel,
   listApplications,
   setApplicationStatus,
   type ApplicationStatus,
   type RestaurantApplication,
 } from '@shared/api/galeyr';
+import { approveApplicationAsStaff } from '@shared/api/ops';
 import { env } from '@shared/config/env';
 import { cn } from '@shared/lib/utils';
+
+import { StaffCodeDialog, useStaffConfirm } from './StaffCodeDialog';
 
 const STATUS_TONE: Record<ApplicationStatus, string> = {
   pending: 'bg-warning-soft text-warning-ink',
@@ -55,6 +57,8 @@ const STATUS_LABEL: Record<ApplicationStatus, string> = {
 export function ControlApplications() {
   const queryClient = useQueryClient();
   const [openId, setOpenId] = useState<string | null>(null);
+  const [approvedBy, setApprovedBy] = useState<string>('');
+  const { confirm, dialogProps } = useStaffConfirm();
 
   const query = useQuery({
     queryKey: ['galeyr', 'applications'],
@@ -73,9 +77,16 @@ export function ControlApplications() {
     onSuccess: invalidate,
   });
 
+  /* Approval is the step that creates a GALEYR partner, so it goes through the
+     staff code: the audit entry, the "Approved by A2" attribution and the line
+     manager assignment all happen inside one database transaction. */
   const approve = useMutation({
-    mutationFn: approveApplication,
-    onSuccess: invalidate,
+    mutationFn: ({ id, token }: { id: string; token: string }) =>
+      approveApplicationAsStaff(id, token),
+    onSuccess: (result) => {
+      invalidate();
+      setApprovedBy(result.approvedBy);
+    },
   });
 
   if (query.isPending) {
@@ -100,6 +111,15 @@ export function ControlApplications() {
 
   return (
     <div className="space-y-3">
+      {/* The attribution the brief asks for, shown back to the operator so they
+          can see the trail recorded their name and not just "the system". */}
+      {approvedBy && (
+        <p className="rounded-card border border-success/35 bg-success-soft px-4 py-3 text-body-sm font-semibold text-success-ink">
+          Approved by {approvedBy} — the restaurant has been created and assigned to you as
+          line manager. Set it live on the Restaurants tab once you have spoken to them.
+        </p>
+      )}
+
       {applications.map((application) => (
         <ApplicationRow
           key={application.id}
@@ -110,19 +130,28 @@ export function ControlApplications() {
           }
           busy={
             (setStatus.isPending && setStatus.variables?.id === application.id) ||
-            (approve.isPending && approve.variables === application.id)
+            (approve.isPending && approve.variables?.id === application.id)
           }
           error={
-            approve.isError && approve.variables === application.id
+            approve.isError && approve.variables?.id === application.id
               ? approve.error.message
               : ''
           }
           onSetStatus={(status, notes) =>
             setStatus.mutate({ id: application.id, status, notes })
           }
-          onApprove={() => approve.mutate(application.id)}
+          onApprove={() =>
+            confirm({
+              actionLabel: `Approve ${application.restaurant_name}`,
+              detail:
+                'This creates the restaurant and makes you its line manager. It stays hidden from customers until set live.',
+              onConfirmed: (token) => approve.mutate({ id: application.id, token }),
+            })
+          }
         />
       ))}
+
+      <StaffCodeDialog {...dialogProps} />
     </div>
   );
 }
@@ -235,7 +264,7 @@ function ApplicationRow({
               <Textarea
                 className="mt-5"
                 label="Internal notes"
-                hint="Only AC7 GALEYR staff can see this. The applicant never does."
+                hint="Only GALEYR staff can see this. The applicant never does."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}

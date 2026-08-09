@@ -165,12 +165,12 @@ export function PortalSettings({ restaurant }: { restaurant: Restaurant }) {
           </div>
           {restaurant.commission_rate !== undefined && (
             <div className="mt-2 flex justify-between gap-4">
-              <dt className="text-ink-muted">AC7 GALEYR commission</dt>
+              <dt className="text-ink-muted">GALEYR commission</dt>
               <dd className="font-semibold text-ink">{restaurant.commission_rate}%</dd>
             </div>
           )}
           <p className="mt-4 text-caption text-ink-subtle">
-            These are agreed with AC7 GALEYR. To change them, speak to the control room.
+            These are agreed with GALEYR. To change them, speak to the control room.
           </p>
         </dl>
       </section>

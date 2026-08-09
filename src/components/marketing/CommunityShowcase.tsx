@@ -13,15 +13,23 @@ import {
 
 import { bannersApi, KIND_LABEL, type BannerKind, type FeaturedBanner } from '@shared/api/banners';
 import { Button } from '@shared/components/ui/Button';
+import { Container } from '@shared/components/ui/Container';
+import { BlurFade } from '@shared/components/motion';
 import { env } from '@shared/config/env';
 import { cn } from '@shared/lib/utils';
 
 /**
- * Community Advertising Showcase — an image-led billboard.
+ * Community Advertising — the billboard.
  *
- * Sits between the tagline and the hero buttons, so it is the first thing
- * below the company name. This is advertising inventory: businesses pay for
- * this placement, and the best drivers are featured here too.
+ * ── Why it is a full-width section and not a card in the hero ──────────────
+ * It used to sit inside the hero at `max-w-4xl`, tucked between the tagline and
+ * the buttons. That framing said "supporting detail". This is inventory GALEYR
+ * sells, and a business paying for the homepage of a delivery service should
+ * get the homepage — so it is now its own full-bleed section with a heading, a
+ * cinematic aspect ratio, and the width of the page.
+ *
+ * This is advertising inventory: businesses pay for this placement, and the
+ * quarter's best courier is featured here too.
  *
  * ── Built for pictures, not paragraphs ─────────────────────────────────────
  * A restaurant advert is a photograph of the food. A shop advert is the shop
@@ -29,6 +37,14 @@ import { cn } from '@shared/lib/utils';
  * fixed aspect ratio — and the words sit on top of it rather than beside it.
  * The previous version put a small thumbnail next to a block of text, which
  * reads as a news item and is not what anybody is buying.
+ *
+ * ── Premium is mostly restraint plus one detail ────────────────────────────
+ * The expensive-looking part is not the number of effects, it is that the
+ * transitions are slow, the type has room, and the timing is visible. The
+ * progress bar under the slide does the last of those: it tells the eye how
+ * long is left rather than surprising it with a change, which is the difference
+ * between a carousel that feels engineered and one that feels like it is
+ * jumping.
  *
  * ── Text on photographs needs a scrim, always ──────────────────────────────
  * White text over an unknown image is a contrast bet you lose the first time
@@ -42,7 +58,7 @@ import { cn } from '@shared/lib/utils';
  * never starts under prefers-reduced-motion.
  */
 
-const ROTATE_MS = 6500;
+const ROTATE_MS = 8000;
 
 export function CommunityShowcase({ className }: { className?: string }) {
   const banners = useQuery({
@@ -60,11 +76,47 @@ export function CommunityShowcase({ className }: { className?: string }) {
   }, [banners.data]);
 
   return (
-    <section aria-labelledby="showcase-heading" className={cn('mx-auto max-w-4xl', className)}>
-      <h2 id="showcase-heading" className="sr-only">
-        Featured businesses and drivers
-      </h2>
-      <Carousel slides={slides} />
+    <section
+      aria-labelledby="showcase-heading"
+      className={cn('border-y border-line bg-surface py-14 sm:py-20', className)}
+    >
+      <Container>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-caption font-semibold uppercase tracking-[0.14em] text-brand-ink">
+              Community advertising
+            </p>
+            <h2
+              id="showcase-heading"
+              className="mt-2 text-h2 font-extrabold tracking-tight text-ink"
+            >
+              Ganacsiyada {env.market.cityLocal}
+            </h2>
+            <p className="mt-2 max-w-xl text-body text-ink-muted">
+              Businesses, promotions and the couriers who earned their place here.
+            </p>
+          </div>
+
+          {/* The route to buying the space, present whether or not anything is
+              currently running. An empty billboard that does not say how to
+              fill it is a missed sale on every page view. */}
+          <a
+            href={`tel:${env.controlCentre.tel}`}
+            className="text-body-sm font-semibold text-brand-ink hover:underline"
+          >
+            Advertise with GALEYR →
+          </a>
+        </div>
+
+        <div className="mt-8">
+          {/* Revealed as one block rather than per-slide: the carousel already
+              animates internally, and two independent motions on the same
+              element read as a glitch. */}
+          <BlurFade>
+            <Carousel slides={slides} />
+          </BlurFade>
+        </div>
+      </Container>
     </section>
   );
 }
@@ -113,11 +165,11 @@ const PLACEHOLDER: Slide = {
   kind: 'placeholder',
   label: 'Community advertising',
   title: 'Your business could be here',
-  subtitle: 'Featured placement on the AC7 homepage',
+  subtitle: 'Featured placement on the GALEYR homepage',
   image: null,
   mediaType: 'image',
   poster: null,
-  ctaLabel: 'Advertise with AC7',
+  ctaLabel: 'Advertise with GALEYR',
   ctaHref: `tel:${env.controlCentre.tel}`,
 };
 
@@ -166,7 +218,7 @@ function Carousel({ slides }: { slides: Slide[] }) {
     <div
       role="group"
       aria-roledescription="carousel"
-      aria-label="Featured businesses and drivers"
+      aria-label="Featured businesses and couriers"
       onKeyDown={(event) => {
         if (event.key === 'ArrowRight') {
           event.preventDefault();
@@ -202,8 +254,29 @@ function Carousel({ slides }: { slides: Slide[] }) {
         />
       </div>
 
+      {/* ── The timing bar ──
+          Keyed on the slide index so the animation restarts with each slide,
+          and paused in step with the rotation — a bar that keeps filling while
+          the carousel is held is worse than no bar, because it promises a
+          change that is not coming. */}
+      {!single && !reduceMotion && (
+        <div
+          aria-hidden
+          className="mt-5 h-0.5 w-full overflow-hidden rounded-pill bg-line"
+        >
+          <div
+            key={index}
+            className="galeyr-showcase-progress h-full bg-brand"
+            style={{
+              animationDuration: `${ROTATE_MS}ms`,
+              animationPlayState: paused ? 'paused' : 'running',
+            }}
+          />
+        </div>
+      )}
+
       {!single && (
-        <div className="mt-4 flex items-center justify-center gap-3">
+        <div className="mt-5 flex items-center justify-center gap-3">
           <IconButton
             label="Previous"
             onClick={() => {
@@ -301,7 +374,7 @@ function SlideCard({
       not a pause button. */
   playing: boolean;
 }) {
-  const isDriver = slide.kind === 'driver_of_quarter';
+  const isCourier = slide.kind === 'courier_of_quarter';
   const isPlaceholder = slide.kind === 'placeholder';
   const hasImage = Boolean(slide.image);
   const isVideo = slide.mediaType === 'video';
@@ -314,10 +387,13 @@ function SlideCard({
       aria-roledescription="slide"
       aria-label={`${position} of ${total}: ${slide.label}`}
       className={cn(
-        'relative overflow-hidden rounded-panel border border-line shadow-card',
-        /* Wide and shallow on desktop so the hero buttons stay above the fold;
-           taller on mobile because a 21:9 strip on a phone is a letterbox. */
-        'aspect-[4/3] sm:aspect-[21/9]',
+        'relative overflow-hidden rounded-panel border border-line shadow-lifted',
+        /* Cinematic on a wide screen, portrait-friendly on a phone. 21:9 was
+           right when this was a strip inside the hero; as a section in its own
+           right it can breathe, and 16:9 gives an advertiser's photograph
+           somewhere to actually be. A 21:9 crop on a phone is a letterbox, so
+           mobile stays close to square. */
+        'aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2.4/1]',
         !hasImage && 'bg-surface',
         animate && 'animate-fade-in',
       )}
@@ -340,7 +416,7 @@ function SlideCard({
         <div className="absolute inset-0 grid place-items-center">
           <div className="m-4 grid h-[calc(100%-2rem)] w-[calc(100%-2rem)] place-items-center rounded-tile border-2 border-dashed border-line-strong">
             <span aria-hidden className="text-ink-subtle">
-              {isDriver ? <Award size={30} /> : isPlaceholder ? <ImageIcon size={30} /> : <Store size={30} />}
+              {isCourier ? <Award size={30} /> : isPlaceholder ? <ImageIcon size={30} /> : <Store size={30} />}
             </span>
           </div>
         </div>
@@ -358,20 +434,22 @@ function SlideCard({
         />
       )}
 
-      <div className="absolute inset-x-0 bottom-0 p-5 text-left sm:p-7">
+      <div className="absolute inset-x-0 bottom-0 p-6 text-left sm:p-9 lg:p-11">
         <p
           className={cn(
-            'inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-micro font-semibold uppercase tracking-[0.1em]',
-            hasImage ? 'bg-white/15 text-white backdrop-blur-sm' : 'bg-brand-soft text-brand-ink',
+            'inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 text-micro font-semibold uppercase tracking-[0.12em]',
+            hasImage
+              ? 'border border-white/20 bg-white/15 text-white backdrop-blur-sm'
+              : 'bg-brand-soft text-brand-ink',
           )}
         >
-          {isDriver && <Award size={11} aria-hidden />}
+          {isCourier && <Award size={13} aria-hidden />}
           {slide.label}
         </p>
 
         <h3
           className={cn(
-            'mt-2 text-h2',
+            'mt-3 max-w-3xl text-h2 font-extrabold tracking-tight sm:text-h1',
             hasImage ? 'text-white drop-shadow-sm' : 'text-ink',
           )}
         >
@@ -381,7 +459,7 @@ function SlideCard({
         {slide.subtitle && (
           <p
             className={cn(
-              'mt-1 text-body font-medium',
+              'mt-2 max-w-2xl text-body-lg font-medium',
               hasImage ? 'text-white/85' : 'text-brand-ink',
             )}
           >
@@ -390,11 +468,11 @@ function SlideCard({
         )}
 
         {slide.ctaLabel && slide.ctaHref && (
-          <a href={slide.ctaHref} className="mt-4 inline-block">
+          <a href={slide.ctaHref} className="mt-6 inline-block">
             <Button
-              variant={hasImage ? 'secondary' : 'primary'}
-              size="sm"
-              trailingIcon={<ArrowRight size={15} />}
+              variant={hasImage ? 'inverse' : 'primary'}
+              size="lg"
+              trailingIcon={<ArrowRight size={16} />}
             >
               {slide.ctaLabel}
             </Button>

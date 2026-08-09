@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone, ShieldCheck } from 'lucide-react';
 
 import { Logo, PoweredByAc7 } from '@shared/components/ui/Logo';
 import { Container } from '@shared/components/ui/Container';
@@ -130,7 +130,48 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-line pt-7 text-caption text-ink-subtle sm:flex-row">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-line pt-6">
+          <span className="text-caption font-semibold uppercase tracking-[0.1em] text-ink-subtle">
+            Business
+          </span>
+          <Link
+            to="/partners"
+            className="text-body-sm text-ink-muted transition-colors hover:text-ink"
+          >
+            Register your restaurant
+          </Link>
+          <Link
+            to="/couriers/apply"
+            className="text-body-sm text-ink-muted transition-colors hover:text-ink"
+          >
+            Become a courier
+          </Link>
+          <Link
+            to="/portal"
+            className="text-body-sm text-ink-muted transition-colors hover:text-ink"
+          >
+            Restaurant portal
+          </Link>
+          <Link
+            to="/control"
+            className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-brand-ink transition-colors hover:underline"
+          >
+            <ShieldCheck size={14} aria-hidden />
+            Control Centre
+          </Link>
+        </div>
+
+        <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-line pt-7 text-caption text-ink-subtle sm:flex-row">
+          {/* ── Operations ──
+              The Control Centre had no link from anywhere, which made it
+              undemonstrable — the only way in was to know the URL. An unlinked
+              URL is not a security measure anyway: /control was always
+              publicly reachable and always returned nothing to anyone without
+              a staff record, because the protection is row level security in
+              Postgres rather than obscurity.
+
+              So it is linked, in the footer, under a heading that tells a
+              customer it is not for them. */}
           {/* ── The official footer branding ──
               "Galeyr Powered by AC7 Group", in that form, rendered by the one
               component that owns the wording. Not "AC7 GALEYR" — that is an

@@ -1,5 +1,5 @@
 /**
- * "Partner with AC7 GALEYR" — the restaurant application.
+ * "Partner with GALEYR" — the restaurant application.
  *
  * ══════════════════════════════════════════════════════════════════════════
  * What submitting this form does, and does not, do
@@ -11,7 +11,7 @@
  * even then it is created `approved`, not `active`.
  *
  * That separation is the whole point. If this form published a listing, any
- * stranger could type a well-known restaurant's name and have AC7 GALEYR
+ * stranger could type a well-known restaurant's name and have GALEYR
  * advertising a partnership that business has never heard of. There is no
  * technical harm in that row existing; the harm is the claim.
  *
@@ -108,7 +108,7 @@ export function PartnersPage() {
           <div className="mt-6 rounded-card border border-line bg-surface p-5 text-left text-body-sm text-ink-muted">
             <p className="font-semibold text-ink">What happens next</p>
             <ol className="mt-3 list-decimal space-y-2 pl-5">
-              <li>Someone from AC7 GALEYR will call you on the number you gave.</li>
+              <li>Someone from GALEYR will call you on the number you gave.</li>
               <li>We visit or speak with you about your menu, prices and hours.</li>
               <li>
                 If we both want to go ahead, we agree terms in writing before anything of
@@ -135,7 +135,7 @@ export function PartnersPage() {
   return (
     <Container className="py-8 sm:py-12" size="narrow">
       <h1 className="text-h2 font-extrabold tracking-tight text-ink">
-        Partner with AC7 GALEYR
+        Register your restaurant
       </h1>
       <p className="mt-2 text-body-lg text-ink-muted">
         Sell to more of Mogadishu without hiring a delivery team.

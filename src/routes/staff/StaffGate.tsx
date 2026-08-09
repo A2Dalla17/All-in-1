@@ -92,8 +92,8 @@ export function StaffGate({
       return (
         <NoAccess
           title="No restaurant linked to this account"
-          description="You are signed in, but this account is not a member of any restaurant on AC7 GALEYR. If you have applied to partner with us, we will set this up after we have spoken."
-          link={{ to: '/partners', label: 'Apply to partner with us' }}
+          description="You are signed in, but this account is not a member of any restaurant on GALEYR. If you have applied to partner with us, we will set this up after we have spoken."
+          link={{ to: '/partners', label: 'Register your restaurant' }}
         />
       );
     }
@@ -143,7 +143,7 @@ function StaffLogin({ area }: { area: StaffArea }) {
           {area === 'control' ? 'Control room' : 'Restaurant portal'}
         </h1>
         <p className="mt-2 text-center text-body-sm text-ink-muted">
-          Sign in with the account AC7 GALEYR set up for you.
+          Sign in with the account GALEYR set up for you.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
@@ -179,11 +179,11 @@ function StaffLogin({ area }: { area: StaffArea }) {
         </form>
 
         {/* No "create an account" link, and that is on purpose. Restaurant and
-            admin accounts are created by AC7 GALEYR after a real conversation.
+            admin accounts are created by GALEYR after a real conversation.
             Self-service registration into a staff area would let anyone create
             a login and start probing what it can reach. */}
         <p className="mt-6 text-center text-caption text-ink-subtle">
-          Accounts are created by AC7 GALEYR. If you cannot get in, call the control room.
+          Accounts are created by GALEYR. If you cannot get in, call the control room.
         </p>
       </div>
     </Container>

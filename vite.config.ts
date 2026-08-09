@@ -87,6 +87,21 @@ export default defineConfig(({ command, mode }) => {
               if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) {
                 return 'vendor-react';
               }
+
+              /* ── Motion gets its own chunk ──
+                 The animation library is ~44KB gzipped, which is a third of
+                 everything else in `vendor` put together. Left in there it
+                 would be downloaded, parsed and executed before the checkout
+                 form could render — and checkout does not animate anything.
+
+                 Split out, it is fetched in parallel by the pages that use it
+                 (landing, restaurants, control room) and cached separately, so
+                 a later release that touches only Supabase does not force
+                 every visitor to re-download the animations too. */
+              if (/node_modules\/(motion|framer-motion|motion-dom|motion-utils)\//.test(id)) {
+                return 'vendor-motion';
+              }
+
               return 'vendor';
             }
             return undefined;

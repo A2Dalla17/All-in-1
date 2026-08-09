@@ -139,7 +139,24 @@ export const IconButton = forwardRef<
     tone?: 'default' | 'plain' | 'brand' | 'glass' | 'danger';
   }
 >(function IconButton({ label, size = 'md', tone = 'default', className, children, ...rest }, ref) {
-  const sizes = { sm: 'h-9 w-9', md: 'h-11 w-11', lg: 'h-12 w-12' } as const;
+  /**
+   * ── Why `sm` is 40px and not 36 ────────────────────────────────────────
+   * The small icon button was h-9 — 36px. WCAG 2.5.8 asks for 24px minimum
+   * and the practical floor on a phone is around 44px, because a fingertip
+   * contact patch is roughly that wide; anything smaller means the tap lands
+   * on whatever is next to it.
+   *
+   * These sit in dense headers where 44 would be visually heavy, so `sm` goes
+   * to 40px and gains an invisible 44px hit area through the `before`
+   * pseudo-element below. The control looks small and behaves large, which is
+   * the correct trade rather than picking one and losing the other.
+   */
+  const sizes = { sm: 'h-10 w-10', md: 'h-11 w-11', lg: 'h-12 w-12' } as const;
+
+  const hitArea =
+    'relative before:absolute before:left-1/2 before:top-1/2 ' +
+    'before:h-11 before:w-11 before:-translate-x-1/2 before:-translate-y-1/2 ' +
+    'before:content-[""]';
 
   const tones = {
     default: 'bg-card text-ink border border-line shadow-xs hover:bg-elevated',
@@ -160,6 +177,9 @@ export const IconButton = forwardRef<
         'pressable grid shrink-0 place-items-center rounded-full',
         'transition-all duration-quick ease-smooth disabled:opacity-40',
         sizes[size],
+        /* The invisible 44px target, only where the visual control is
+           smaller than that. */
+        size === 'sm' && hitArea,
         tones[tone],
         className,
       )}

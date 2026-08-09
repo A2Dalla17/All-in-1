@@ -1,20 +1,23 @@
 /**
- * "Deliver with AC7 GALEYR" — the courier page.
+ * "Deliver with GALEYR" — the courier page.
  *
- * ── Why this has no application form ───────────────────────────────────────
- * A courier is trusted with a stranger's food, a stranger's address and a
- * stranger's cash. That is not a decision to make from a web form, and there is
- * no approval workflow behind couriers yet — `galeyr_couriers.is_approved`
- * exists and defaults to false, but nothing populates the table from outside.
+ * ── The form exists now, and the phone number stays ───────────────────────
+ * This page used to offer only a phone number, because there was no review
+ * process behind an application and a form that dropped names into a queue
+ * nobody read would have been worse — an applicant waiting for a call that was
+ * never coming.
  *
- * Building a form that drops names into a queue nobody reads would be worse
- * than a phone number: an applicant would wait for a call that was never coming.
- * A phone number is answered today. The form arrives when the process behind it
- * does.
+ * That process now exists: applications land in the Control Centre, are
+ * reviewed, carry a background-check workflow and are approved against a staff
+ * code. So the form is real.
+ *
+ * The phone number stays alongside it. Plenty of people who would make good
+ * couriers would rather talk to a person than fill in twelve fields on a
+ * phone, and turning them away to save a button would be a poor trade.
  */
 
 import { Link } from 'react-router-dom';
-import { Banknote, Clock, Headphones, MessageCircle, Phone } from 'lucide-react';
+import { ArrowRight, Banknote, Clock, Headphones, MessageCircle, Phone } from 'lucide-react';
 
 import { Button } from '@shared/components/ui/Button';
 import { Container } from '@shared/components/ui/Container';
@@ -48,7 +51,7 @@ export function CouriersPage() {
   return (
     <Container className="py-8 sm:py-12" size="narrow">
       <h1 className="text-h2 font-extrabold tracking-tight text-ink">
-        Nala shaqee — deliver with AC7 GALEYR
+        Nala shaqee — deliver with GALEYR
       </h1>
       <p className="mt-2 text-body-lg text-ink-muted">
         Have a motorbike and know Mogadishu? We are looking for couriers.
@@ -90,13 +93,25 @@ export function CouriersPage() {
       <section className="mt-8 rounded-card brand-gradient p-6 text-white">
         <h2 className="text-h5 font-bold">Ready to start?</h2>
         <p className="mt-2 text-body-sm text-white/85">
-          Call or message the control room. We will talk you through it, check your
-          documents in person, and get you working.
+          Send an application, or call us. Either way we check your documents in person
+          before you start.
         </p>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <Link to="/couriers/apply" className="flex-1">
+            <Button variant="inverse" size="lg" fullWidth trailingIcon={<ArrowRight size={17} />}>
+              Apply now
+            </Button>
+          </Link>
+
           <a href={`tel:${env.controlCentre.tel}`} className="flex-1">
-            <Button variant="inverse" size="lg" fullWidth leadingIcon={<Phone size={17} />}>
+            <Button
+              variant="outline"
+              size="lg"
+              fullWidth
+              className="border-white/40 text-white hover:bg-white/10"
+              leadingIcon={<Phone size={17} />}
+            >
               {env.controlCentre.display}
             </Button>
           </a>
@@ -125,7 +140,7 @@ export function CouriersPage() {
       <p className="mt-8 text-center text-body-sm text-ink-muted">
         Run a restaurant instead?{' '}
         <Link to="/partners" className="font-semibold text-brand-ink">
-          Partner with us
+          Register your restaurant
         </Link>
       </p>
     </Container>

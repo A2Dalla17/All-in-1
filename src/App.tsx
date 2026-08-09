@@ -88,6 +88,27 @@ const PartnersPage = lazy(() =>
 const CouriersPage = lazy(() =>
   import('./routes/delivery/CouriersPage').then((m) => ({ default: m.CouriersPage })),
 );
+const CourierApplyPage = lazy(() =>
+  import('./routes/delivery/CourierApplyPage').then((m) => ({ default: m.CourierApplyPage })),
+);
+
+/* ── The Delivery Hub ──────────────────────────────────────────────────────
+   A layout route with its own sidebar. Track is the index, so /delivery lands
+   on tracking rather than on a menu of links — the person opening this page
+   usually wants to know where their food is. */
+const DeliveryHubPage = lazy(() =>
+  import('./routes/delivery/DeliveryHubPage').then((m) => ({ default: m.DeliveryHubPage })),
+);
+const DeliverySupportPage = lazy(() =>
+  import('./routes/delivery/DeliverySupportPage').then((m) => ({
+    default: m.DeliverySupportPage,
+  })),
+);
+const DeliverySettingsPage = lazy(() =>
+  import('./routes/delivery/DeliverySettingsPage').then((m) => ({
+    default: m.DeliverySettingsPage,
+  })),
+);
 
 /* ── Staff ────────────────────────────────────────────────────────────────
    The restaurant portal and the control room. Lazy for the usual reason and
@@ -125,13 +146,29 @@ export function App() {
                 in the path is what the confirmation screen links to, so they do
                 not retype what they just saw. Both render the same page. */}
             <Route path="restaurants" element={<RestaurantsPage />} />
+            {/* The param is a slug now; uuids still resolve for older links. */}
             <Route path="restaurants/:restaurantId" element={<RestaurantMenuPage />} />
             <Route path="checkout" element={<CheckoutPage />} />
             <Route path="order/:orderNumber" element={<OrderPlacedPage />} />
-            <Route path="track" element={<TrackOrderPage />} />
+
+            {/* ── Delivery Hub ──
+                /track and /track/:orderNumber are kept as redirects rather than
+                deleted: they are printed on confirmation screens people have
+                already seen, and in messages already sent. */}
+            <Route path="delivery" element={<DeliveryHubPage />}>
+              <Route index element={<TrackOrderPage embedded />} />
+              <Route path="track/:orderNumber" element={<TrackOrderPage embedded />} />
+              <Route path="support" element={<DeliverySupportPage mode="support" />} />
+              <Route path="complaint" element={<DeliverySupportPage mode="complaint" />} />
+              <Route path="settings" element={<DeliverySettingsPage />} />
+            </Route>
+
+            <Route path="track" element={<Navigate to="/delivery" replace />} />
             <Route path="track/:orderNumber" element={<TrackOrderPage />} />
+
             <Route path="partners" element={<PartnersPage />} />
             <Route path="couriers" element={<CouriersPage />} />
+            <Route path="couriers/apply" element={<CourierApplyPage />} />
 
             {/* ── Staff ──
                 Not linked from anywhere on the public site. That is not a
@@ -145,14 +182,6 @@ export function App() {
                 </StaffGate>
               }
             />
-            <Route
-              path="control"
-              element={
-                <StaffGate area="control">
-                  <ControlRoomPage />
-                </StaffGate>
-              }
-            />
 
             <Route path="about" element={<AboutPage />} />
             <Route path="faq" element={<FaqPage />} />
@@ -163,6 +192,11 @@ export function App() {
                 are in search results and in messages people have already sent
                 — a 404 loses a visitor who was trying to reach us. Each points
                 at the delivery page that answers the same question. */}
+            {/* Aliases. Somebody demonstrating this will type one of these. */}
+            <Route path="control-centre" element={<Navigate to="/control" replace />} />
+            <Route path="operations" element={<Navigate to="/control" replace />} />
+            <Route path="admin" element={<Navigate to="/control?s=admin" replace />} />
+
             <Route path="services" element={<Navigate to="/restaurants" replace />} />
             <Route path="drivers" element={<Navigate to="/couriers" replace />} />
             <Route path="pricing" element={<Navigate to="/faq" replace />} />
@@ -173,6 +207,23 @@ export function App() {
             <Route path="cookies" element={<CookiesPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
+
+          {/* ── The Control Centre renders outside SiteLayout ──
+              It is a full-screen operations console with its own sidebar and
+              top bar. Wrapping it in the public header and footer would put a
+              marketing navigation bar and a cookie policy link above an order
+              board, and steal the vertical space the console needs.
+
+              Still behind StaffGate, and still — as everywhere — actually
+              protected by row level security rather than by routing. */}
+          <Route
+            path="control"
+            element={
+              <StaffGate area="control">
+                <ControlRoomPage />
+              </StaffGate>
+            }
+          />
         </Routes>
       </Suspense>
 

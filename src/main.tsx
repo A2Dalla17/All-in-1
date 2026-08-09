@@ -12,6 +12,24 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+/* ══════════════════════════════════════════════════════════════════════════
+   The typeface
+   ══════════════════════════════════════════════════════════════════════════
+   Inter was named in the Tailwind config from the beginning and never actually
+   loaded, so every screen has been rendering in whatever the operating system
+   defaults to — Segoe UI on Windows, Roboto on Android. That single omission is
+   most of why the site read as a generic template: the type scale, the tracking
+   and the optical sizes were all tuned for a typeface that was not there.
+
+   Self-hosted through fontsource rather than linked from Google Fonts. Two
+   reasons, both of which matter more here than usual: no third-party request on
+   a connection where every round trip is expensive, and no visitor data sent to
+   a third party just to render text.
+
+   The variable font is one file covering every weight, which is smaller than
+   the three static weights this design uses. */
+import '@fontsource-variable/inter';
+
 import '@shared/styles/index.css';
 
 import { AuthProvider } from '@shared/providers/AuthProvider';

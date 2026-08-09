@@ -218,8 +218,15 @@ export function BrandIntro({ onFinished }: { onFinished: () => void }) {
                 animationDuration: `${d}s`,
                 background:
                   'linear-gradient(105deg, transparent 38%, rgba(255,255,255,0.55) 50%, transparent 62%)',
-                WebkitMaskImage: `url(${brand.intro.png})`,
-                maskImage: `url(${brand.intro.png})`,
+                /* The WebP, not the PNG — the <picture> above has already
+                   fetched it on any browser that supports WebP, so the mask
+                   costs nothing. Pointing this at the PNG would pull a second
+                   copy of the same artwork, roughly 300KB, purely to drive a
+                   decorative highlight. On a browser without WebP the mask
+                   simply does not resolve and the sweep does not render, which
+                   is the right thing to lose. */
+                WebkitMaskImage: `url(${brand.intro.webp})`,
+                maskImage: `url(${brand.intro.webp})`,
                 WebkitMaskSize: 'contain',
                 maskSize: 'contain',
                 WebkitMaskRepeat: 'no-repeat',

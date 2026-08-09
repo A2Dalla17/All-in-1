@@ -28,13 +28,14 @@
          from the component, because by the time React has mounted the request
          would already be several hundred milliseconds behind.
 
-         `imagesrcset` lets the browser take the WebP and skip the PNG entirely
-         where it is supported, which is most places. -->
+         Only the WebP is preloaded. `type` makes the browser skip this entirely
+         if it cannot decode WebP, and those browsers fall through to the PNG
+         when the component renders — a slightly later first frame for a small
+         minority, rather than everyone else downloading both copies. -->
     <link
       rel="preload"
       as="image"
-      href="/brand/gr-intro.png"
-      imagesrcset="/brand/gr-intro.webp"
+      href="/brand/gr-intro.webp"
       type="image/webp"
       fetchpriority="high"
     />

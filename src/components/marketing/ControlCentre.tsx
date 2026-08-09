@@ -13,6 +13,7 @@
 import { Phone, MessageCircle } from 'lucide-react';
 
 import { Container } from '@shared/components/ui/Container';
+import { BlurFade, BorderBeam } from '@shared/components/motion';
 import { env } from '@shared/config/env';
 
 export function ControlCentre() {
@@ -21,7 +22,12 @@ export function ControlCentre() {
   return (
     <section id="control-room" className="py-16 sm:py-20">
       <Container>
-        <div className="overflow-hidden rounded-card border border-line bg-card">
+        <BlurFade>
+        {/* The only BorderBeam on the public site. It marks the one thing a
+            worried customer needs to find — the phone number — and it only
+            works as emphasis because nothing else on the page is doing it. */}
+        <div className="relative overflow-hidden rounded-card border border-line bg-card">
+          <BorderBeam size={90} duration={9} />
           <div className="grid gap-8 p-8 sm:p-10 md:grid-cols-2 md:items-center">
             <div>
               <p className="text-caption font-semibold uppercase tracking-wide text-brand-ink">
@@ -63,6 +69,7 @@ export function ControlCentre() {
             </div>
           </div>
         </div>
+        </BlurFade>
       </Container>
     </section>
   );

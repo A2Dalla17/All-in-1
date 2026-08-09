@@ -4,7 +4,7 @@
  * ══════════════════════════════════════════════════════════════════════════
  * Why this component exists at all
  * ══════════════════════════════════════════════════════════════════════════
- * AC7 GALEYR has no signed restaurant partners yet. The demo restaurants exist
+ * GALEYR has no signed restaurant partners yet. The demo restaurants exist
  * so the whole pipeline — order, accept, cook, assign, deliver — can be tested
  * before the first agreement is signed.
  *
@@ -60,7 +60,7 @@ export function DemoNotice({ className }: { className?: string }) {
       <div className="text-body-sm text-warning-ink">
         <p className="font-semibold">Demo data — no real restaurants yet</p>
         <p className="mt-1 text-warning-ink/90">
-          AC7 GALEYR is being built and tested. Every restaurant and menu shown here is
+          GALEYR is being built and tested. Every restaurant and menu shown here is
           invented test data. No real restaurant has partnered with us yet, and nothing
           ordered here will be cooked or delivered.
         </p>

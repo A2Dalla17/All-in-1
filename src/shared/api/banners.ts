@@ -1,16 +1,18 @@
 import { supabase, friendlyError, isSupabaseConfigured } from '@shared/lib/supabase';
 
 /**
- * Community advertising — the showcase carousel under the hero.
+ * Community Advertising — the billboard on the GALEYR homepage.
  *
- * ── One slot became several ────────────────────────────────────────────────
- * The homepage used to show a single banner. It now rotates through everything
- * live: featured businesses, restaurant and shop promotions, seasonal
- * campaigns, company announcements, and the Driver of the Quarter. `priority`
- * still decides who leads; `sort_order` decides reading order among equals.
+ * ── Real inventory, not decoration ─────────────────────────────────────────
+ * This space is a product. Businesses in Mogadishu pay for placement on it, and
+ * it is one of the few things GALEYR can sell before a single delivery
+ * commission has been earned. It rotates through featured businesses,
+ * restaurant and shop promotions, seasonal campaigns, company announcements,
+ * and the Courier of the Quarter. `priority` decides who leads; `sort_order`
+ * decides reading order among equals.
  *
  * ── Why the spotlight window is derived, not scheduled ─────────────────────
- * For the first few days of each calendar quarter the Driver of the Quarter is
+ * For the first few days of each calendar quarter the Courier of the Quarter is
  * promoted to the front of the rotation. That window is computed from the date
  * on every page load rather than flipped by a scheduled job, because a cron
  * that fails silently leaves last quarter's winner leading the homepage for
@@ -23,7 +25,7 @@ export type BannerKind =
   | 'featured_business'
   | 'restaurant_promotion'
   | 'shop_promotion'
-  | 'driver_of_quarter'
+  | 'courier_of_quarter'
   | 'seasonal_campaign'
   | 'announcement';
 
@@ -55,13 +57,13 @@ export const KIND_LABEL: Record<BannerKind, string> = {
   featured_business: 'Featured business',
   restaurant_promotion: 'Restaurant promotion',
   shop_promotion: 'Shop promotion',
-  driver_of_quarter: 'Driver of the Quarter',
+  courier_of_quarter: 'Courier of the Quarter',
   seasonal_campaign: 'Seasonal campaign',
   announcement: 'Announcement',
 };
 
 /** How many slides the carousel will show at most. */
-const MAX_SLIDES = 6;
+const MAX_SLIDES = 8;
 
 /** How long the new quarter's spotlight leads the rotation. */
 export const SPOTLIGHT_DAYS = 3;
@@ -123,13 +125,13 @@ export const bannersApi = {
     const live = (data ?? []) as FeaturedBanner[];
     if (live.length === 0) return [];
 
-    /* Outside its window the quarterly driver stays in the rotation but does
+    /* Outside its window the quarterly courier stays in the rotation but does
        not lead it, so a paid campaign is not buried behind a spotlight that
        ran three months ago. */
     if (isSpotlightWindow(now)) return live;
 
-    const spotlight = live.filter((b) => b.kind === 'driver_of_quarter');
-    const rest = live.filter((b) => b.kind !== 'driver_of_quarter');
+    const spotlight = live.filter((b) => b.kind === 'courier_of_quarter');
+    const rest = live.filter((b) => b.kind !== 'courier_of_quarter');
     return [...rest, ...spotlight];
   },
 };

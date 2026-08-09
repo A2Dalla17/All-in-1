@@ -103,7 +103,7 @@ const SECTIONS: { title: string; faqs: Faq[] }[] = [
     ],
   },
   {
-    title: 'About AC7 GALEYR',
+    title: 'About GALEYR',
     faqs: [
       {
         // The question a careful person asks, so it is answered rather than avoided.
@@ -129,7 +129,7 @@ const SECTIONS: { title: string; faqs: Faq[] }[] = [
       {
         question: 'What happened to the taxi service?',
         answer:
-          'AC7 GROUP still runs it. AC7 GALEYR is focused on food delivery in Mogadishu, and doing one thing properly comes before doing two things halfway.',
+          'AC7 GROUP still runs it. GALEYR is focused on food delivery in Mogadishu, and doing one thing properly comes before doing two things halfway.',
       },
     ],
   },
@@ -142,7 +142,7 @@ export function FaqPage() {
         Su'aalaha badanaa la weydiiyo
       </h1>
       <p className="mt-2 text-body-lg text-ink-muted">
-        Common questions about ordering with AC7 GALEYR.
+        Common questions about ordering with GALEYR.
       </p>
 
       <div className="mt-10 space-y-10">

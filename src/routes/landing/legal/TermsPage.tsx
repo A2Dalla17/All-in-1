@@ -20,14 +20,21 @@ export function TermsPage() {
 
       <LegalSection heading="The service">
         <p>
-          {env.company.name} provides licensed private hire transport, contracted school
-          transport and a booking service for local businesses. Journeys are carried out by
-          drivers who are licensed by the relevant local authority.
+          GALEYR delivers food from restaurants in {env.market.city} to the address you give
+          when ordering. The food is prepared by the restaurant; we collect it and bring it
+          to you.
         </p>
         <p>
-          Availability depends on demand, traffic and weather. We aim to arrive within the time
-          quoted but cannot guarantee it, and we are not liable for missed onward travel such as
-          flights or trains. If timing is critical, book in advance and tell the control centre.
+          <strong>These terms are being rewritten for the delivery service and are not
+          final.</strong>{' '}
+          Parts of this page still describe our transport business. Nothing here is intended
+          to reduce any right you have under Somali law. Call the control room if you need a
+          clear answer on anything.
+        </p>
+        <p>
+          Delivery times are estimates. They depend on how busy the restaurant is and on
+          traffic, and we cannot guarantee them. You pay the courier in cash when the food
+          arrives, so if it does not arrive you pay nothing.
         </p>
       </LegalSection>
 

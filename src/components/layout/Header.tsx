@@ -10,6 +10,7 @@ import {
   X,
 } from 'lucide-react';
 
+import { RestaurantsMenu } from '@/components/layout/RestaurantsMenu';
 import { Logo } from '@shared/components/ui/Logo';
 import { Container } from '@shared/components/ui/Container';
 import { env } from '@shared/config/env';
@@ -94,11 +95,20 @@ export function Header() {
 
             <nav aria-label="Main" className="hidden lg:block">
               <ul className="flex items-center gap-0.5">
-                {HEADER_NAV.map((item) => (
-                  <li key={item.label}>
-                    <NavItem {...item} />
-                  </li>
-                ))}
+                {HEADER_NAV.map((item) =>
+                  /* Restaurants gets the dropdown; everything else is a plain
+                     link. The special case lives here rather than inside
+                     NavItem so NavItem stays a dumb link. */
+                  item.label === 'Restaurants' ? (
+                    <li key={item.label}>
+                      <RestaurantsMenu active={location.pathname.startsWith('/restaurants')} />
+                    </li>
+                  ) : (
+                    <li key={item.label}>
+                      <NavItem {...item} />
+                    </li>
+                  ),
+                )}
               </ul>
             </nav>
           </div>

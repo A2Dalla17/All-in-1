@@ -9,7 +9,7 @@ import { env } from '@shared/config/env';
 import { usePageMeta } from '@shared/lib/seo';
 
 /**
- * About AC7 GALEYR.
+ * About GALEYR.
  *
  * ── No invented history ────────────────────────────────────────────────────
  * The business is new. There is no founding date, no headcount, no "trusted by
@@ -25,7 +25,7 @@ import { usePageMeta } from '@shared/lib/seo';
 export function AboutPage() {
   usePageMeta(
     'About us',
-    'AC7 GALEYR — food delivery in Mogadishu. Part of AC7 GROUP.',
+    'GALEYR — food delivery in Mogadishu. Part of AC7 GROUP.',
   );
 
   return (
@@ -45,7 +45,7 @@ export function AboutPage() {
           </p>
           <h1 className="mt-4 text-h1 text-ink">Cunto la keeno, si fudud</h1>
           <p className="mt-5 text-body-lg leading-relaxed text-ink-muted">
-            AC7 GALEYR delivers food across {env.market.city}. You order from a restaurant
+            GALEYR delivers food across {env.market.city}. You order from a restaurant
             near you, a courier collects it, and you pay cash when it reaches your door.
           </p>
           <p className="mt-4 text-body leading-relaxed text-ink-muted">
@@ -63,7 +63,7 @@ export function AboutPage() {
         <div className="rounded-card border border-warning/35 bg-warning-soft p-5 text-body-sm text-warning-ink">
           <p className="font-semibold">We are still being built</p>
           <p className="mt-1">
-            AC7 GALEYR has not signed its first restaurant yet. Everything you can see on
+            GALEYR has not signed its first restaurant yet. Everything you can see on
             the site today is clearly labelled demo data, used to test that ordering,
             cooking, dispatch and delivery all work before a single real order is taken. We
             will not list a restaurant until they have agreed to work with us.
@@ -156,7 +156,7 @@ export function AboutPage() {
             </p>
             <Link to="/partners" className="mt-6 inline-block">
               <Button variant="primary" trailingIcon={<ArrowRight size={16} />}>
-                Partner with us
+                Register your restaurant
               </Button>
             </Link>
           </div>

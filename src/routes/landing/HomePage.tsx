@@ -1,3 +1,4 @@
+import { CommunityShowcase } from '@/components/marketing/CommunityShowcase';
 import { ControlCentre } from '@/components/marketing/ControlCentre';
 import { Hero } from '@/components/marketing/Hero';
 import { ServiceCards } from '@/components/marketing/ServiceCards';
@@ -8,23 +9,30 @@ import { usePageMeta } from '@shared/lib/seo';
  * The hub.
  *
  * Composition only — every section owns its own data and layout. That is what
- * makes adding a sixth section, or reordering them for a campaign, a one-line
- * change rather than an edit inside a thousand-line component.
+ * makes adding a section, or reordering them for a campaign, a one-line change
+ * rather than an edit inside a thousand-line component.
  *
- * The advertising billboard is not listed here: it lives inside the hero,
- * between the tagline and the buttons, because it is part of that first
- * screenful rather than a section following it.
+ * ── Why the billboard sits third ───────────────────────────────────────────
+ * Ordering is the job of this page, so the hero and the three ways in come
+ * first. Community Advertising follows immediately — high enough that an
+ * advertiser is genuinely buying attention rather than the bottom of a scroll,
+ * but not so high that it stands between a hungry customer and the food.
+ *
+ * It used to live inside the hero. That framing made paid placement look like
+ * decoration; as a section of its own it reads as what it is.
  */
 export function HomePage() {
   usePageMeta(
-    'Transport, school runs and bookings in London',
-    'ACT (AC7 Transport) by AC7 GROUP. Licensed private hire, school run contracts and local bookings across London, with a 24/7 control centre answered by a person.',
+    'Food delivery in Mogadishu',
+    'GALEYR delivers food across Mogadishu. Order from restaurants near you, ' +
+      'pay the courier in cash on delivery, and track your order. Powered by AC7 Group.',
   );
 
   return (
     <>
       <Hero />
       <ServiceCards />
+      <CommunityShowcase />
       <WhyACT />
       <ControlCentre />
     </>

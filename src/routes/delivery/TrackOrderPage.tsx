@@ -6,7 +6,7 @@
  * Both land here so there is one implementation of the progress display.
  */
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { Fragment, useEffect, useState, type FormEvent } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { Check, CircleDashed, Phone, XCircle } from 'lucide-react';
@@ -26,7 +26,7 @@ import {
 import { env } from '@shared/config/env';
 import { cn } from '@shared/lib/utils';
 
-export function TrackOrderPage() {
+export function TrackOrderPage({ embedded = false }: { embedded?: boolean } = {}) {
   const { orderNumber: fromUrl } = useParams();
   const location = useLocation();
   const prefilledPhone = (location.state as { phone?: string } | null)?.phone ?? '';
@@ -55,14 +55,28 @@ export function TrackOrderPage() {
 
   const order = mutation.data ?? null;
 
-  return (
-    <Container className="py-8 sm:py-12" size="narrow">
-      <h1 className="text-h2 font-extrabold tracking-tight text-ink">Track your order</h1>
-      <p className="mt-2 text-body text-ink-muted">
-        Enter your order number and the phone number you gave when you ordered.
-      </p>
+  /* Inside the Delivery Hub the page title and the surrounding Container are
+     already provided by the layout, so rendering them again would produce two
+     headings and double padding. */
+  const Wrapper = embedded ? Fragment : Container;
+  const wrapperProps = embedded ? {} : { className: 'py-8 sm:py-12', size: 'narrow' as const };
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+  return (
+    <Wrapper {...wrapperProps}>
+      {!embedded && (
+        <>
+          <h1 className="text-h2 font-extrabold tracking-tight text-ink">Track your order</h1>
+          <p className="mt-2 text-body text-ink-muted">
+            Enter your order number and the phone number you gave when you ordered.
+          </p>
+        </>
+      )}
+
+      {embedded && (
+        <h2 className="text-h4 font-bold text-ink">Track your order</h2>
+      )}
+
+      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <Input
           label="Order number"
           value={orderNumber}
@@ -121,7 +135,7 @@ export function TrackOrderPage() {
       )}
 
       {order && <OrderProgress order={order} />}
-    </Container>
+    </Wrapper>
   );
 }
 

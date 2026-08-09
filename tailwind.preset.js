@@ -129,6 +129,11 @@ export default {
 
       fontFamily: {
         sans: [
+          /* fontsource registers the variable font under this exact name.
+             'Inter var' was the old Google-hosted name and matches nothing
+             here — with only that in the stack the font loaded and was never
+             used, which is indistinguishable from not loading it. */
+          'Inter Variable',
           'Inter var',
           'Inter',
           '-apple-system',

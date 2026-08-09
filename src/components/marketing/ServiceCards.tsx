@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
 import { Container } from '@shared/components/ui/Container';
+import { BlurFade, SpotlightCard } from '@shared/components/motion';
 import { SERVICES } from '@shared/config/navigation';
 import { cn } from '@shared/lib/utils';
 
@@ -27,13 +28,26 @@ export function ServiceCards() {
             const primary = i === 0;
 
             return (
-              <Link
+              /* Staggered by 90ms per card. Enough that the eye follows them in
+                 order — which is the order they should be read in — without the
+                 last one arriving so late it feels broken. */
+              <BlurFade
                 key={service.id}
+                delay={i * 0.09}
+                className={cn('flex', primary && 'md:row-span-2')}
+              >
+              {/* Three nested wrappers, each doing one job: BlurFade is the
+                  grid item and owns the row span, SpotlightCard owns the hover
+                  glow, Link owns the navigation. `h-full` has to be threaded
+                  through all of them or the primary card stops filling its two
+                  rows and leaves a gap beside the other two. */}
+              <SpotlightCard className="flex h-full w-full rounded-card">
+              <Link
                 to={service.to}
                 className={cn(
-                  'pressable group flex flex-col rounded-card p-6 transition-colors',
+                  'pressable group flex h-full w-full flex-col rounded-card p-6 transition-colors',
                   primary
-                    ? 'brand-gradient text-white shadow-brand md:row-span-2'
+                    ? 'brand-gradient text-white shadow-brand'
                     : 'border border-line bg-card hover:border-line-strong',
                 )}
               >
@@ -90,6 +104,8 @@ export function ServiceCards() {
                   />
                 </span>
               </Link>
+              </SpotlightCard>
+              </BlurFade>
             );
           })}
         </div>

@@ -695,3 +695,23 @@
     filter: none !important;
   }
 }
+
+/* Community Advertising — the rotation timing bar.
+   Animating `transform` rather than `width` keeps this off the layout path;
+   a width animation would reflow the bar sixty times a second for eight
+   seconds, on a phone that has better things to do. */
+@keyframes galeyr-showcase-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.galeyr-showcase-progress {
+  transform-origin: left center;
+  animation-name: galeyr-showcase-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .galeyr-showcase-progress { animation: none !important; }
+}

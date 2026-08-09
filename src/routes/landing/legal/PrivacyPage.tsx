@@ -13,9 +13,17 @@ export function PrivacyPage() {
     >
       <LegalSection heading="Who we are">
         <p>
-          {env.company.name} ({env.company.meaning}) operates ACT — {env.company.productLong} —
-          providing private hire, contracted school transport and local booking services in{' '}
-          {env.company.city}. We are the data controller for the information described here.
+          GALEYR is a food delivery service operating in {env.market.city},{' '}
+          {env.market.country}, run by {env.company.name} ({env.company.meaning}). We are
+          responsible for the information described here.
+        </p>
+        <p>
+          <strong>
+            This policy is being rewritten for the delivery service and is not final.
+          </strong>{' '}
+          Parts of it still describe our transport business. If anything here matters to a
+          decision you are making, call the control room and ask — we would rather answer
+          than have you rely on a page we have told you is out of date.
         </p>
         <p>
           For any privacy question, contact{' '}

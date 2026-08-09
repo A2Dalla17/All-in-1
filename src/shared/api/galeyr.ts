@@ -174,6 +174,22 @@ export interface Restaurant {
   commission_rate?: number;
   email?: string | null;
   opening_hours?: Record<string, { open: string; close: string }> | null;
+
+  /* Profile additions used by the public restaurant page. */
+  slug?: string | null;
+  logo_url?: string | null;
+  cover_image_url?: string | null;
+  rating?: number | null;
+  rating_count?: number;
+  website_url?: string | null;
+  ios_app_url?: string | null;
+  android_app_url?: string | null;
+
+  /* Operational ownership. Whoever approved the restaurant owns the
+     relationship with it — see ControlMyRestaurants. */
+  line_manager_id?: string | null;
+  approved_by_staff_id?: string | null;
+  approved_at?: string | null;
 }
 
 export interface MenuCategory {
@@ -290,12 +306,43 @@ export async function listRestaurants(): Promise<Restaurant[]> {
       .select(
         'id,name,name_so,description,district,landmark,phone,image_url,cuisine,' +
           'delivery_fee_cents,minimum_order_cents,prep_time_minutes,' +
-          'is_accepting_orders,status,is_demo,opening_hours',
+          'is_accepting_orders,status,is_demo,opening_hours,slug,' +
+          'logo_url,cover_image_url,rating,rating_count',
       )
       // Open kitchens first — a closed restaurant is not a useful first result.
       .order('is_accepting_orders', { ascending: false })
       .order('name'),
   );
+}
+
+/**
+ * Look up a restaurant by slug, falling back to id.
+ *
+ * ── Why both ──────────────────────────────────────────────────────────────
+ * `/restaurants/aroos-restaurant` is what a partner wants to print and what
+ * shares readably over WhatsApp. But links to the uuid form already exist —
+ * in the cart, in messages people have sent — and breaking them to gain a
+ * prettier URL is a bad trade. A uuid is recognisable by shape, so one function
+ * serves both without ambiguity.
+ */
+export async function getRestaurantBySlug(slugOrId: string): Promise<Restaurant | null> {
+  const isUuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId);
+
+  const { data, error } = await supabase
+    .from('galeyr_restaurants')
+    .select(
+      'id,name,name_so,description,district,landmark,phone,image_url,cuisine,' +
+        'delivery_fee_cents,minimum_order_cents,prep_time_minutes,' +
+        'is_accepting_orders,status,is_demo,opening_hours,slug,' +
+        'logo_url,cover_image_url,rating,rating_count,website_url,' +
+        'ios_app_url,android_app_url',
+    )
+    .eq(isUuid ? 'id' : 'slug', slugOrId)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return (data as Restaurant | null) ?? null;
 }
 
 export async function getRestaurant(id: string): Promise<Restaurant | null> {
@@ -304,7 +351,9 @@ export async function getRestaurant(id: string): Promise<Restaurant | null> {
     .select(
       'id,name,name_so,description,district,landmark,phone,image_url,cuisine,' +
         'delivery_fee_cents,minimum_order_cents,prep_time_minutes,' +
-        'is_accepting_orders,status,is_demo,opening_hours',
+        'is_accepting_orders,status,is_demo,opening_hours,slug,' +
+        'logo_url,cover_image_url,rating,rating_count,website_url,' +
+        'ios_app_url,android_app_url',
     )
     .eq('id', id)
     .maybeSingle();
@@ -476,6 +525,16 @@ export interface ApplicationInput {
  * business's name on AC7 GALEYR without that business ever hearing of us.
  */
 export async function submitApplication(input: ApplicationInput): Promise<void> {
+  /* ── Do not add `.select()` here ──
+     supabase-js only appends RETURNING when you chain `.select()`, and RETURNING
+     additionally requires a SELECT policy for the new row. Anonymous callers
+     deliberately have none — an application holds an owner's private phone
+     number and business details, and RLS is row level, so any read policy at
+     all would expose every column to everyone.
+
+     Adding `.select()` to "get the new id back" would therefore break every
+     public registration with an RLS violation, while working perfectly for any
+     signed-in admin testing it. Verified against the live database. */
   const { error } = await supabase.from('galeyr_restaurant_applications').insert(input);
   if (error) throw new Error(error.message);
 }
@@ -747,7 +806,9 @@ export async function listRestaurantsAdmin(): Promise<Restaurant[]> {
       .select(
         'id,name,name_so,description,district,landmark,phone,email,cuisine,image_url,' +
           'delivery_fee_cents,minimum_order_cents,prep_time_minutes,' +
-          'is_accepting_orders,status,is_demo,commission_rate',
+          'is_accepting_orders,status,is_demo,commission_rate,slug,' +
+          'logo_url,cover_image_url,rating,rating_count,' +
+          'line_manager_id,approved_by_staff_id,approved_at',
       )
       .order('status')
       .order('name'),

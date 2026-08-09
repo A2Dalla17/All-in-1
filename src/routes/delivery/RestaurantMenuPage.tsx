@@ -9,9 +9,13 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft, ArrowUpRight, Clock, Minus, Plus, Smartphone, Star,
+  ShoppingBag, Trash2,
+} from 'lucide-react';
 
 import { DemoBadge, DemoNotice } from '@/components/delivery/DemoNotice';
+import { RestaurantCommunity } from '@/components/delivery/RestaurantCommunity';
 import { Button } from '@shared/components/ui/Button';
 import { Container } from '@shared/components/ui/Container';
 import { ErrorState } from '@shared/components/ui/EmptyState';
@@ -21,7 +25,7 @@ import {
   districtLabel,
   formatUsd,
   getMenu,
-  getRestaurant,
+  getRestaurantBySlug,
   type MenuItem,
 } from '@shared/api/galeyr';
 import {
@@ -36,6 +40,8 @@ import {
 import { cn } from '@shared/lib/utils';
 
 export function RestaurantMenuPage() {
+  /* The route param is a slug now, but may still be a uuid from an older
+     link. `getRestaurantBySlug` handles both. */
   const { restaurantId = '' } = useParams();
   const cart = useCart();
 
@@ -44,17 +50,20 @@ export function RestaurantMenuPage() {
 
   const restaurantQuery = useQuery({
     queryKey: ['galeyr', 'restaurant', restaurantId],
-    queryFn: () => getRestaurant(restaurantId),
-    enabled: Boolean(restaurantId),
-  });
-
-  const menuQuery = useQuery({
-    queryKey: ['galeyr', 'menu', restaurantId],
-    queryFn: () => getMenu(restaurantId),
+    queryFn: () => getRestaurantBySlug(restaurantId),
     enabled: Boolean(restaurantId),
   });
 
   const restaurant = restaurantQuery.data;
+
+  /* Keyed on the resolved id, not the URL param — otherwise the same
+     restaurant reached by slug and by uuid would occupy two cache entries and
+     fetch its menu twice. */
+  const menuQuery = useQuery({
+    queryKey: ['galeyr', 'menu', restaurant?.id],
+    queryFn: () => getMenu(restaurant!.id),
+    enabled: Boolean(restaurant?.id),
+  });
 
   /** Items grouped under their category, in the restaurant's own order. */
   const sections = useMemo(() => {
@@ -68,14 +77,20 @@ export function RestaurantMenuPage() {
     const uncategorised = items.filter((i) => !i.category_id);
     if (uncategorised.length > 0) {
       grouped.push({
-        category: { id: 'other', restaurant_id: restaurantId, name: 'Other', name_so: null, sort_order: 999 },
+        category: {
+          id: 'other',
+          restaurant_id: restaurant?.id ?? '',
+          name: 'Other',
+          name_so: null,
+          sort_order: 999,
+        },
         items: uncategorised,
       });
     }
 
     // A category with nothing in it is a heading with no content.
     return grouped.filter((g) => g.items.length > 0);
-  }, [menuQuery.data, restaurantId]);
+  }, [menuQuery.data, restaurant?.id]);
 
   if (restaurantQuery.isPending || menuQuery.isPending) {
     return (
@@ -124,28 +139,146 @@ export function RestaurantMenuPage() {
         All restaurants
       </Link>
 
-      <header className="mt-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-h2 font-extrabold tracking-tight text-ink">{restaurant.name}</h1>
-          {restaurant.is_demo && <DemoBadge />}
+      {/* ── Cover image ──
+          Rendered only when the restaurant has supplied one. A grey placeholder
+          block in its place would look like a broken image on every partner who
+          has not sent artwork yet — which is all of them at the moment. */}
+      {restaurant.cover_image_url && (
+        <div className="mt-4 overflow-hidden rounded-card border border-line">
+          <img
+            src={restaurant.cover_image_url}
+            alt=""
+            className="aspect-[21/9] w-full object-cover sm:aspect-[3/1]"
+          />
         </div>
+      )}
 
-        <p className="mt-2 text-body text-ink-muted">
-          {districtLabel(restaurant.district)} · {restaurant.prep_time_minutes} min prep ·{' '}
-          {formatUsd(restaurant.delivery_fee_cents)} delivery
-          {restaurant.minimum_order_cents > 0 &&
-            ` · ${formatUsd(restaurant.minimum_order_cents)} minimum`}
-        </p>
-
-        {!restaurant.is_accepting_orders && (
-          <p className="mt-3 rounded-card border border-line bg-surface px-4 py-3 text-body-sm text-ink-muted">
-            This restaurant is not taking orders at the moment. You can still look at the
-            menu.
-          </p>
+      <header className="mt-4 flex flex-wrap items-start gap-4">
+        {restaurant.logo_url && (
+          <img
+            src={restaurant.logo_url}
+            alt=""
+            className="h-16 w-16 shrink-0 rounded-card border border-line object-cover sm:h-20 sm:w-20"
+          />
         )}
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-h2 font-extrabold tracking-tight text-ink">{restaurant.name}</h1>
+            {restaurant.is_demo && <DemoBadge />}
+
+            <span
+              className={cn(
+                'rounded-pill px-2.5 py-1 text-caption font-bold',
+                restaurant.is_accepting_orders
+                  ? 'bg-success-soft text-success-ink'
+                  : 'bg-surface text-ink-subtle',
+              )}
+            >
+              {restaurant.is_accepting_orders ? 'Open' : 'Closed'}
+            </span>
+
+            {/* Only when there are actually ratings. "0.0 ★" on a restaurant's
+                first day is worse than no rating at all. */}
+            {restaurant.rating != null && (restaurant.rating_count ?? 0) > 0 && (
+              <span className="inline-flex items-center gap-1 text-body-sm font-semibold text-ink">
+                <Star size={14} aria-hidden className="fill-warning text-warning" />
+                {restaurant.rating.toFixed(1)}
+                <span className="font-normal text-ink-subtle">
+                  ({restaurant.rating_count})
+                </span>
+              </span>
+            )}
+          </div>
+
+          {restaurant.cuisine && restaurant.cuisine.length > 0 && (
+            <p className="mt-1.5 text-body-sm text-ink-muted">
+              {restaurant.cuisine.join(' · ')}
+            </p>
+          )}
+
+          {restaurant.description && (
+            <p className="mt-2 max-w-prose text-body text-ink-muted">
+              {restaurant.description}
+            </p>
+          )}
+
+          <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm text-ink-muted">
+            <span>{districtLabel(restaurant.district)} · {restaurant.landmark}</span>
+            <span className="inline-flex items-center gap-1.5">
+              <Clock size={14} aria-hidden />
+              {restaurant.prep_time_minutes} min prep
+            </span>
+            <span>{formatUsd(restaurant.delivery_fee_cents)} delivery</span>
+            {restaurant.minimum_order_cents > 0 && (
+              <span>{formatUsd(restaurant.minimum_order_cents)} minimum</span>
+            )}
+          </p>
+
+          {/* ── Their site, and ours ──
+              An external link only when they actually have one. A "Visit
+              website" button leading nowhere is worse than its absence. */}
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            {restaurant.website_url && (
+              <a
+                href={restaurant.website_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-brand-ink hover:underline"
+              >
+                Visit restaurant website
+                <ArrowUpRight size={14} aria-hidden />
+              </a>
+            )}
+
+            {(restaurant.ios_app_url || restaurant.android_app_url) && (
+              <span className="inline-flex items-center gap-2 text-body-sm text-ink-muted">
+                <Smartphone size={14} aria-hidden />
+                Their app:
+                {restaurant.ios_app_url && (
+                  <a
+                    href={restaurant.ios_app_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-brand-ink hover:underline"
+                  >
+                    iPhone
+                  </a>
+                )}
+                {restaurant.android_app_url && (
+                  <a
+                    href={restaurant.android_app_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-brand-ink hover:underline"
+                  >
+                    Android
+                  </a>
+                )}
+              </span>
+            )}
+
+            {/* GALEYR's own app is not released. Stated as coming soon rather
+                than linked to a store page that does not exist. */}
+            <span className="inline-flex items-center gap-1.5 rounded-pill bg-surface px-3 py-1 text-caption font-medium text-ink-subtle">
+              <Smartphone size={12} aria-hidden />
+              GALEYR App — coming soon
+            </span>
+          </div>
+        </div>
       </header>
 
+      {!restaurant.is_accepting_orders && (
+        <p className="mt-4 rounded-card border border-line bg-surface px-4 py-3 text-body-sm text-ink-muted">
+          This restaurant is not taking orders at the moment. You can still look at the menu.
+        </p>
+      )}
+
       {restaurant.is_demo && <DemoNotice className="mt-6" />}
+
+      {/* The restaurant's own offers and announcements. Renders nothing when
+          they have none running. */}
+      <RestaurantCommunity restaurantId={restaurant.id} restaurantName={restaurant.name} />
 
       <div className="mt-8 gap-8 lg:flex lg:items-start">
         {/* ── Menu ── */}

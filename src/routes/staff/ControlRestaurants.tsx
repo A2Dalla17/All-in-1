@@ -10,7 +10,7 @@
  *
  * So moving a restaurant to Active is the single most consequential action in
  * this whole product. It is a public statement that a business has agreed to
- * work with AC7 GALEYR. This screen therefore asks for confirmation and says so
+ * work with GALEYR. This screen therefore asks for confirmation and says so
  * in words, rather than offering a quiet dropdown that changes the answer
  * without comment.
  */
@@ -28,11 +28,13 @@ import {
   districtLabel,
   formatUsd,
   listRestaurantsAdmin,
-  setRestaurantStatus,
   type Restaurant,
   type RestaurantStatus,
 } from '@shared/api/galeyr';
+import { setRestaurantStatusAsStaff } from '@shared/api/ops';
 import { cn } from '@shared/lib/utils';
+
+import { StaffCodeDialog, useStaffConfirm } from './StaffCodeDialog';
 
 const STATUS_LABEL: Record<RestaurantStatus, string> = {
   pending: 'Pending',
@@ -55,19 +57,35 @@ const STATUS_TONE: Record<RestaurantStatus, string> = {
 export function ControlRestaurants() {
   const queryClient = useQueryClient();
   const [goingLive, setGoingLive] = useState<Restaurant | null>(null);
+  const [lastAction, setLastAction] = useState<string>('');
+  const { confirm, dialogProps } = useStaffConfirm();
 
   const query = useQuery({
     queryKey: ['galeyr', 'admin-restaurants'],
     queryFn: listRestaurantsAdmin,
   });
 
+  /* Takes a confirmation token rather than acting directly. The token comes
+     from the staff-code dialog and is single use — see StaffCodeDialog for why
+     the code itself never reaches this call. */
   const mutate = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: RestaurantStatus }) =>
-      setRestaurantStatus(id, status),
-    onSuccess: () => {
+    mutationFn: ({
+      id,
+      status,
+      token,
+    }: {
+      id: string;
+      status: RestaurantStatus;
+      token: string;
+    }) => setRestaurantStatusAsStaff(id, status, token),
+    onSuccess: (staffRef, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['galeyr', 'admin-restaurants'] });
       void queryClient.invalidateQueries({ queryKey: ['galeyr', 'control-stats'] });
+      void queryClient.invalidateQueries({ queryKey: ['ops', 'audit'] });
       setGoingLive(null);
+      setLastAction(
+        `${variables.status === 'active' ? 'Set live' : 'Taken offline'} by ${staffRef}`,
+      );
     },
   });
 
@@ -93,6 +111,15 @@ export function ControlRestaurants() {
 
   return (
     <>
+      {/* ── Attribution, shown back to the operator ──
+          "Set live by A2" confirms the audit entry was written under their name
+          — which is the only way they can tell the trail is working. */}
+      {lastAction && (
+        <p className="mb-4 rounded-card border border-success/35 bg-success-soft px-4 py-3 text-body-sm font-semibold text-success-ink">
+          {lastAction}
+        </p>
+      )}
+
       <div className="space-y-3">
         {restaurants.map((restaurant) => {
           const live = restaurant.status === 'active';
@@ -145,7 +172,14 @@ export function ControlRestaurants() {
                     size="sm"
                     leadingIcon={<EyeOff size={15} />}
                     loading={mutate.isPending && mutate.variables?.id === restaurant.id}
-                    onClick={() => mutate.mutate({ id: restaurant.id, status: 'suspended' })}
+                    onClick={() =>
+                      confirm({
+                        actionLabel: `Take ${restaurant.name} offline`,
+                        detail: 'Customers will no longer see it or be able to order.',
+                        onConfirmed: (token) =>
+                          mutate.mutate({ id: restaurant.id, status: 'suspended', token }),
+                      })
+                    }
                   >
                     Take offline
                   </Button>
@@ -179,7 +213,7 @@ export function ControlRestaurants() {
         </p>
 
         <ul className="mt-4 space-y-2 text-body-sm text-ink-muted">
-          <li>· Only do this if they have agreed to work with AC7 GALEYR.</li>
+          <li>· Only do this if they have agreed to work with GALEYR.</li>
           <li>· Check their menu and prices are loaded and correct.</li>
           <li>· Check the phone number reaches someone who will answer.</li>
         </ul>
@@ -204,14 +238,22 @@ export function ControlRestaurants() {
           <Button
             fullWidth
             loading={mutate.isPending}
-            onClick={() =>
-              goingLive && mutate.mutate({ id: goingLive.id, status: 'active' })
-            }
+            onClick={() => {
+              if (!goingLive) return;
+              confirm({
+                actionLabel: `Set ${goingLive.name} live`,
+                detail: 'They will appear on the public site and can take real orders.',
+                onConfirmed: (token) =>
+                  mutate.mutate({ id: goingLive.id, status: 'active', token }),
+              });
+            }}
           >
             Yes, set live
           </Button>
         </div>
       </Modal>
+
+      <StaffCodeDialog {...dialogProps} />
     </>
   );
 }

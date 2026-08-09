@@ -64,14 +64,14 @@ export const SERVICES: readonly ServiceLink[] = [
   },
   {
     id: 'partners',
-    label: 'Partner restaurants',
+    label: 'Register your restaurant',
     labelSo: 'Iska diiwaan geli',
     to: '/partners',
     icon: Store,
     tagline: 'Sell more without a delivery team',
     description:
       'List your menu, receive orders through the control room, and let our couriers handle the rest.',
-    cta: 'List your restaurant',
+    cta: 'Register your restaurant',
   },
 ];
 
@@ -95,12 +95,27 @@ export interface NavItem {
  * Restaurants leads, because browsing is the thing to do here.
  */
 export const HEADER_NAV: readonly NavItem[] = [
+  { label: 'Home', to: '/' },
+  /* Rendered by RestaurantsMenu rather than as a plain link — it opens a
+     dropdown listing every live partner. Kept in this array so the mobile
+     menu, which has no hover, still gets a normal link to the same page. */
   { label: 'Restaurants', to: '/restaurants' },
-  { label: 'Track order', to: '/track' },
-  { label: 'Become a courier', to: '/couriers' },
-  { label: 'Partner with us', to: '/partners' },
-  { label: 'About', to: '/about' },
+  /* Deliberately NOT a list of restaurants. Delivery is the customer's own
+     side of the service: tracking, help, complaints, settings, and applying
+     to be a courier. Two navigation items that both opened restaurant lists
+     would be one item with two names. */
+  { label: 'Delivery', to: '/delivery' },
+  { label: 'About us', to: '/about' },
   { label: 'Contact', to: '/contact' },
+];
+
+/** The Delivery Hub's own sections, used by the hub page and its sub-nav. */
+export const DELIVERY_NAV: readonly { label: string; to: string; description: string }[] = [
+  { label: 'Track your order', to: '/delivery', description: 'See exactly where your food is.' },
+  { label: 'Support and help', to: '/delivery/support', description: 'Something wrong with an order.' },
+  { label: 'Make a complaint', to: '/delivery/complaint', description: 'Tell us what went wrong.' },
+  { label: 'Delivery settings', to: '/delivery/settings', description: 'Language and preferences.' },
+  { label: 'Become a courier', to: '/couriers', description: 'Deliver with GALEYR.' },
 ];
 
 export const LEGAL_NAV: readonly { label: string; to: string }[] = [
