@@ -1,4 +1,3 @@
-import { CommunityShowcase } from '@/components/marketing/CommunityShowcase';
 import { ControlCentre } from '@/components/marketing/ControlCentre';
 import { Hero } from '@/components/marketing/Hero';
 import { CategoryStrip } from '@/components/delivery/CategoryStrip';
@@ -38,7 +37,12 @@ export function HomePage() {
           few seconds they file Galeyr as another food app and leave. */}
       <CategoryStrip />
       <ServiceCards />
-      <CommunityShowcase />
+      {/* ── Community Advertising has moved to the customer app ──
+          It is paid inventory, and it belongs in front of people who are
+          about to order rather than people reading a marketing page. It is
+          still managed from the Control Centre; only where it renders changed.
+          `CommunityShowcase` remains in the repository, unused, so nothing is
+          lost if it is ever wanted back here. */}
       <WhyACT />
       <ControlCentre />
     </>

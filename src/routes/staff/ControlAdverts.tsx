@@ -59,6 +59,53 @@ function emptyBanner(): BannerInput {
   };
 }
 
+import { ControlImageSlots } from './ControlImageSlots';
+
+type AdvertTab = 'adverts' | 'images';
+
+/**
+ * Two products, two tabs.
+ *
+ * Community Advertising is paid inventory — campaigns with a title, a call to
+ * action and dates, shown large on the customer home page.
+ *
+ * Images are fixed slots A1–A6 — artwork only, small, and named so that
+ * somebody who sees a wrong picture in the app knows exactly which one to
+ * open. They are separated because they are different jobs done by different
+ * people at different times, not because the data differs.
+ */
+export function ControlAdvertsScreen() {
+  const [tab, setTab] = useState<AdvertTab>('adverts');
+
+  return (
+    <div>
+      <nav aria-label="Advertising sections" className="mb-6 flex gap-1 border-b border-line">
+        {([
+          { id: 'adverts', label: 'Community Advertising' },
+          { id: 'images', label: 'Images' },
+        ] as const).map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setTab(item.id)}
+            aria-current={tab === item.id ? 'page' : undefined}
+            className={cn(
+              'shrink-0 border-b-2 px-4 py-3 text-body-sm font-semibold transition-colors',
+              tab === item.id
+                ? 'border-brand text-brand-ink'
+                : 'border-transparent text-ink-muted hover:text-ink',
+            )}
+          >
+            {item.label}
+          </button>
+        ))}
+      </nav>
+
+      {tab === 'adverts' ? <ControlAdverts /> : <ControlImageSlots />}
+    </div>
+  );
+}
+
 export function ControlAdverts() {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<{ id?: string; values: BannerInput } | null>(null);
@@ -104,6 +151,9 @@ export function ControlAdverts() {
     );
   }
 
+  /* Image spaces used to live in this table and had to be filtered out here.
+     They now have their own table, so every row in featured_banners is an
+     advert and no filter is needed. */
   const banners = query.data ?? [];
   const live = banners.filter((b) => b.is_active).length;
 

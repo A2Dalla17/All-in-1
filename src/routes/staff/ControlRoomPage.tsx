@@ -33,7 +33,7 @@ import { ControlApplications } from './ControlApplications';
 import { ControlCourierApplications } from './ControlCourierApplications';
 import { ControlRestaurants } from './ControlRestaurants';
 import { ControlCouriers } from './ControlCouriers';
-import { ControlAdverts } from './ControlAdverts';
+import { ControlAdvertsScreen } from './ControlAdverts';
 import { ControlAudit } from './ControlAudit';
 import { ControlAdmin } from './ControlAdmin';
 
@@ -154,7 +154,7 @@ export function ControlRoomPage() {
             title="Community advertising"
             description="Campaigns on the GALEYR homepage."
           />
-          <ControlAdverts />
+          <ControlAdvertsScreen />
         </>
       )}
 

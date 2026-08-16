@@ -43,6 +43,8 @@ export interface FeaturedBanner {
   poster_url: string | null;
   cta_label: string | null;
   cta_href: string | null;
+  /** Which surface this row belongs to. See the note on BannerInput. */
+  placement: string | null;
   priority: number;
   sort_order: number;
   starts_at: string;
@@ -203,8 +205,33 @@ async function capturePoster(file: File): Promise<Blob | null> {
 
 export type MediaType = 'image' | 'video';
 
+/**
+ * Where a banner appears.
+ *
+ * ══════════════════════════════════════════════════════════════════════════
+ * Two products share this one table
+ * ══════════════════════════════════════════════════════════════════════════
+ *   COMMUNITY_ADVERT   the paid inventory. Large cards on the customer home
+ *                      page, with a title, subtitle and call to action.
+ *
+ *   IMAGE_SLOT_*       small fixed picture slots, A1 to A6. Artwork only.
+ *                      They exist so somebody can change a picture on the
+ *                      customer app WITHOUT touching code — the whole point
+ *                      of naming them A1, A2, A3 is that a person can look at
+ *                      the app, see which one is wrong, and go straight to it.
+ *
+ * They share a table because they are the same thing to the database: an
+ * image, a window of time, and an order. Splitting them would be two tables,
+ * two policies and two upload paths to keep in step for no gain.
+ */
+export const COMMUNITY_ADVERT_PLACEMENT = 'landing_banner';
+
+
+
 export interface BannerInput {
   kind: BannerKind;
+  /** See the note above. Defaults to the community advert placement. */
+  placement?: string;
   title: string;
   subtitle: string | null;
   cta_label: string | null;
