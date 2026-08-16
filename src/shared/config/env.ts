@@ -40,6 +40,29 @@ function resolveWsBase(): string {
 }
 
 export const env = {
+  /**
+   * Where the customer app lives.
+   *
+   * ── Why this is a separate origin ─────────────────────────────────────
+   * Galeyr is two applications sharing one database:
+   *
+   *   this app        the back office — landing page, Control Centre,
+   *                   restaurant portal, courier operations
+   *   customer app    where a customer browses, orders, pays and tracks
+   *
+   * They used to fight over port 3000, so whichever started second either
+   * failed or silently took the port — which is why they never appeared to
+   * change together. The customer app now runs on 3100.
+   *
+   * In production this becomes `https://app.galeyr.com`. It is read from the
+   * environment rather than hard-coded so the two can be deployed
+   * independently, which is the whole point of keeping them separate.
+   */
+  customerAppUrl: readString(
+    import.meta.env['VITE_CUSTOMER_APP_URL'],
+    'http://localhost:3100',
+  ).replace(/\/+$/, ''),
+
   /** REST base, e.g. "" (proxied) or "https://api.ac7ride.com". No trailing slash. */
   apiBaseUrl: API_BASE_URL.replace(/\/+$/, ''),
 

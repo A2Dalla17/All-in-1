@@ -64,14 +64,14 @@ export const SERVICES: readonly ServiceLink[] = [
   },
   {
     id: 'partners',
-    label: 'Register your restaurant',
+    label: 'Become Our Partner',
     labelSo: 'Iska diiwaan geli',
     to: '/partners',
     icon: Store,
     tagline: 'Sell more without a delivery team',
     description:
-      'List your menu, receive orders through the control room, and let our couriers handle the rest.',
-    cta: 'Register your restaurant',
+      'List your products, receive orders through the control room, and let our couriers handle the rest.',
+    cta: 'Become Our Partner',
   },
 ];
 
@@ -96,10 +96,17 @@ export interface NavItem {
  */
 export const HEADER_NAV: readonly NavItem[] = [
   { label: 'Home', to: '/' },
-  /* Rendered by RestaurantsMenu rather than as a plain link — it opens a
-     dropdown listing every live partner. Kept in this array so the mobile
-     menu, which has no hover, still gets a normal link to the same page. */
-  { label: 'Restaurants', to: '/restaurants' },
+  /* ── "Our Partners", not "Restaurants" ──
+     Galeyr delivers from supermarkets, pharmacies, cosmetics shops,
+     electronics shops and warehouses as well. A nav item reading
+     "Restaurants" tells every other kind of business that this platform is
+     not for them, and tells customers Galeyr is a food app.
+
+     Rendered by PartnersMenu rather than as a plain link — it opens a
+     dropdown listing the business categories. Kept in this array so the
+     mobile menu, which has no hover, still gets a normal link to the same
+     page. */
+  { label: 'Our Partners', to: '/our-partners' },
   /* Deliberately NOT a list of restaurants. Delivery is the customer's own
      side of the service: tracking, help, complaints, settings, and applying
      to be a courier. Two navigation items that both opened restaurant lists

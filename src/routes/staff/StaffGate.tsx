@@ -91,9 +91,9 @@ export function StaffGate({
     if ((memberships.data ?? []).length === 0) {
       return (
         <NoAccess
-          title="No restaurant linked to this account"
-          description="You are signed in, but this account is not a member of any restaurant on GALEYR. If you have applied to partner with us, we will set this up after we have spoken."
-          link={{ to: '/partners', label: 'Register your restaurant' }}
+          title="No business linked to this account"
+          description="You are signed in, but this account is not linked to any business on GALEYR. If you have applied to partner with us, we will set this up after we have spoken."
+          link={{ to: '/partners', label: 'Become Our Partner' }}
         />
       );
     }

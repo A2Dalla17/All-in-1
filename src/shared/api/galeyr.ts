@@ -861,3 +861,86 @@ export async function approveApplication(id: string): Promise<string> {
   if (error) throw new Error(error.message);
   return data as string;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Food photography                                                            */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The bucket holding menu and restaurant photographs.
+ *
+ * Public for reads — a picture of a plate is not private, and making it
+ * private would mean a signed URL per item on every menu render: slow,
+ * uncacheable, and protecting nothing. Contrast `verification-docs`, which
+ * holds passports and is correctly private.
+ *
+ * Writes are policed in SQL, not here. The storage policy checks that the
+ * first path segment is a restaurant the caller actually belongs to, so a
+ * manager cannot upload into somebody else's folder however the client is
+ * manipulated.
+ */
+const MENU_IMAGE_BUCKET = 'menu-images';
+
+/** Matches the bucket's own limit. Checked here too so the user gets a
+ *  sentence rather than a 413 from the storage API. */
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+
+/**
+ * Upload one food photograph and return its public URL.
+ *
+ * ── The path is the permission ────────────────────────────────────────────
+ *     menu-images/<restaurant_id>/<random>.<ext>
+ *
+ * The restaurant id has to be the first segment because that is what the RLS
+ * policy reads. Changing this shape without changing the policy would either
+ * break every upload or, worse, stop the folder check meaning anything.
+ *
+ * ── Why a generated filename ──────────────────────────────────────────────
+ * Never the user's own filename. A name like `../../avatar.png` is a path
+ * traversal attempt, and `Suqaar.jpg` from two restaurants would collide.
+ * A random name is both safe and unique, and nothing reads it back.
+ */
+export async function uploadMenuImage(
+  restaurantId: string,
+  file: File,
+): Promise<string> {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    throw new Error('That file is not an image. Use a JPG, PNG or WebP photo.');
+  }
+  if (file.size > MAX_IMAGE_BYTES) {
+    throw new Error(
+      `That photo is ${(file.size / 1024 / 1024).toFixed(1)} MB. The limit is 5 MB — take it again at a smaller size.`,
+    );
+  }
+
+  const ext = file.type.split('/')[1]?.replace('jpeg', 'jpg') ?? 'jpg';
+  const path = `${restaurantId}/${crypto.randomUUID()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from(MENU_IMAGE_BUCKET)
+    .upload(path, file, { cacheControl: '31536000', upsert: false });
+
+  if (error) throw new Error(error.message);
+
+  const { data } = supabase.storage.from(MENU_IMAGE_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+/**
+ * Remove a photograph, given the public URL we stored.
+ *
+ * Deliberately never throws. A menu item whose photo has already gone, or
+ * whose URL points somewhere outside our bucket, is not a reason to block the
+ * person from saving their menu — the orphaned file costs a few kilobytes and
+ * the failed edit costs them their evening.
+ */
+export async function deleteMenuImage(publicUrl: string | null): Promise<void> {
+  if (!publicUrl) return;
+  const marker = `/${MENU_IMAGE_BUCKET}/`;
+  const at = publicUrl.indexOf(marker);
+  if (at === -1) return;
+  const path = publicUrl.slice(at + marker.length);
+  if (!path) return;
+  await supabase.storage.from(MENU_IMAGE_BUCKET).remove([path]);
+}

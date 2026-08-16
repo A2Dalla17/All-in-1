@@ -11,9 +11,9 @@
  * paying for food that does not exist.
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { ImagePlus, Loader2, Pencil, Plus, Trash2, X } from 'lucide-react';
 
 import { Button } from '@shared/components/ui/Button';
 import { EmptyState } from '@shared/components/ui/EmptyState';
@@ -26,6 +26,7 @@ import {
   formatUsd,
   getMenu,
   setItemAvailability,
+  uploadMenuImage,
   upsertMenuItem,
   type MenuItem,
   type Restaurant,
@@ -315,9 +316,117 @@ function ItemForm({
   const priceCents = Math.round(Number(price) * 100);
   const valid = name.trim().length >= 2 && Number.isFinite(priceCents) && priceCents > 0;
 
+  /**
+   * ── The photograph ──────────────────────────────────────────────────────
+   * Uploaded immediately on selection rather than held until Save. Two
+   * reasons: the person sees whether they picked the right picture while they
+   * can still remember which one they meant, and a 2 MB upload that only
+   * starts when they press Save makes Save feel broken on a slow connection.
+   *
+   * The cost is an orphaned file if they then cancel. That is a few kilobytes
+   * in a public bucket, which is the cheaper of the two mistakes.
+   */
+  const [imageUrl, setImageUrl] = useState(initial.image_url ?? null);
+  const [uploading, setUploading] = useState(false);
+  const [imageError, setImageError] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function handleFile(file: File | undefined) {
+    if (!file) return;
+    setImageError('');
+    setUploading(true);
+    try {
+      const url = await uploadMenuImage(initial.restaurant_id as string, file);
+      setImageUrl(url);
+    } catch (err) {
+      setImageError(err instanceof Error ? err.message : 'The photo could not be uploaded.');
+    } finally {
+      setUploading(false);
+      /* Reset the input, or choosing the same file twice after an error
+         fires no change event and looks like the button has died. */
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  }
+
   return (
     <div className="space-y-4">
       <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} inputSize="lg" />
+
+      {/* ── Photo ──
+          A hidden input driven by a real button. `<Button as="span">` is not
+          supported by this Button, and a bare styled <label> loses keyboard
+          focus behaviour, so the button calls click() on the input. */}
+      <div>
+        <span className="mb-1.5 block text-body-sm font-semibold text-ink">
+          Photo <span className="font-normal text-ink-subtle">— optional</span>
+        </span>
+
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/avif"
+          className="hidden"
+          onChange={(e) => void handleFile(e.target.files?.[0])}
+        />
+
+        {imageUrl ? (
+          <div className="flex items-center gap-3">
+            <img
+              src={imageUrl}
+              alt=""
+              className="h-20 w-20 shrink-0 rounded-tile border border-line object-cover"
+            />
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                loading={uploading}
+                onClick={() => fileRef.current?.click()}
+              >
+                Replace
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                leadingIcon={<X size={14} />}
+                onClick={() => setImageUrl(null)}
+              >
+                Remove
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="flex h-24 w-full items-center justify-center gap-2 rounded-tile border border-dashed border-line bg-surface text-body-sm font-semibold text-ink-muted transition-colors hover:border-brand hover:text-brand-ink disabled:opacity-60"
+          >
+            {uploading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Uploading…
+              </>
+            ) : (
+              <>
+                <ImagePlus size={18} />
+                Add a photo
+              </>
+            )}
+          </button>
+        )}
+
+        <p className="mt-1.5 text-caption text-ink-subtle">
+          JPG, PNG or WebP, up to 5&nbsp;MB. A clear photo of the dish sells it better
+          than any description.
+        </p>
+
+        {imageError && (
+          <p role="alert" className="mt-1.5 text-body-sm text-danger">
+            {imageError}
+          </p>
+        )}
+      </div>
 
       <Input
         label="Somali name (optional)"
@@ -384,6 +493,7 @@ function ItemForm({
               description: description.trim() || null,
               price_cents: priceCents,
               category_id: categoryId || null,
+              image_url: imageUrl,
               is_available: initial.is_available ?? true,
             })
           }

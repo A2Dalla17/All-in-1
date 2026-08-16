@@ -248,7 +248,7 @@ function ContentTab() {
             { key: 'privacy', label: 'Privacy policy', status: 'Being rewritten', route: '/privacy' },
             { key: 'terms', label: 'Terms and conditions', status: 'Being rewritten', route: '/terms' },
             { key: 'cookies', label: 'Cookie policy', status: 'Published', route: '/cookies' },
-            { key: 'restaurant-agreement', label: 'Restaurant partner agreement', status: 'Draft — not a contract', route: null },
+            { key: 'restaurant-agreement', label: 'Partner agreement', status: 'Draft — not a contract', route: null },
             { key: 'courier-agreement', label: 'Courier agreement', status: 'Not started', route: null },
           ].map((doc) => (
             <li key={doc.key} className="flex flex-wrap items-center gap-4 p-4 sm:p-5">

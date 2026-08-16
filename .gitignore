@@ -3,13 +3,40 @@ dist/
 .vercel/
 *.tsbuildinfo
 
-# Environment. Every variant, because .env.*.local does NOT match .env.local
-# and that gap is how a key reaches a public repository.
+# ── Environment ───────────────────────────────────────────────────────────
+# The wildcard pair is what actually closes the gap: `.env.local` alone does
+# NOT match `.env.development.local`, and that gap is how a key reaches a
+# public repository. The negation keeps the placeholder template tracked.
 .env
+.env.*
+!.env.example
+
+# Kept from the earlier list — redundant under `.env.*`, harmless, and they
+# document the specific filenames that have caused trouble before.
 .env.local
 .env.*.local
 .env.development.local
 .env.production.local
 
+# ── Credentials that are not .env files ───────────────────────────────────
+# GALEYR-SEC-0001: a database password reached a public repo inside a
+# PowerShell script, not an env file. Extensions are not a complete defence,
+# but these are the ones that show up in mobile and deployment work.
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
+service-account*.json
+
 logs/
 *.log
+
+# ── Third-party code that is not ours to redistribute ─────────────────────
+# `backend/` is an unlicensed clone of github.com/richxcame/ride-hailing.
+# See LICENSE_AUDIT.md. It is pending removal from the working tree AND from
+# git history; ignoring it stops any further commit adding to the problem.
+backend/

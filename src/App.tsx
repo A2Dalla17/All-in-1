@@ -65,6 +65,9 @@ const NotFoundPage = lazy(() =>
    cart and the checkout out of the bundle someone downloads to read the
    privacy policy, which matters on a connection where every kilobyte is
    noticeable. */
+const OurPartnersPage = lazy(() =>
+  import('./routes/delivery/OurPartnersPage').then((m) => ({ default: m.OurPartnersPage })),
+);
 const RestaurantsPage = lazy(() =>
   import('./routes/delivery/RestaurantsPage').then((m) => ({ default: m.RestaurantsPage })),
 );
@@ -145,7 +148,9 @@ export function App() {
                 typing their number in from the header; the one with the number
                 in the path is what the confirmation screen links to, so they do
                 not retype what they just saw. Both render the same page. */}
-            <Route path="restaurants" element={<RestaurantsPage />} />
+            <Route path="our-partners" element={<OurPartnersPage />} />
+          {/* Kept so old links and bookmarks still resolve. */}
+          <Route path="restaurants" element={<RestaurantsPage />} />
             {/* The param is a slug now; uuids still resolve for older links. */}
             <Route path="restaurants/:restaurantId" element={<RestaurantMenuPage />} />
             <Route path="checkout" element={<CheckoutPage />} />

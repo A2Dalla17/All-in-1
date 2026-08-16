@@ -1,59 +1,59 @@
 /**
- * The Restaurants dropdown.
+ * The "Our Partners" dropdown.
  *
  * ══════════════════════════════════════════════════════════════════════════
- * Hover opens it, but hover is not the only way in
+ * Why this lists CATEGORIES and no longer lists restaurants
  * ══════════════════════════════════════════════════════════════════════════
- * The brief asks for a menu that appears on mouse-over. That works for a mouse
- * and for nothing else — there is no hover on a phone, and a keyboard user
- * never generates one. A menu that only opens on hover is a menu that a third
- * of visitors cannot open at all.
+ * It used to fetch every live restaurant and show them by name. That was
+ * right when Galeyr was a food delivery company. It is not one.
+ *
+ * Galeyr delivers from supermarkets, pharmacies, cosmetics shops, electronics
+ * shops and warehouses too — so a dropdown of restaurant names told every
+ * other kind of business that the platform was not for them, and told
+ * customers that Galeyr was a food app.
+ *
+ * It now lists the twelve business categories. Browsing individual businesses
+ * happens in the customer app, which is the place built for it; this menu's
+ * job is to show BREADTH in one glance.
+ *
+ * ── Hover opens it, but hover is not the only way in ──────────────────────
+ * The brief asks for a menu on mouse-over. That works for a mouse and for
+ * nothing else — there is no hover on a phone, and a keyboard user never
+ * generates one. A menu that only opens on hover is a menu a third of
+ * visitors cannot open at all.
  *
  * So hover opens it, and so do click, Enter, Space and arrow-down; Escape
- * closes it and returns focus. The trigger is a real link, so on touch the
- * first tap simply goes to the Restaurants page — which is where the dropdown
- * was going to send them anyway.
+ * closes it. The trigger is a real link, so on touch the first tap simply
+ * goes to the Our Partners page — which lists the same categories.
  *
- * ── The close delay is not a detail ────────────────────────────────────────
+ * ── The close delay is not a detail ───────────────────────────────────────
  * There is a gap between the trigger and the panel. Closing the instant the
  * pointer leaves the trigger means the menu vanishes while somebody is moving
- * towards it, which feels broken and is the single most common failure of
- * hover menus. A short delay covers the journey.
+ * towards it, which feels broken and is the commonest failure of hover menus.
+ * A short delay covers the journey.
  *
- * ── Dynamic, never hard-coded ──────────────────────────────────────────────
- * The list comes from `listRestaurants()`, which reads under the public RLS
- * policy — so only genuinely live partners can appear here. There is no
- * hard-coded name anywhere, and there is no path by which an unapproved
- * restaurant reaches this component.
+ * ── The file name is unchanged on purpose ─────────────────────────────────
+ * Renaming the file to PartnersMenu.tsx would touch every importer for no
+ * behavioural gain. The exported component is `PartnersMenu`; the old name is
+ * re-exported so nothing breaks.
  */
 
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { ChevronDown, Store, UtensilsCrossed } from 'lucide-react';
+import { ChevronDown, Store } from 'lucide-react';
 
-import { DemoBadge } from '@/components/delivery/DemoNotice';
-import { districtLabel, listRestaurants } from '@shared/api/galeyr';
+import { GALEYR_CATEGORIES } from '@shared/config/categories';
+import { env } from '@shared/config/env';
 import { cn } from '@shared/lib/utils';
 
 /** How long the panel stays open after the pointer leaves. */
 const CLOSE_DELAY_MS = 180;
 
-export function RestaurantsMenu({ active }: { active: boolean }) {
+export function PartnersMenu({ active }: { active: boolean }) {
   const [open, setOpen] = useState(false);
   const closeTimer = useRef<number>();
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
-  /* Only fetched once the menu has been opened. The restaurant list is not
-     needed to render the header, and loading it on every page would put a
-     query on the critical path of the privacy policy. */
-  const { data, isPending } = useQuery({
-    queryKey: ['galeyr', 'restaurants'],
-    queryFn: listRestaurants,
-    enabled: open,
-    staleTime: 5 * 60_000,
-  });
 
   function cancelClose() {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
@@ -66,8 +66,9 @@ export function RestaurantsMenu({ active }: { active: boolean }) {
 
   useEffect(() => cancelClose, []);
 
-  /* Escape closes from anywhere inside, and a click outside dismisses. Without
-     the outside-click handler the panel can be left open behind a modal. */
+  /* Escape closes from anywhere inside, and a click outside dismisses.
+     Without the outside-click handler the panel can be left open behind a
+     modal. */
   useEffect(() => {
     if (!open) return;
 
@@ -86,8 +87,6 @@ export function RestaurantsMenu({ active }: { active: boolean }) {
     };
   }, [open]);
 
-  const restaurants = data ?? [];
-
   return (
     <div
       ref={containerRef}
@@ -99,7 +98,7 @@ export function RestaurantsMenu({ active }: { active: boolean }) {
       onMouseLeave={scheduleClose}
     >
       <Link
-        to="/restaurants"
+        to="/our-partners"
         aria-expanded={open}
         aria-haspopup="true"
         onFocus={() => setOpen(true)}
@@ -115,7 +114,7 @@ export function RestaurantsMenu({ active }: { active: boolean }) {
           active ? 'text-brand-ink' : 'text-ink',
         )}
       >
-        Restaurants
+        Our Partners
         <ChevronDown
           size={14}
           aria-hidden
@@ -125,78 +124,55 @@ export function RestaurantsMenu({ active }: { active: boolean }) {
 
       {open && (
         <div
-          /* Wide enough for two columns of names on a laptop, and capped so a
-             long list scrolls inside the panel rather than running off the
-             bottom of the window. */
           className={cn(
-            'absolute left-0 top-full z-50 mt-1 w-[min(30rem,calc(100vw-2rem))]',
+            'absolute left-0 top-full z-50 mt-1 w-[min(34rem,calc(100vw-2rem))]',
             'overflow-hidden rounded-panel border border-line bg-bg shadow-lifted',
           )}
         >
           <div className="px-5 pb-3 pt-4">
             <p className="text-caption font-semibold uppercase tracking-[0.12em] text-ink-subtle">
-              All registered restaurants
+              What we deliver
             </p>
           </div>
 
-          <div className="max-h-[min(24rem,60vh)] overflow-y-auto px-2 pb-2">
-            {isPending && (
-              <p className="px-3 py-6 text-center text-body-sm text-ink-muted">
-                Loading restaurants…
-              </p>
-            )}
-
-            {!isPending && restaurants.length === 0 && (
-              <p className="px-3 py-6 text-center text-body-sm text-ink-muted">
-                No restaurants are live yet.
-              </p>
-            )}
-
+          <div className="max-h-[min(26rem,60vh)] overflow-y-auto px-2 pb-2">
             <ul className="grid gap-0.5 sm:grid-cols-2">
-              {restaurants.map((restaurant) => (
-                <li key={restaurant.id}>
-                  <Link
-                    to={`/restaurants/${restaurant.slug ?? restaurant.id}`}
+              {GALEYR_CATEGORIES.map((category) => (
+                <li key={category.slug}>
+                  {/* An <a>, not a <Link>: the customer app is a separate
+                      application on a different origin, so react-router would
+                      404 on it. The origin comes from env so the two halves
+                      can deploy independently. */}
+                  <a
+                    href={`${env.customerAppUrl}/c/${category.slug}`}
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 rounded-tile px-3 py-2.5 transition-colors hover:bg-surface"
                   >
                     <span
                       aria-hidden
-                      className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-tile bg-brand-soft text-brand-ink"
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-tile bg-brand-soft text-brand-ink"
                     >
-                      {restaurant.logo_url ? (
-                        <img
-                          src={restaurant.logo_url}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <UtensilsCrossed size={15} />
-                      )}
+                      <Store size={15} />
                     </span>
 
                     <span className="min-w-0">
-                      <span className="flex items-center gap-1.5">
-                        <span className="truncate text-body-sm font-semibold text-ink">
-                          {restaurant.name}
-                        </span>
-                        {restaurant.is_demo && <DemoBadge />}
+                      <span className="block truncate text-body-sm font-semibold text-ink">
+                        {category.label}
                       </span>
                       <span className="block truncate text-caption text-ink-muted">
-                        {districtLabel(restaurant.district)}
-                        {!restaurant.is_accepting_orders && ' · Closed'}
+                        {category.labelSo}
                       </span>
                     </span>
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* ── Become our partner ──
-              Separated by a rule and set in bold, because it is addressed to a
-              completely different person from everything above it: a restaurant
-              owner, not somebody choosing dinner. */}
+          {/* ── Become Our Partner ──
+              Separated by a rule and set in bold, because it addresses a
+              completely different person from everything above it: a business
+              owner, not somebody deciding what to order. */}
           <div className="border-t border-line bg-surface p-2">
             <button
               type="button"
@@ -215,10 +191,10 @@ export function RestaurantsMenu({ active }: { active: boolean }) {
 
               <span>
                 <span className="block text-body font-extrabold uppercase tracking-wide text-brand-ink">
-                  Become our partner
+                  Become Our Partner
                 </span>
                 <span className="block text-caption text-ink-muted">
-                  Register your restaurant with GALEYR
+                  Restaurant, shop, pharmacy, warehouse — list your business
                 </span>
               </span>
             </button>
@@ -228,3 +204,6 @@ export function RestaurantsMenu({ active }: { active: boolean }) {
     </div>
   );
 }
+
+/** Old name, kept so existing importers keep working. */
+export const RestaurantsMenu = PartnersMenu;

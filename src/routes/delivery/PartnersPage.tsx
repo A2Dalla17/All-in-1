@@ -135,7 +135,7 @@ export function PartnersPage() {
   return (
     <Container className="py-8 sm:py-12" size="narrow">
       <h1 className="text-h2 font-extrabold tracking-tight text-ink">
-        Register your restaurant
+        Become Our Partner
       </h1>
       <p className="mt-2 text-body-lg text-ink-muted">
         Sell to more of Mogadishu without hiring a delivery team.

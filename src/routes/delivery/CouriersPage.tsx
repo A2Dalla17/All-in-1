@@ -140,7 +140,7 @@ export function CouriersPage() {
       <p className="mt-8 text-center text-body-sm text-ink-muted">
         Run a restaurant instead?{' '}
         <Link to="/partners" className="font-semibold text-brand-ink">
-          Register your restaurant
+          Become Our Partner
         </Link>
       </p>
     </Container>

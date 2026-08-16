@@ -156,7 +156,7 @@ export function AboutPage() {
             </p>
             <Link to="/partners" className="mt-6 inline-block">
               <Button variant="primary" trailingIcon={<ArrowRight size={16} />}>
-                Register your restaurant
+                Become Our Partner
               </Button>
             </Link>
           </div>

@@ -1,6 +1,7 @@
 import { CommunityShowcase } from '@/components/marketing/CommunityShowcase';
 import { ControlCentre } from '@/components/marketing/ControlCentre';
 import { Hero } from '@/components/marketing/Hero';
+import { CategoryStrip } from '@/components/delivery/CategoryStrip';
 import { ServiceCards } from '@/components/marketing/ServiceCards';
 import { WhyACT } from '@/components/marketing/WhyACT';
 import { usePageMeta } from '@shared/lib/seo';
@@ -23,14 +24,19 @@ import { usePageMeta } from '@shared/lib/seo';
  */
 export function HomePage() {
   usePageMeta(
-    'Food delivery in Mogadishu',
-    'GALEYR delivers food across Mogadishu. Order from restaurants near you, ' +
-      'pay the courier in cash on delivery, and track your order. Powered by AC7 Group.',
+    'Everything you need, delivered',
+    'GALEYR delivers across Mogadishu — restaurants, supermarkets, pharmacies, ' +
+      'shops and warehouses. Pay the courier in cash on delivery, and track your ' +
+      'order. Powered by AC7 Group.',
   );
 
   return (
     <>
       <Hero />
+      {/* Directly under the hero, ahead of everything else. A visitor who
+          reads "delivery" assumes food; if they are not corrected within a
+          few seconds they file Galeyr as another food app and leave. */}
+      <CategoryStrip />
       <ServiceCards />
       <CommunityShowcase />
       <WhyACT />

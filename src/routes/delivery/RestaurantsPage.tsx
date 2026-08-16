@@ -169,7 +169,7 @@ export function RestaurantsPage() {
             Become our partner
           </p>
           <p className="mt-1 text-h5 font-semibold text-white/90">
-            Register your restaurant with GALEYR
+            Become Our Partner
           </p>
 
           <p className="mt-4 text-body-lg text-white/85">
@@ -184,7 +184,7 @@ export function RestaurantsPage() {
 
           <Link to="/partners" className="mt-8 inline-block">
             <Button variant="inverse" size="xl" trailingIcon={<ArrowRight size={18} />}>
-              Register your restaurant
+              Become Our Partner
             </Button>
           </Link>
 

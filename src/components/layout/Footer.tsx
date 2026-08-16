@@ -138,7 +138,7 @@ export function Footer() {
             to="/partners"
             className="text-body-sm text-ink-muted transition-colors hover:text-ink"
           >
-            Register your restaurant
+            Become Our Partner
           </Link>
           <Link
             to="/couriers/apply"

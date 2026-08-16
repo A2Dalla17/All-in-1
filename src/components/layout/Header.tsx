@@ -10,7 +10,7 @@ import {
   X,
 } from 'lucide-react';
 
-import { RestaurantsMenu } from '@/components/layout/RestaurantsMenu';
+import { PartnersMenu } from '@/components/layout/RestaurantsMenu';
 import { Logo } from '@shared/components/ui/Logo';
 import { Container } from '@shared/components/ui/Container';
 import { env } from '@shared/config/env';
@@ -99,9 +99,9 @@ export function Header() {
                   /* Restaurants gets the dropdown; everything else is a plain
                      link. The special case lives here rather than inside
                      NavItem so NavItem stays a dumb link. */
-                  item.label === 'Restaurants' ? (
+                  item.label === 'Our Partners' ? (
                     <li key={item.label}>
-                      <RestaurantsMenu active={location.pathname.startsWith('/restaurants')} />
+                      <PartnersMenu active={location.pathname.startsWith('/our-partners')} />
                     </li>
                   ) : (
                     <li key={item.label}>
